@@ -12,7 +12,7 @@ const config: ExpoConfig = {
   icon: "./assets/images/icon.png",
   scheme: "ourcutelife",
   userInterfaceStyle: "automatic",
-  owner: "aplyd",
+  owner: "aftacnik",
   platforms: ["ios"],
   runtimeVersion: { policy: "appVersion" },
   updates: {

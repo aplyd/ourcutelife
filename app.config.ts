@@ -5,7 +5,7 @@ const convexHttpActionsUrl =
   process.env.EXPO_PUBLIC_CONVEX_HTTP_ACTIONS_URL ?? "https://fleet-pig-957.convex.site";
 
 const config: ExpoConfig = {
-  name: "Our Cute Life",
+  name: "ourcutelife",
   slug: "ourcutelife",
   version: "1.0.0",
   orientation: "portrait",

@@ -12,8 +12,25 @@
     },
     "production": {
       "autoIncrement": true,
-      "ios": { "resourceClass": "m-medium" }
+      "ios": { 
+        "resourceClass": "m-medium",
+        "buildConfiguration": "Release"
+      },
+      "env": {
+        "EXPO_NO_DOTENV": "1",
+        "APP_ENV": "production"
+      },
+      "channel": "production",
+      "environment": "production",
+      "distribution": "store"
     }
   },
-  "submit": { "production": {} }
+  "submit": { 
+    "production": {
+      "ios": {
+        "ascAppId": "6781453603",
+        "appleTeamId": "X5KBCB6WPT"
+      }
+    } 
+  }
 }

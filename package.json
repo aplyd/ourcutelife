@@ -16,7 +16,7 @@
     "convex:deploy": "convex deploy",
     "update:ios": "eas update --platform ios --auto",
     "prebuild:ios": "expo prebuild --platform ios",
-    "build:production": "APP_ENV=production EXPO_NO_DOTENV=1 eas build --profile production --clear-cache"
+    "build:production": "APP_ENV=production EXPO_NO_DOTENV=1 eas build --profile production --clear-cache --platform ios --auto-submit"
   },
   "dependencies": {
     "@expo/metro-runtime": "~56.0.13",

@@ -51,4 +51,73 @@ export default defineSchema({
   })
     .index("by_couple_and_author_and_happened_at", ["coupleId", "authorUserId", "happenedAt"])
     .index("by_couple_and_happened_at", ["coupleId", "happenedAt"]),
+  monthlyReviews: defineTable({
+    coupleId: v.id("couples"),
+    ownerUserId: v.id("users"),
+    month: v.string(),
+    status: v.union(v.literal("draft"), v.literal("shared"), v.literal("completed")),
+    generatedAt: v.number(),
+    summary: v.string(),
+    highlights: v.array(v.string()),
+    patterns: v.array(v.string()),
+    questions: v.array(v.string()),
+    ownerWorkOns: v.array(v.string()),
+    partnerRequests: v.array(v.string()),
+    agreements: v.array(v.string()),
+    sharedAt: v.optional(v.number()),
+  })
+    .index("by_owner_and_month", ["ownerUserId", "month"])
+    .index("by_couple_and_month", ["coupleId", "month"]),
+  coupleChatMessages: defineTable({
+    coupleId: v.id("couples"),
+    senderKind: v.union(v.literal("ai"), v.literal("user")),
+    senderUserId: v.optional(v.id("users")),
+    text: v.string(),
+    createdAt: v.number(),
+    relatedReviewId: v.optional(v.id("monthlyReviews")),
+  }).index("by_couple_and_created_at", ["coupleId", "createdAt"]),
+  promptResponses: defineTable({
+    coupleId: v.id("couples"),
+    userId: v.id("users"),
+    promptDate: v.string(),
+    prompt: v.string(),
+    response: v.string(),
+    createdAt: v.number(),
+  })
+    .index("by_user_and_date", ["userId", "promptDate"])
+    .index("by_couple_and_date", ["coupleId", "promptDate"]),
+  planIdeas: defineTable({
+    coupleId: v.id("couples"),
+    title: v.string(),
+    description: v.string(),
+    category: v.union(
+      v.literal("dinner"),
+      v.literal("date"),
+      v.literal("activity"),
+      v.literal("weekend"),
+    ),
+    costLevel: v.number(),
+    durationMinutes: v.number(),
+    vibeTags: v.array(v.string()),
+    createdAt: v.number(),
+  })
+    .index("by_couple_and_created_at", ["coupleId", "createdAt"])
+    .index("by_couple_and_category", ["coupleId", "category"]),
+  planSwipes: defineTable({
+    coupleId: v.id("couples"),
+    ideaId: v.id("planIdeas"),
+    userId: v.id("users"),
+    vote: v.union(v.literal("like"), v.literal("pass")),
+    createdAt: v.number(),
+  })
+    .index("by_user_and_idea", ["userId", "ideaId"])
+    .index("by_idea", ["ideaId"]),
+  planMatches: defineTable({
+    coupleId: v.id("couples"),
+    ideaId: v.id("planIdeas"),
+    createdAt: v.number(),
+    status: v.union(v.literal("matched"), v.literal("planned"), v.literal("done")),
+  })
+    .index("by_couple_and_created_at", ["coupleId", "createdAt"])
+    .index("by_idea", ["ideaId"]),
 });

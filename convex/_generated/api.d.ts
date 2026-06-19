@@ -12,6 +12,10 @@ import type * as auth from "../auth.js";
 import type * as health from "../health.js";
 import type * as moments from "../moments.js";
 import type * as pairing from "../pairing.js";
+import type * as plans from "../plans.js";
+import type * as prompts from "../prompts.js";
+import type * as reviews from "../reviews.js";
+import type * as stats from "../stats.js";
 
 import type {
   ApiFromModules,
@@ -24,6 +28,10 @@ declare const fullApi: ApiFromModules<{
   health: typeof health;
   moments: typeof moments;
   pairing: typeof pairing;
+  plans: typeof plans;
+  prompts: typeof prompts;
+  reviews: typeof reviews;
+  stats: typeof stats;
 }>;
 
 /**

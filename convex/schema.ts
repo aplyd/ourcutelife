@@ -37,11 +37,18 @@ export default defineSchema({
   })
     .index("by_code", ["code"])
     .index("by_couple", ["coupleId"]),
-  journalEntries: defineTable({
+  moments: defineTable({
     coupleId: v.id("couples"),
-    authorId: v.id("users"),
-    body: v.string(),
-    mood: v.optional(v.string()),
+    authorUserId: v.id("users"),
+    happenedAt: v.number(),
     createdAt: v.number(),
-  }).index("by_couple", ["coupleId"]),
+    summary: v.string(),
+    feeling: v.string(),
+    tone: v.union(v.literal("good"), v.literal("bad"), v.literal("mixed")),
+    partnerCouldDo: v.optional(v.string()),
+    authorCouldDo: v.optional(v.string()),
+    tags: v.array(v.string()),
+  })
+    .index("by_couple_and_author_and_happened_at", ["coupleId", "authorUserId", "happenedAt"])
+    .index("by_couple_and_happened_at", ["coupleId", "happenedAt"]),
 });

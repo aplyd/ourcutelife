@@ -10,6 +10,7 @@
 
 import type * as auth from "../auth.js";
 import type * as health from "../health.js";
+import type * as moments from "../moments.js";
 import type * as pairing from "../pairing.js";
 
 import type {
@@ -21,6 +22,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   health: typeof health;
+  moments: typeof moments;
   pairing: typeof pairing;
 }>;
 

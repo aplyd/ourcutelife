@@ -1,5 +1,5 @@
 import { useQuery } from "convex/react";
-import { Redirect } from "expo-router";
+import { Redirect, router } from "expo-router";
 import type { JSX } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import AnimatedRollingNumber from "react-native-animated-rolling-numbers";
@@ -61,7 +61,10 @@ export default function TodayTab(): JSX.Element {
         </Text>
       </View>
 
-      <Pressable className="h-14 rounded-full bg-[#7c3aed] items-center justify-center">
+      <Pressable
+        className="h-14 rounded-full bg-[#7c3aed] items-center justify-center"
+        onPress={() => router.push("/moments/new")}
+      >
         <Text className="font-semibold text-white">Log a moment</Text>
       </Pressable>
     </View>

@@ -12,7 +12,7 @@
     },
     "production": {
       "autoIncrement": true,
-      "ios": { 
+      "ios": {
         "resourceClass": "m-medium",
         "buildConfiguration": "Release"
       },
@@ -25,12 +25,12 @@
       "distribution": "store"
     }
   },
-  "submit": { 
+  "submit": {
     "production": {
       "ios": {
         "ascAppId": "6781453603",
         "appleTeamId": "X5KBCB6WPT"
       }
-    } 
+    }
   }
 }

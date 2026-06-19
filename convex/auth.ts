@@ -13,6 +13,7 @@ export const { getAuthUser } = authComponent.clientApi();
 
 export const createAuth = (ctx: any) =>
   betterAuth({
+    secret: process.env.BETTER_AUTH_SECRET,
     baseURL: process.env.CONVEX_SITE_URL,
     basePath: "/api/auth",
     database: authComponent.adapter(ctx),

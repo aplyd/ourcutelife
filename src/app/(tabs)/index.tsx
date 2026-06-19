@@ -6,23 +6,17 @@ import { ActivityIndicator, Pressable, Text, TextInput, View } from "react-nativ
 import AnimatedRollingNumber from "react-native-animated-rolling-numbers";
 
 import { api } from "../../../convex/_generated/api";
-import { useAuthSession } from "@/lib/authSession";
+import { useSession } from "@/lib/betterAuth";
 
 export default function TodayTab(): JSX.Element {
-  const { userId, sessionToken } = useAuthSession();
-  const viewer = useQuery(api.auth.viewer, {
-    userId: userId ?? undefined,
-    sessionToken: sessionToken ?? undefined,
-  });
-  const todayPrompt = useQuery(api.prompts.today, {
-    userId: userId ?? undefined,
-    sessionToken: sessionToken ?? undefined,
-  });
+  const betterAuthSession = useSession();
+  const viewer = useQuery(api.auth.viewer, {});
+  const todayPrompt = useQuery(api.prompts.today, {});
   const saveAnswer = useMutation(api.prompts.answer);
   const [answer, setAnswer] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
-  if (!userId || !sessionToken) return <Redirect href="/auth" />;
+  if (!betterAuthSession.data?.session) return <Redirect href="/auth" />;
   if (viewer === undefined || todayPrompt === undefined) {
     return (
       <View className="flex-1 bg-[#fff8f1] items-center justify-center">
@@ -39,12 +33,10 @@ export default function TodayTab(): JSX.Element {
     : 0;
 
   async function handleSaveAnswer() {
-    if (!userId || !sessionToken || !answer.trim()) return;
+    if (!betterAuthSession.data?.session || !answer.trim()) return;
     setIsSaving(true);
     try {
       await saveAnswer({
-        userId,
-        sessionToken,
         promptDate: promptData.promptDate,
         prompt: promptData.prompt,
         response: answer,

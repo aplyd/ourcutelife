@@ -1,34 +1,29 @@
 import { v } from "convex/values";
-import type { Id } from "./_generated/dataModel";
 import type { QueryCtx } from "./_generated/server";
 import { query } from "./_generated/server";
+import { getCurrentAppUser } from "./auth";
 
-async function requireSession(
-  ctx: QueryCtx,
-  userId: Id<"users"> | undefined,
-  sessionToken: string | undefined,
-) {
-  if (!userId || !sessionToken) throw new Error("Not signed in.");
-  const user = await ctx.db.get(userId);
-  if (!user || user.sessionToken !== sessionToken) throw new Error("Not signed in.");
+async function requireSession(ctx: QueryCtx) {
+  const user = await getCurrentAppUser(ctx);
+  if (!user) throw new Error("Not signed in.");
   const membership = await ctx.db
     .query("coupleMembers")
-    .withIndex("by_user", (q) => q.eq("userId", userId))
+    .withIndex("by_user", (q) => q.eq("userId", user._id))
     .first();
   if (!membership) throw new Error("Pair with your partner first.");
   const couple = await ctx.db.get(membership.coupleId);
   if (!couple) throw new Error("Relationship space unavailable.");
-  return { membership, couple };
+  return { user, membership, couple };
 }
 
 export const mine = query({
-  args: { userId: v.optional(v.id("users")), sessionToken: v.optional(v.string()) },
+  args: {},
   handler: async (ctx, args) => {
-    const { membership, couple } = await requireSession(ctx, args.userId, args.sessionToken);
+    const { user, membership, couple } = await requireSession(ctx);
     const moments = await ctx.db
       .query("moments")
       .withIndex("by_couple_and_author_and_happened_at", (q) =>
-        q.eq("coupleId", membership.coupleId).eq("authorUserId", args.userId!),
+        q.eq("coupleId", membership.coupleId).eq("authorUserId", user._id),
       )
       .take(200);
     const counts = { good: 0, mixed: 0, bad: 0 };
@@ -39,7 +34,7 @@ export const mine = query({
     }
     const reviews = await ctx.db
       .query("monthlyReviews")
-      .withIndex("by_owner_and_month", (q) => q.eq("ownerUserId", args.userId!))
+      .withIndex("by_owner_and_month", (q) => q.eq("ownerUserId", user._id))
       .take(50);
     return {
       daysTogether: couple.anniversaryDate

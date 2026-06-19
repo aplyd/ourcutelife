@@ -5,16 +5,13 @@ import type { JSX } from "react";
 import { ActivityIndicator, View } from "react-native";
 
 import { api } from "../../../convex/_generated/api";
-import { useAuthSession } from "@/lib/authSession";
+import { useSession } from "@/lib/betterAuth";
 
 export default function TabsLayout(): JSX.Element {
-  const { userId, sessionToken } = useAuthSession();
-  const viewer = useQuery(api.auth.viewer, {
-    userId: userId ?? undefined,
-    sessionToken: sessionToken ?? undefined,
-  });
+  const betterAuthSession = useSession();
+  const viewer = useQuery(api.auth.viewer, {});
 
-  if (!userId || !sessionToken) return <Redirect href="/auth" />;
+  if (!betterAuthSession.data?.session) return <Redirect href="/auth" />;
   if (viewer === undefined) {
     return (
       <View className="flex-1 bg-[#fff8f1] items-center justify-center">

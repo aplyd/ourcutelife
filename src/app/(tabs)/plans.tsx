@@ -6,47 +6,43 @@ import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-nati
 
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
-import { useAuthSession } from "@/lib/authSession";
+import { useSession } from "@/lib/betterAuth";
 
 type Category = "dinner" | "date" | "activity" | "weekend";
 const categories: Category[] = ["dinner", "date", "activity", "weekend"];
 
 export default function PlansTab(): JSX.Element {
-  const { userId, sessionToken } = useAuthSession();
+  const betterAuthSession = useSession();
   const [category, setCategory] = useState<Category | undefined>();
-  const viewer = useQuery(api.auth.viewer, {
-    userId: userId ?? undefined,
-    sessionToken: sessionToken ?? undefined,
-  });
-  const canLoad = Boolean(userId && sessionToken && viewer?.couple && viewer.memberCount >= 2);
-  const ideas = useQuery(
-    api.plans.list,
-    canLoad ? { userId: userId!, sessionToken: sessionToken!, category } : "skip",
+  const viewer = useQuery(api.auth.viewer, {});
+  const canLoad = Boolean(
+    betterAuthSession.data?.session && viewer?.couple && viewer.memberCount >= 2,
   );
-  const matches = useQuery(
-    api.plans.matches,
-    canLoad ? { userId: userId!, sessionToken: sessionToken! } : "skip",
-  );
+  const ideas = useQuery(api.plans.list, canLoad ? { category } : "skip");
+  const matches = useQuery(api.plans.matches, canLoad ? {} : "skip");
   const seed = useMutation(api.plans.seed);
   const vote = useMutation(api.plans.vote);
   const [isWorking, setIsWorking] = useState(false);
 
   useEffect(() => {
-    if (!userId || !sessionToken || !canLoad) return;
-    void seed({ userId, sessionToken });
-  }, [canLoad, seed, sessionToken, userId]);
+    if (!betterAuthSession.data?.session || !canLoad) return;
+    void seed({});
+  }, [canLoad, seed]);
 
   async function handleVote(ideaId: Id<"planIdeas">, nextVote: "like" | "pass") {
-    if (!userId || !sessionToken) return;
+    if (!betterAuthSession.data?.session) return;
     setIsWorking(true);
     try {
-      await vote({ userId, sessionToken, ideaId, vote: nextVote });
+      await vote({
+        ideaId,
+        vote: nextVote,
+      });
     } finally {
       setIsWorking(false);
     }
   }
 
-  if (!userId || !sessionToken) return <Redirect href="/auth" />;
+  if (!betterAuthSession.data?.session) return <Redirect href="/auth" />;
   if (viewer === undefined) {
     return (
       <View className="flex-1 bg-[#fff8f1] items-center justify-center">

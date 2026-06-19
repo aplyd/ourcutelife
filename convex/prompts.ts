@@ -1,22 +1,17 @@
 import { v } from "convex/values";
-import type { Id } from "./_generated/dataModel";
 import type { MutationCtx, QueryCtx } from "./_generated/server";
 import { mutation, query } from "./_generated/server";
+import { getCurrentAppUser } from "./auth";
 
-async function requireSession(
-  ctx: QueryCtx | MutationCtx,
-  userId: Id<"users"> | undefined,
-  sessionToken: string | undefined,
-) {
-  if (!userId || !sessionToken) throw new Error("Not signed in.");
-  const user = await ctx.db.get(userId);
-  if (!user || user.sessionToken !== sessionToken) throw new Error("Not signed in.");
+async function requireSession(ctx: QueryCtx | MutationCtx) {
+  const user = await getCurrentAppUser(ctx);
+  if (!user) throw new Error("Not signed in.");
   const membership = await ctx.db
     .query("coupleMembers")
-    .withIndex("by_user", (q) => q.eq("userId", userId))
+    .withIndex("by_user", (q) => q.eq("userId", user._id))
     .first();
   if (!membership) throw new Error("Pair with your partner first.");
-  return { membership };
+  return { user, membership };
 }
 
 function todayKey(): string {
@@ -33,13 +28,13 @@ function choosePrompt(tags: string[]): string {
 }
 
 export const today = query({
-  args: { userId: v.optional(v.id("users")), sessionToken: v.optional(v.string()) },
+  args: {},
   handler: async (ctx, args) => {
-    const { membership } = await requireSession(ctx, args.userId, args.sessionToken);
+    const { user, membership } = await requireSession(ctx);
     const recent = await ctx.db
       .query("moments")
       .withIndex("by_couple_and_author_and_happened_at", (q) =>
-        q.eq("coupleId", membership.coupleId).eq("authorUserId", args.userId!),
+        q.eq("coupleId", membership.coupleId).eq("authorUserId", user._id),
       )
       .order("desc")
       .take(10);
@@ -47,9 +42,7 @@ export const today = query({
     const promptDate = todayKey();
     const existing = await ctx.db
       .query("promptResponses")
-      .withIndex("by_user_and_date", (q) =>
-        q.eq("userId", args.userId!).eq("promptDate", promptDate),
-      )
+      .withIndex("by_user_and_date", (q) => q.eq("userId", user._id).eq("promptDate", promptDate))
       .first();
     return {
       promptDate,
@@ -64,25 +57,23 @@ export const today = query({
 
 export const answer = mutation({
   args: {
-    userId: v.id("users"),
-    sessionToken: v.string(),
     promptDate: v.string(),
     prompt: v.string(),
     response: v.string(),
   },
   handler: async (ctx, args) => {
-    const { membership } = await requireSession(ctx, args.userId, args.sessionToken);
+    const { user, membership } = await requireSession(ctx);
     const response = args.response.trim();
     if (!response) throw new Error("Write an answer before saving.");
     const existing = await ctx.db
       .query("promptResponses")
       .withIndex("by_user_and_date", (q) =>
-        q.eq("userId", args.userId).eq("promptDate", args.promptDate),
+        q.eq("userId", user._id).eq("promptDate", args.promptDate),
       )
       .first();
     const payload = {
       coupleId: membership.coupleId,
-      userId: args.userId,
+      userId: user._id,
       promptDate: args.promptDate,
       prompt: args.prompt,
       response,

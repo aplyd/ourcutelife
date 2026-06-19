@@ -3,13 +3,12 @@ import { v } from "convex/values";
 
 export default defineSchema({
   users: defineTable({
-    appleSubject: v.string(),
+    authUserId: v.string(),
     email: v.optional(v.string()),
     fullName: v.optional(v.string()),
-    sessionToken: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
-  }).index("by_apple_subject", ["appleSubject"]),
+  }).index("by_auth_user_id", ["authUserId"]),
   couples: defineTable({
     name: v.string(),
     anniversaryDate: v.optional(v.number()),

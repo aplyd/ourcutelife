@@ -1,19 +1,14 @@
 import { v } from "convex/values";
-import type { Id } from "./_generated/dataModel";
 import type { MutationCtx, QueryCtx } from "./_generated/server";
 import { mutation, query } from "./_generated/server";
+import { getCurrentAppUser } from "./auth";
 
-async function requireSession(
-  ctx: QueryCtx | MutationCtx,
-  userId: Id<"users"> | undefined,
-  sessionToken: string | undefined,
-) {
-  if (!userId || !sessionToken) throw new Error("Not signed in.");
-  const user = await ctx.db.get(userId);
-  if (!user || user.sessionToken !== sessionToken) throw new Error("Not signed in.");
+async function requireSession(ctx: QueryCtx | MutationCtx) {
+  const user = await getCurrentAppUser(ctx);
+  if (!user) throw new Error("Not signed in.");
   const membership = await ctx.db
     .query("coupleMembers")
-    .withIndex("by_user", (q) => q.eq("userId", userId))
+    .withIndex("by_user", (q) => q.eq("userId", user._id))
     .first();
   if (!membership) throw new Error("Pair with your partner first.");
   return { user, membership };
@@ -46,21 +41,21 @@ function safeSnippet(text: string): string {
 }
 
 export const latestMine = query({
-  args: { userId: v.optional(v.id("users")), sessionToken: v.optional(v.string()) },
+  args: {},
   handler: async (ctx, args) => {
-    await requireSession(ctx, args.userId, args.sessionToken);
+    const { user } = await requireSession(ctx);
     return await ctx.db
       .query("monthlyReviews")
-      .withIndex("by_owner_and_month", (q) => q.eq("ownerUserId", args.userId!))
+      .withIndex("by_owner_and_month", (q) => q.eq("ownerUserId", user._id))
       .order("desc")
       .take(6);
   },
 });
 
 export const chatMessages = query({
-  args: { userId: v.optional(v.id("users")), sessionToken: v.optional(v.string()) },
+  args: {},
   handler: async (ctx, args) => {
-    const { membership } = await requireSession(ctx, args.userId, args.sessionToken);
+    const { user, membership } = await requireSession(ctx);
     return await ctx.db
       .query("coupleChatMessages")
       .withIndex("by_couple_and_created_at", (q) => q.eq("coupleId", membership.coupleId))
@@ -70,15 +65,17 @@ export const chatMessages = query({
 });
 
 export const generateMine = mutation({
-  args: { userId: v.id("users"), sessionToken: v.string(), month: v.optional(v.string()) },
+  args: {
+    month: v.optional(v.string()),
+  },
   handler: async (ctx, args) => {
-    const { membership } = await requireSession(ctx, args.userId, args.sessionToken);
+    const { user, membership } = await requireSession(ctx);
     const month = args.month ?? currentMonth();
     const { start, end } = monthRange(month);
     const moments = await ctx.db
       .query("moments")
       .withIndex("by_couple_and_author_and_happened_at", (q) =>
-        q.eq("coupleId", membership.coupleId).eq("authorUserId", args.userId),
+        q.eq("coupleId", membership.coupleId).eq("authorUserId", user._id),
       )
       .collect()
       .then((items) => items.filter((item) => item.happenedAt >= start && item.happenedAt < end));
@@ -114,12 +111,12 @@ export const generateMine = mutation({
 
     const existing = await ctx.db
       .query("monthlyReviews")
-      .withIndex("by_owner_and_month", (q) => q.eq("ownerUserId", args.userId).eq("month", month))
+      .withIndex("by_owner_and_month", (q) => q.eq("ownerUserId", user._id).eq("month", month))
       .first();
 
     const payload = {
       coupleId: membership.coupleId,
-      ownerUserId: args.userId,
+      ownerUserId: user._id,
       month,
       status: "draft" as const,
       generatedAt: Date.now(),
@@ -145,11 +142,13 @@ export const generateMine = mutation({
 });
 
 export const share = mutation({
-  args: { userId: v.id("users"), sessionToken: v.string(), reviewId: v.id("monthlyReviews") },
+  args: {
+    reviewId: v.id("monthlyReviews"),
+  },
   handler: async (ctx, args) => {
-    const { membership } = await requireSession(ctx, args.userId, args.sessionToken);
+    const { user, membership } = await requireSession(ctx);
     const review = await ctx.db.get(args.reviewId);
-    if (!review || review.ownerUserId !== args.userId || review.coupleId !== membership.coupleId) {
+    if (!review || review.ownerUserId !== user._id || review.coupleId !== membership.coupleId) {
       throw new Error("Review unavailable.");
     }
     const now = Date.now();

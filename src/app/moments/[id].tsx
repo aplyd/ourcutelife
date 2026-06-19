@@ -5,7 +5,7 @@ import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
-import { useAuthSession } from "@/lib/authSession";
+import { useSession } from "@/lib/betterAuth";
 
 const toneLabel = {
   good: "Good",
@@ -24,26 +24,21 @@ function formatDate(timestamp: number): string {
 
 export default function MomentDetailScreen(): JSX.Element {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { userId, sessionToken } = useAuthSession();
-  const viewer = useQuery(api.auth.viewer, {
-    userId: userId ?? undefined,
-    sessionToken: sessionToken ?? undefined,
-  });
+  const betterAuthSession = useSession();
+  const viewer = useQuery(api.auth.viewer, {});
   const canLoadMoment = Boolean(
-    userId && sessionToken && viewer?.couple && viewer.memberCount >= 2,
+    betterAuthSession.data?.session && viewer?.couple && viewer.memberCount >= 2,
   );
   const moment = useQuery(
     api.moments.getMine,
     canLoadMoment
       ? {
-          userId: userId!,
-          sessionToken: sessionToken!,
           momentId: id as Id<"moments">,
         }
       : "skip",
   );
 
-  if (!userId || !sessionToken) return <Redirect href="/auth" />;
+  if (!betterAuthSession.data?.session) return <Redirect href="/auth" />;
 
   if (viewer === undefined || (canLoadMoment && moment === undefined)) {
     return (

@@ -4,7 +4,6 @@ import type { JSX } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 
 import { api } from "../../../convex/_generated/api";
-import { useAuthSession } from "@/lib/authSession";
 
 const toneStyles = {
   good: "bg-emerald-100 text-emerald-900",
@@ -21,11 +20,7 @@ function formatDate(timestamp: number): string {
 }
 
 export default function MomentsTab(): JSX.Element {
-  const { userId, sessionToken } = useAuthSession();
-  const moments = useQuery(api.moments.listMine, {
-    userId: userId ?? undefined,
-    sessionToken: sessionToken ?? undefined,
-  });
+  const moments = useQuery(api.moments.listMine, {});
 
   return (
     <ScrollView className="flex-1 bg-[#fff8f1]" contentContainerClassName="px-6 pt-16 pb-28 gap-5">

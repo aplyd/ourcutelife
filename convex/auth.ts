@@ -1,75 +1,81 @@
-import { v } from "convex/values";
+import { createClient } from "@convex-dev/better-auth";
+import { convex as convexPlugin } from "@convex-dev/better-auth/plugins";
+import { expo } from "@better-auth/expo";
+import { betterAuth } from "better-auth";
+import { components } from "./_generated/api";
+import type { Doc } from "./_generated/dataModel";
+import type { MutationCtx, QueryCtx } from "./_generated/server";
 import { mutation, query } from "./_generated/server";
-import type { Id } from "./_generated/dataModel";
-import type { QueryCtx, MutationCtx } from "./_generated/server";
+import authConfig from "./auth.config";
 
-function createSessionToken(): string {
-  return `${crypto.randomUUID()}-${crypto.randomUUID()}`;
+export const authComponent = createClient(components.betterAuth);
+export const { getAuthUser } = authComponent.clientApi();
+
+export const createAuth = (ctx: any) =>
+  betterAuth({
+    baseURL: process.env.CONVEX_SITE_URL,
+    basePath: "/api/auth",
+    database: authComponent.adapter(ctx),
+    trustedOrigins: ["ourcutelife://", "exp://", "http://localhost:8081"],
+    socialProviders: {
+      apple:
+        process.env.BETTER_AUTH_APPLE_CLIENT_ID && process.env.BETTER_AUTH_APPLE_CLIENT_SECRET
+          ? {
+              clientId: process.env.BETTER_AUTH_APPLE_CLIENT_ID,
+              clientSecret: process.env.BETTER_AUTH_APPLE_CLIENT_SECRET,
+            }
+          : undefined,
+    },
+    plugins: [expo(), convexPlugin({ authConfig })],
+  });
+
+export async function getCurrentAppUser(ctx: QueryCtx | MutationCtx): Promise<Doc<"users"> | null> {
+  const authUser = await authComponent.safeGetAuthUser(ctx as never);
+  if (!authUser) return null;
+
+  return await ctx.db
+    .query("users")
+    .withIndex("by_auth_user_id", (q) => q.eq("authUserId", authUser._id))
+    .first();
 }
 
-async function requireUserBySession(
-  ctx: QueryCtx | MutationCtx,
-  userId: Id<"users"> | undefined,
-  sessionToken: string | undefined,
-) {
-  if (!userId || !sessionToken) return null;
-  const user = await ctx.db.get(userId);
-  if (!user || user.sessionToken !== sessionToken) return null;
-  return user;
-}
-
-export const signInWithApple = mutation({
-  args: {
-    appleSubject: v.string(),
-    email: v.optional(v.string()),
-    fullName: v.optional(v.string()),
-    identityToken: v.string(),
-  },
-  handler: async (ctx, args) => {
-    // TODO: Verify identityToken server-side against Apple's JWKS before production launch.
-    // Expo gives the client token; Convex must own the trusted user record.
-    const now = Date.now();
-    const sessionToken = createSessionToken();
+export const syncBetterAuthUser = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const authUser = await authComponent.getAuthUser(ctx as never);
     const existing = await ctx.db
       .query("users")
-      .withIndex("by_apple_subject", (q) => q.eq("appleSubject", args.appleSubject))
-      .unique();
-
+      .withIndex("by_auth_user_id", (q) => q.eq("authUserId", authUser._id))
+      .first();
+    const now = Date.now();
     if (existing) {
       await ctx.db.patch(existing._id, {
-        email: args.email ?? existing.email,
-        fullName: args.fullName ?? existing.fullName,
-        sessionToken,
+        email: authUser.email ?? existing.email,
+        fullName: authUser.name ?? existing.fullName,
         updatedAt: now,
       });
-      return { userId: existing._id, sessionToken };
+      return { userId: existing._id };
     }
-
     const userId = await ctx.db.insert("users", {
-      appleSubject: args.appleSubject,
-      email: args.email,
-      fullName: args.fullName,
-      sessionToken,
+      authUserId: authUser._id,
+      email: authUser.email ?? undefined,
+      fullName: authUser.name ?? undefined,
       createdAt: now,
       updatedAt: now,
     });
-
-    return { userId, sessionToken };
+    return { userId };
   },
 });
 
 export const viewer = query({
-  args: {
-    userId: v.optional(v.id("users")),
-    sessionToken: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => {
-    const user = await requireUserBySession(ctx, args.userId, args.sessionToken);
-    if (!user || !args.userId) return null;
+  args: {},
+  handler: async (ctx) => {
+    const user = await getCurrentAppUser(ctx);
+    if (!user) return null;
 
     const membership = await ctx.db
       .query("coupleMembers")
-      .withIndex("by_user", (q) => q.eq("userId", args.userId!))
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
       .first();
 
     const couple = membership ? await ctx.db.get(membership.coupleId) : null;

@@ -2,19 +2,9 @@ import { v } from "convex/values";
 import type { Id } from "./_generated/dataModel";
 import type { MutationCtx, QueryCtx } from "./_generated/server";
 import { mutation, query } from "./_generated/server";
+import { getCurrentAppUser } from "./auth";
 
 const toneValidator = v.union(v.literal("good"), v.literal("bad"), v.literal("mixed"));
-
-async function requireUserBySession(
-  ctx: QueryCtx | MutationCtx,
-  userId: Id<"users"> | undefined,
-  sessionToken: string | undefined,
-) {
-  if (!userId || !sessionToken) throw new Error("Not signed in.");
-  const user = await ctx.db.get(userId);
-  if (!user || user.sessionToken !== sessionToken) throw new Error("Not signed in.");
-  return user;
-}
 
 async function requireMembership(ctx: QueryCtx | MutationCtx, userId: Id<"users">) {
   const membership = await ctx.db
@@ -38,18 +28,16 @@ function cleanOptionalText(value: string | undefined): string | undefined {
 }
 
 export const listMine = query({
-  args: {
-    userId: v.optional(v.id("users")),
-    sessionToken: v.optional(v.string()),
-  },
+  args: {},
   handler: async (ctx, args) => {
-    await requireUserBySession(ctx, args.userId, args.sessionToken);
-    const membership = await requireMembership(ctx, args.userId!);
+    const user = await getCurrentAppUser(ctx);
+    if (!user) throw new Error("Not signed in.");
+    const membership = await requireMembership(ctx, user._id);
 
     return await ctx.db
       .query("moments")
       .withIndex("by_couple_and_author_and_happened_at", (q) =>
-        q.eq("coupleId", membership.coupleId).eq("authorUserId", args.userId!),
+        q.eq("coupleId", membership.coupleId).eq("authorUserId", user._id),
       )
       .order("desc")
       .take(50);
@@ -58,24 +46,21 @@ export const listMine = query({
 
 export const getMine = query({
   args: {
-    userId: v.optional(v.id("users")),
-    sessionToken: v.optional(v.string()),
     momentId: v.id("moments"),
   },
   handler: async (ctx, args) => {
-    await requireUserBySession(ctx, args.userId, args.sessionToken);
-    await requireMembership(ctx, args.userId!);
+    const user = await getCurrentAppUser(ctx);
+    if (!user) throw new Error("Not signed in.");
+    await requireMembership(ctx, user._id);
 
     const moment = await ctx.db.get(args.momentId);
-    if (!moment || moment.authorUserId !== args.userId) return null;
+    if (!moment || moment.authorUserId !== user._id) return null;
     return moment;
   },
 });
 
 export const create = mutation({
   args: {
-    userId: v.id("users"),
-    sessionToken: v.string(),
     happenedAt: v.number(),
     summary: v.string(),
     feeling: v.string(),
@@ -85,8 +70,9 @@ export const create = mutation({
     tags: v.array(v.string()),
   },
   handler: async (ctx, args) => {
-    await requireUserBySession(ctx, args.userId, args.sessionToken);
-    const membership = await requireMembership(ctx, args.userId);
+    const user = await getCurrentAppUser(ctx);
+    if (!user) throw new Error("Not signed in.");
+    const membership = await requireMembership(ctx, user._id);
 
     const summary = args.summary.trim();
     const feeling = args.feeling.trim();
@@ -102,7 +88,7 @@ export const create = mutation({
 
     return await ctx.db.insert("moments", {
       coupleId: membership.coupleId,
-      authorUserId: args.userId,
+      authorUserId: user._id,
       happenedAt: args.happenedAt,
       createdAt: Date.now(),
       summary,

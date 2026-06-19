@@ -10,6 +10,7 @@
 
 import type * as auth from "../auth.js";
 import type * as health from "../health.js";
+import type * as http from "../http.js";
 import type * as moments from "../moments.js";
 import type * as pairing from "../pairing.js";
 import type * as plans from "../plans.js";
@@ -22,6 +23,7 @@ import type { ApiFromModules, FilterApi, FunctionReference } from "convex/server
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   health: typeof health;
+  http: typeof http;
   moments: typeof moments;
   pairing: typeof pairing;
   plans: typeof plans;
@@ -50,4 +52,6 @@ export declare const api: FilterApi<typeof fullApi, FunctionReference<any, "publ
  */
 export declare const internal: FilterApi<typeof fullApi, FunctionReference<any, "internal">>;
 
-export declare const components: {};
+export declare const components: {
+  betterAuth: import("@convex-dev/better-auth/_generated/component.js").ComponentApi<"betterAuth">;
+};

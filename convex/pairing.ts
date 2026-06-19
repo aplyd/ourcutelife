@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation } from "./_generated/server";
+import { getCurrentAppUser } from "./auth";
 
 const PAIRING_CODE_TTL_MS = 1000 * 60 * 60 * 24 * 7;
 
@@ -17,17 +18,15 @@ function generateCode(): string {
 
 export const createCoupleAndCode = mutation({
   args: {
-    userId: v.id("users"),
-    sessionToken: v.string(),
     anniversaryDate: v.number(),
   },
   handler: async (ctx, args) => {
-    const user = await ctx.db.get(args.userId);
-    if (!user || user.sessionToken !== args.sessionToken) throw new Error("Not signed in.");
+    const user = await getCurrentAppUser(ctx);
+    if (!user) throw new Error("Not signed in.");
 
     const existingMembership = await ctx.db
       .query("coupleMembers")
-      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
       .first();
 
     if (!Number.isFinite(args.anniversaryDate)) {
@@ -54,14 +53,14 @@ export const createCoupleAndCode = mutation({
       coupleId = await ctx.db.insert("couples", {
         name,
         anniversaryDate: args.anniversaryDate,
-        createdByUserId: args.userId,
+        createdByUserId: user._id,
         createdAt: now,
         updatedAt: now,
       });
 
       await ctx.db.insert("coupleMembers", {
         coupleId,
-        userId: args.userId,
+        userId: user._id,
         role: "partner",
         joinedAt: now,
       });
@@ -87,7 +86,7 @@ export const createCoupleAndCode = mutation({
     await ctx.db.insert("pairingCodes", {
       coupleId: activeCoupleId,
       code,
-      createdByUserId: args.userId,
+      createdByUserId: user._id,
       expiresAt: now + PAIRING_CODE_TTL_MS,
       createdAt: now,
     });
@@ -102,17 +101,15 @@ export const createCoupleAndCode = mutation({
 
 export const joinWithCode = mutation({
   args: {
-    userId: v.id("users"),
-    sessionToken: v.string(),
     code: v.string(),
   },
   handler: async (ctx, args) => {
-    const user = await ctx.db.get(args.userId);
-    if (!user || user.sessionToken !== args.sessionToken) throw new Error("Not signed in.");
+    const user = await getCurrentAppUser(ctx);
+    if (!user) throw new Error("Not signed in.");
 
     const existingMembership = await ctx.db
       .query("coupleMembers")
-      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
       .first();
     if (existingMembership) {
       throw new Error("You are already paired.");
@@ -141,14 +138,14 @@ export const joinWithCode = mutation({
 
     await ctx.db.insert("coupleMembers", {
       coupleId: pairingCode.coupleId,
-      userId: args.userId,
+      userId: user._id,
       role: "partner",
       joinedAt: now,
     });
 
     await ctx.db.patch(pairingCode._id, {
       usedAt: now,
-      usedByUserId: args.userId,
+      usedByUserId: user._id,
     });
 
     await ctx.db.patch(pairingCode.coupleId, { updatedAt: now });

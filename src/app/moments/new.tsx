@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 
 import { api } from "../../../convex/_generated/api";
-import { useAuthSession } from "@/lib/authSession";
+import { useSession } from "@/lib/betterAuth";
 
 type Tone = "good" | "bad" | "mixed";
 
@@ -27,11 +27,8 @@ const suggestedTags = [
 ];
 
 export default function NewMomentScreen(): JSX.Element {
-  const { userId, sessionToken } = useAuthSession();
-  const viewer = useQuery(api.auth.viewer, {
-    userId: userId ?? undefined,
-    sessionToken: sessionToken ?? undefined,
-  });
+  const betterAuthSession = useSession();
+  const viewer = useQuery(api.auth.viewer, {});
   const createMoment = useMutation(api.moments.create);
   const [happenedAtText, setHappenedAtText] = useState(() => new Date().toISOString().slice(0, 10));
   const [summary, setSummary] = useState("");
@@ -45,8 +42,8 @@ export default function NewMomentScreen(): JSX.Element {
 
   const needsRepairFields = tone === "bad" || tone === "mixed";
   const canSave = useMemo(
-    () => Boolean(userId && sessionToken && summary.trim() && feeling.trim() && !isSaving),
-    [feeling, isSaving, sessionToken, summary, userId],
+    () => Boolean(betterAuthSession.data?.session && summary.trim() && feeling.trim() && !isSaving),
+    [feeling, isSaving, summary],
   );
 
   function toggleTag(tag: string) {
@@ -56,7 +53,7 @@ export default function NewMomentScreen(): JSX.Element {
   }
 
   async function handleSave() {
-    if (!userId || !sessionToken) return;
+    if (!betterAuthSession.data?.session) return;
     const happenedAt = new Date(`${happenedAtText}T12:00:00`).getTime();
     if (!Number.isFinite(happenedAt)) {
       setError("Enter the date as YYYY-MM-DD.");
@@ -67,8 +64,6 @@ export default function NewMomentScreen(): JSX.Element {
     setIsSaving(true);
     try {
       const momentId = await createMoment({
-        userId,
-        sessionToken,
         happenedAt,
         summary,
         feeling,
@@ -85,7 +80,7 @@ export default function NewMomentScreen(): JSX.Element {
     }
   }
 
-  if (!userId || !sessionToken) return <Redirect href="/auth" />;
+  if (!betterAuthSession.data?.session) return <Redirect href="/auth" />;
   if (viewer === undefined) {
     return (
       <View className="flex-1 bg-[#fff8f1] items-center justify-center">

@@ -1,7 +1,7 @@
 import { v } from "convex/values";
-import type { Id } from "./_generated/dataModel";
 import type { MutationCtx, QueryCtx } from "./_generated/server";
 import { mutation, query } from "./_generated/server";
+import { getCurrentAppUser } from "./auth";
 
 const categoryValidator = v.union(
   v.literal("dinner"),
@@ -52,30 +52,23 @@ const starterIdeas: Array<{
   },
 ];
 
-async function requireSession(
-  ctx: QueryCtx | MutationCtx,
-  userId: Id<"users"> | undefined,
-  sessionToken: string | undefined,
-) {
-  if (!userId || !sessionToken) throw new Error("Not signed in.");
-  const user = await ctx.db.get(userId);
-  if (!user || user.sessionToken !== sessionToken) throw new Error("Not signed in.");
+async function requireSession(ctx: QueryCtx | MutationCtx) {
+  const user = await getCurrentAppUser(ctx);
+  if (!user) throw new Error("Not signed in.");
   const membership = await ctx.db
     .query("coupleMembers")
-    .withIndex("by_user", (q) => q.eq("userId", userId))
+    .withIndex("by_user", (q) => q.eq("userId", user._id))
     .first();
   if (!membership) throw new Error("Pair with your partner first.");
-  return { membership };
+  return { user, membership };
 }
 
 export const list = query({
   args: {
-    userId: v.optional(v.id("users")),
-    sessionToken: v.optional(v.string()),
     category: v.optional(categoryValidator),
   },
   handler: async (ctx, args) => {
-    const { membership } = await requireSession(ctx, args.userId, args.sessionToken);
+    const { user, membership } = await requireSession(ctx);
     const ideas = args.category
       ? await ctx.db
           .query("planIdeas")
@@ -90,7 +83,7 @@ export const list = query({
           .take(20);
     const swipes = await ctx.db
       .query("planSwipes")
-      .withIndex("by_user_and_idea", (q) => q.eq("userId", args.userId!))
+      .withIndex("by_user_and_idea", (q) => q.eq("userId", user._id))
       .collect();
     const voted = new Set(swipes.map((swipe) => swipe.ideaId));
     return ideas.filter((idea) => !voted.has(idea._id));
@@ -98,9 +91,9 @@ export const list = query({
 });
 
 export const matches = query({
-  args: { userId: v.optional(v.id("users")), sessionToken: v.optional(v.string()) },
+  args: {},
   handler: async (ctx, args) => {
-    const { membership } = await requireSession(ctx, args.userId, args.sessionToken);
+    const { user, membership } = await requireSession(ctx);
     const matches = await ctx.db
       .query("planMatches")
       .withIndex("by_couple_and_created_at", (q) => q.eq("coupleId", membership.coupleId))
@@ -116,9 +109,9 @@ export const matches = query({
 });
 
 export const seed = mutation({
-  args: { userId: v.id("users"), sessionToken: v.string() },
+  args: {},
   handler: async (ctx, args) => {
-    const { membership } = await requireSession(ctx, args.userId, args.sessionToken);
+    const { user, membership } = await requireSession(ctx);
     const existing = await ctx.db
       .query("planIdeas")
       .withIndex("by_couple_and_created_at", (q) => q.eq("coupleId", membership.coupleId))
@@ -133,25 +126,23 @@ export const seed = mutation({
 
 export const vote = mutation({
   args: {
-    userId: v.id("users"),
-    sessionToken: v.string(),
     ideaId: v.id("planIdeas"),
     vote: v.union(v.literal("like"), v.literal("pass")),
   },
   handler: async (ctx, args) => {
-    const { membership } = await requireSession(ctx, args.userId, args.sessionToken);
+    const { user, membership } = await requireSession(ctx);
     const idea = await ctx.db.get(args.ideaId);
     if (!idea || idea.coupleId !== membership.coupleId) throw new Error("Idea unavailable.");
     const existing = await ctx.db
       .query("planSwipes")
-      .withIndex("by_user_and_idea", (q) => q.eq("userId", args.userId).eq("ideaId", args.ideaId))
+      .withIndex("by_user_and_idea", (q) => q.eq("userId", user._id).eq("ideaId", args.ideaId))
       .first();
     if (existing) await ctx.db.patch(existing._id, { vote: args.vote, createdAt: Date.now() });
     else
       await ctx.db.insert("planSwipes", {
         coupleId: membership.coupleId,
         ideaId: args.ideaId,
-        userId: args.userId,
+        userId: user._id,
         vote: args.vote,
         createdAt: Date.now(),
       });

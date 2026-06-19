@@ -1,25 +1,33 @@
+import { useMutation } from "convex/react";
 import type { JSX } from "react";
 import { useState } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { Redirect, router } from "expo-router";
 
-import { useAppleSignIn } from "@/lib/appleAuth";
-import { useAuthSession } from "@/lib/authSession";
+import { api } from "../../convex/_generated/api";
+import { authClient, useSession } from "@/lib/betterAuth";
 
 export default function AuthLanding(): JSX.Element {
-  const { userId, sessionToken, setSession, signOut } = useAuthSession();
-  const signInWithApple = useAppleSignIn();
+  const betterAuthSession = useSession();
+  const syncBetterAuthUser = useMutation(api.auth.syncBetterAuthUser);
   const [error, setError] = useState<string | null>(null);
   const [isSigningIn, setIsSigningIn] = useState(false);
 
-  if (userId && sessionToken) return <Redirect href="/pairing" />;
+  if (betterAuthSession.data?.session) {
+    return <Redirect href="/pairing" />;
+  }
 
   async function handleSignIn() {
     setError(null);
     setIsSigningIn(true);
     try {
-      const result = await signInWithApple();
-      setSession(result);
+      const result = await authClient.signIn.social({
+        provider: "apple",
+        callbackURL: "ourcutelife://auth",
+      });
+
+      if (result.error) throw new Error(result.error.message ?? "Apple sign in failed.");
+      await syncBetterAuthUser();
       router.replace("/pairing");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Apple sign in failed.");
@@ -40,24 +48,19 @@ export default function AuthLanding(): JSX.Element {
       <View className="gap-3">
         <Pressable
           className="h-14 rounded-full bg-[#2f211c] items-center justify-center"
-          disabled={isSigningIn}
+          disabled={isSigningIn || betterAuthSession.isPending}
           onPress={handleSignIn}
         >
-          {isSigningIn ? (
+          {isSigningIn || betterAuthSession.isPending ? (
             <ActivityIndicator color="#fff8f1" />
           ) : (
             <Text className="text-base font-semibold text-[#fff8f1]">Continue with Apple</Text>
           )}
         </Pressable>
         <Text className="text-center text-sm text-[#8c766b]">
-          Apple auth keeps the first version simple and private.
+          Sign in is handled by Better Auth and Convex. No device-owned session tokens.
         </Text>
         {error ? <Text className="text-center text-sm text-red-700">{error}</Text> : null}
-        {userId && !sessionToken ? (
-          <Pressable className="items-center" onPress={signOut}>
-            <Text className="text-sm text-[#8c766b]">Clear old session and sign in again</Text>
-          </Pressable>
-        ) : null}
       </View>
     </View>
   );

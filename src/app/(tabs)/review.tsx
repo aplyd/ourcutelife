@@ -7,27 +7,17 @@ import { GiftedChat, type IMessage } from "react-native-gifted-chat";
 
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
-import { useAuthSession } from "@/lib/authSession";
+import { useSession } from "@/lib/betterAuth";
 
 export default function ReviewTab(): JSX.Element {
-  const { userId, sessionToken } = useAuthSession();
-  const viewer = useQuery(api.auth.viewer, {
-    userId: userId ?? undefined,
-    sessionToken: sessionToken ?? undefined,
-  });
-  const canLoad = Boolean(userId && sessionToken && viewer?.couple && viewer.memberCount >= 2);
-  const reviews = useQuery(
-    api.reviews.latestMine,
-    canLoad ? { userId: userId!, sessionToken: sessionToken! } : "skip",
+  const betterAuthSession = useSession();
+  const viewer = useQuery(api.auth.viewer, {});
+  const canLoad = Boolean(
+    betterAuthSession.data?.session && viewer?.couple && viewer.memberCount >= 2,
   );
-  const chatRows = useQuery(
-    api.reviews.chatMessages,
-    canLoad ? { userId: userId!, sessionToken: sessionToken! } : "skip",
-  );
-  const stats = useQuery(
-    api.stats.mine,
-    canLoad ? { userId: userId!, sessionToken: sessionToken! } : "skip",
-  );
+  const reviews = useQuery(api.reviews.latestMine, canLoad ? {} : "skip");
+  const chatRows = useQuery(api.reviews.chatMessages, canLoad ? {} : "skip");
+  const stats = useQuery(api.stats.mine, canLoad ? {} : "skip");
   const generateReview = useMutation(api.reviews.generateMine);
   const shareReview = useMutation(api.reviews.share);
   const [isWorking, setIsWorking] = useState(false);
@@ -47,11 +37,11 @@ export default function ReviewTab(): JSX.Element {
   }, [chatRows]);
 
   async function handleGenerate() {
-    if (!userId || !sessionToken) return;
+    if (!betterAuthSession.data?.session) return;
     setError(null);
     setIsWorking(true);
     try {
-      await generateReview({ userId, sessionToken });
+      await generateReview({});
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not generate review.");
     } finally {
@@ -60,11 +50,13 @@ export default function ReviewTab(): JSX.Element {
   }
 
   async function handleShare(reviewId: Id<"monthlyReviews">) {
-    if (!userId || !sessionToken) return;
+    if (!betterAuthSession.data?.session) return;
     setError(null);
     setIsWorking(true);
     try {
-      await shareReview({ userId, sessionToken, reviewId });
+      await shareReview({
+        reviewId,
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not share review.");
     } finally {
@@ -72,7 +64,7 @@ export default function ReviewTab(): JSX.Element {
     }
   }
 
-  if (!userId || !sessionToken) return <Redirect href="/auth" />;
+  if (!betterAuthSession.data?.session) return <Redirect href="/auth" />;
   if (viewer === undefined) {
     return (
       <View className="flex-1 bg-[#fff8f1] items-center justify-center">
@@ -181,11 +173,7 @@ export default function ReviewTab(): JSX.Element {
             AI-mediated summaries appear here for both partners.
           </Text>
         </View>
-        <GiftedChat
-          messages={messages}
-          user={{ _id: userId ?? "me" }}
-          renderInputToolbar={() => null}
-        />
+        <GiftedChat messages={messages} user={{ _id: "me" }} renderInputToolbar={() => null} />
       </View>
 
       {error ? <Text className="text-center text-sm text-red-700">{error}</Text> : null}

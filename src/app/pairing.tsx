@@ -5,14 +5,11 @@ import { useMemo, useState } from "react";
 import { ActivityIndicator, Pressable, Share, Text, TextInput, View } from "react-native";
 
 import { api } from "../../convex/_generated/api";
-import { useAuthSession } from "@/lib/authSession";
+import { authClient, useSession } from "@/lib/betterAuth";
 
 export default function PairingScreen(): JSX.Element {
-  const { userId, sessionToken, signOut } = useAuthSession();
-  const viewer = useQuery(api.auth.viewer, {
-    userId: userId ?? undefined,
-    sessionToken: sessionToken ?? undefined,
-  });
+  const betterAuthSession = useSession();
+  const viewer = useQuery(api.auth.viewer, {});
   const createCoupleAndCode = useMutation(api.pairing.createCoupleAndCode);
   const joinWithCode = useMutation(api.pairing.joinWithCode);
 
@@ -30,7 +27,7 @@ export default function PairingScreen(): JSX.Element {
     return Math.max(0, Math.floor(diff / 86_400_000));
   }, [anniversaryDateText]);
 
-  if (!userId || !sessionToken) return <Redirect href="/auth" />;
+  if (!betterAuthSession.data?.session) return <Redirect href="/auth" />;
   if (viewer === undefined) {
     return (
       <View className="flex-1 bg-[#fff8f1] items-center justify-center">
@@ -41,7 +38,6 @@ export default function PairingScreen(): JSX.Element {
   if (viewer?.couple && viewer.memberCount >= 2) return <Redirect href="/(tabs)" />;
 
   async function handleCreateCode() {
-    if (!userId || !sessionToken) return;
     const anniversaryTime = new Date(`${anniversaryDateText}T00:00:00`).getTime();
     if (!Number.isFinite(anniversaryTime)) {
       setError("Enter the anniversary date as YYYY-MM-DD.");
@@ -51,8 +47,6 @@ export default function PairingScreen(): JSX.Element {
     setIsWorking(true);
     try {
       const result = await createCoupleAndCode({
-        userId,
-        sessionToken,
         anniversaryDate: anniversaryTime,
       });
       setGeneratedCode(result.code);
@@ -64,11 +58,12 @@ export default function PairingScreen(): JSX.Element {
   }
 
   async function handleJoin() {
-    if (!userId || !sessionToken) return;
     setError(null);
     setIsWorking(true);
     try {
-      await joinWithCode({ userId, sessionToken, code });
+      await joinWithCode({
+        code,
+      });
       router.replace("/(tabs)");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not join with that code.");
@@ -149,7 +144,7 @@ export default function PairingScreen(): JSX.Element {
       </View>
 
       {error ? <Text className="text-center text-sm text-red-700">{error}</Text> : null}
-      <Pressable className="items-center" onPress={signOut}>
+      <Pressable className="items-center" onPress={() => void authClient.signOut()}>
         <Text className="text-sm text-[#8c766b]">Sign out</Text>
       </Pressable>
     </View>

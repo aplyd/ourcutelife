@@ -1,9 +1,12 @@
 import { Redirect } from "expo-router";
 import type { JSX } from "react";
 
-import { useAuthSession } from "@/lib/authSession";
+import { useSession } from "@/lib/betterAuth";
 
 export default function EntryRoute(): JSX.Element {
-  const { userId, sessionToken } = useAuthSession();
-  return <Redirect href={userId && sessionToken ? "/pairing" : "/auth"} />;
+  const betterAuthSession = useSession();
+
+  if (betterAuthSession.isPending) return <Redirect href="/auth" />;
+
+  return <Redirect href={betterAuthSession.data?.session ? "/pairing" : "/auth"} />;
 }

@@ -6,7 +6,7 @@ iOS-only Expo couples app scaffolded with the HeroUI Native Expo tabs starter.
 
 - Expo SDK 56 + Expo Router
 - HeroUI Native + Uniwind
-- Convex backend (`https://fleet-pig-957.convex.cloud`)
+- Convex backend (`https://usable-tapir-102.convex.cloud`)
 - Apple Authentication wired for Convex auth handoff
 - Expo Updates / Notifications / Splash Screen / Vision Camera plugins configured
 - `pnpm`, `oxfmt`, `oxlint --type-aware --type-check`, TypeScript

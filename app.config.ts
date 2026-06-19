@@ -1,8 +1,8 @@
 import type { ExpoConfig } from "expo/config";
 
-const convexUrl = process.env.EXPO_PUBLIC_CONVEX_URL ?? "https://fleet-pig-957.convex.cloud";
+const convexUrl = process.env.EXPO_PUBLIC_CONVEX_URL ?? "https://usable-tapir-102.convex.cloud";
 const convexHttpActionsUrl =
-  process.env.EXPO_PUBLIC_CONVEX_HTTP_ACTIONS_URL ?? "https://fleet-pig-957.convex.site";
+  process.env.EXPO_PUBLIC_CONVEX_HTTP_ACTIONS_URL ?? "https://usable-tapir-102.convex.site";
 
 const config: ExpoConfig = {
   name: "ourcutelife",

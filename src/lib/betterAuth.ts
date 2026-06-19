@@ -8,7 +8,7 @@ const convexSiteUrl =
   process.env.EXPO_PUBLIC_CONVEX_SITE_URL ??
   process.env.EXPO_PUBLIC_CONVEX_HTTP_ACTIONS_URL ??
   (Constants.expoConfig?.extra?.convexHttpActionsUrl as string | undefined) ??
-  "https://fleet-pig-957.convex.site";
+  "https://usable-tapir-102.convex.site";
 
 export const authClient = createAuthClient({
   baseURL: `${convexSiteUrl}/api/auth`,

@@ -1,4 +1,6 @@
 import { v } from "convex/values";
+import type { Id } from "./_generated/dataModel";
+import type { MutationCtx } from "./_generated/server";
 import { mutation } from "./_generated/server";
 import { getCurrentAppUser } from "./auth";
 
@@ -14,6 +16,16 @@ function displayCode(code: string): string {
 
 function generateCode(): string {
   return String(Math.floor(100000 + Math.random() * 900000));
+}
+
+async function expireActiveCodesForCouple(ctx: MutationCtx, coupleId: Id<"couples">, now: number) {
+  const activeCodes = await ctx.db
+    .query("pairingCodes")
+    .withIndex("by_couple", (q) => q.eq("coupleId", coupleId))
+    .collect()
+    .then((codes) => codes.filter((code) => !code.usedAt && code.expiresAt > now));
+
+  await Promise.all(activeCodes.map((code) => ctx.db.patch(code._id, { usedAt: now })));
 }
 
 export const createCoupleAndCode = mutation({
@@ -48,6 +60,7 @@ export const createCoupleAndCode = mutation({
         anniversaryDate: args.anniversaryDate,
         updatedAt: now,
       });
+      await expireActiveCodesForCouple(ctx, existingMembership.coupleId, now);
     } else {
       const name = user.fullName ? `${user.fullName}'s relationship` : "Our Cute Life";
       coupleId = await ctx.db.insert("couples", {
@@ -82,19 +95,20 @@ export const createCoupleAndCode = mutation({
     if (!code) throw new Error("Could not generate a unique pairing code. Try again.");
     if (!coupleId) throw new Error("Could not create a relationship space. Try again.");
     const activeCoupleId = coupleId;
+    const expiresAt = now + PAIRING_CODE_TTL_MS;
 
     await ctx.db.insert("pairingCodes", {
       coupleId: activeCoupleId,
       code,
       createdByUserId: user._id,
-      expiresAt: now + PAIRING_CODE_TTL_MS,
+      expiresAt,
       createdAt: now,
     });
 
     return {
       coupleId: activeCoupleId,
       code: displayCode(code),
-      expiresAt: now + PAIRING_CODE_TTL_MS,
+      expiresAt,
     };
   },
 });
@@ -134,6 +148,18 @@ export const joinWithCode = mutation({
 
     if (!pairingCode) {
       throw new Error("That pairing code is invalid or expired.");
+    }
+    if (pairingCode.createdByUserId === user._id) {
+      throw new Error("You cannot join your own pairing code. Share it with your partner instead.");
+    }
+
+    const members = await ctx.db
+      .query("coupleMembers")
+      .withIndex("by_couple", (q) => q.eq("coupleId", pairingCode.coupleId))
+      .collect();
+    if (members.length >= 2) {
+      await ctx.db.patch(pairingCode._id, { usedAt: now });
+      throw new Error("That relationship space is already full.");
     }
 
     await ctx.db.insert("coupleMembers", {

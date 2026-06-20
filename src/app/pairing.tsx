@@ -2,10 +2,33 @@ import { useMutation, useQuery } from "convex/react";
 import { Redirect, router } from "expo-router";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
-import { ActivityIndicator, Pressable, Share, Text, TextInput, View } from "react-native";
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  Share,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 
 import { api } from "../../convex/_generated/api";
 import { authClient, useSession } from "@/lib/betterAuth";
+
+function formatExpiry(expiresAt: number | null | undefined): string | null {
+  if (!expiresAt) return null;
+  return new Intl.DateTimeFormat("en", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(expiresAt));
+}
+
+function formatPairingInput(value: string): string {
+  const digits = value.replace(/[^0-9]/g, "").slice(0, 6);
+  return digits.length > 3 ? `${digits.slice(0, 3)}-${digits.slice(3)}` : digits;
+}
 
 export default function PairingScreen(): JSX.Element {
   const betterAuthSession = useSession();
@@ -19,6 +42,7 @@ export default function PairingScreen(): JSX.Element {
   );
   const [code, setCode] = useState("");
   const [generatedCode, setGeneratedCode] = useState<string | null>(null);
+  const [generatedCodeExpiresAt, setGeneratedCodeExpiresAt] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isWorking, setIsWorking] = useState(false);
 
@@ -51,6 +75,7 @@ export default function PairingScreen(): JSX.Element {
         anniversaryDate: anniversaryTime,
       });
       setGeneratedCode(result.code);
+      setGeneratedCodeExpiresAt(result.expiresAt);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not create a pairing code.");
     } finally {
@@ -92,14 +117,19 @@ export default function PairingScreen(): JSX.Element {
   }
 
   const displayedCode = generatedCode ?? viewer?.activePairingCode ?? null;
+  const displayedCodeExpiresAt =
+    generatedCodeExpiresAt ?? viewer?.activePairingCodeExpiresAt ?? null;
+  const displayedExpiry = formatExpiry(displayedCodeExpiresAt);
 
   async function handleShare() {
     if (!displayedCode) return;
-    await Share.share({ message: `Join me on Our Cute Life with pairing code ${displayedCode}` });
+    await Share.share({
+      message: `Join me on Our Cute Life with pairing code ${displayedCode}`,
+    });
   }
 
   return (
-    <View className="flex-1 bg-[#fff8f1] px-6 py-16 gap-6">
+    <ScrollView className="flex-1 bg-[#fff8f1]" contentContainerClassName="px-6 py-16 gap-6">
       <View className="gap-2">
         <Text className="text-4xl font-bold text-[#2f211c]">Pair your space</Text>
         <Text className="text-base leading-6 text-[#6f5a50]">
@@ -124,7 +154,9 @@ export default function PairingScreen(): JSX.Element {
           disabled={isWorking}
           onPress={handleCreateCode}
         >
-          <Text className="font-semibold text-white">Generate pairing code</Text>
+          <Text className="font-semibold text-white">
+            {displayedCode ? "Generate a fresh code" : "Generate pairing code"}
+          </Text>
         </Pressable>
         {displayedCode ? (
           <View className="gap-3 rounded-2xl bg-[#f4ecff] p-4">
@@ -132,6 +164,9 @@ export default function PairingScreen(): JSX.Element {
             <Text className="text-4xl font-bold tracking-widest text-[#2f211c]">
               {displayedCode}
             </Text>
+            {displayedExpiry ? (
+              <Text className="text-sm text-[#6f5a50]">Expires {displayedExpiry}</Text>
+            ) : null}
             <Pressable
               className="h-11 rounded-full bg-[#2f211c] items-center justify-center"
               onPress={handleShare}
@@ -151,7 +186,7 @@ export default function PairingScreen(): JSX.Element {
           className="h-12 rounded-2xl border border-[#e6d2c2] px-4 text-xl tracking-widest text-[#2f211c]"
           placeholder="482-913"
           value={code}
-          onChangeText={setCode}
+          onChangeText={(value) => setCode(formatPairingInput(value))}
         />
         <Pressable
           className="h-12 rounded-full bg-[#2f211c] items-center justify-center"
@@ -181,6 +216,6 @@ export default function PairingScreen(): JSX.Element {
       <Pressable className="items-center" onPress={() => void authClient.signOut()}>
         <Text className="text-sm text-[#8c766b]">Sign out</Text>
       </Pressable>
-    </View>
+    </ScrollView>
   );
 }

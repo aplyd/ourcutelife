@@ -109,6 +109,7 @@ export const viewer = query({
       activePairingCode: activePairingCode
         ? `${activePairingCode.code.slice(0, 3)}-${activePairingCode.code.slice(3)}`
         : null,
+      activePairingCodeExpiresAt: activePairingCode?.expiresAt ?? null,
     };
   },
 });

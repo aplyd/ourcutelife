@@ -28,6 +28,27 @@ export default function RootLayout(): JSX.Element {
             <Stack.Screen name="auth" />
             <Stack.Screen name="pairing" />
             <Stack.Screen name="(tabs)" />
+            <Stack.Screen
+              name="(sheet)"
+              options={{
+                contentStyle: {
+                  backgroundColor: "transparent",
+                },
+                presentation: "formSheet",
+                headerShown: false,
+                gestureDirection: "vertical",
+                gestureResponseDistance: {
+                  top: 50,
+                  bottom: 50,
+                },
+                animation: "slide_from_bottom",
+                sheetGrabberVisible: false,
+                sheetInitialDetentIndex: 1,
+                sheetAllowedDetents: [0.3, 0.8],
+                sheetExpandsWhenScrolledToEdge: true,
+                sheetCornerRadius: 48,
+              }}
+            />
           </Stack>
           <StatusBar style="auto" />
         </HeroUINativeProvider>

@@ -1,3 +1,4 @@
+import { v } from "convex/values";
 import { createClient } from "@convex-dev/better-auth";
 import { convex as convexPlugin } from "@convex-dev/better-auth/plugins";
 import { expo } from "@better-auth/expo";
@@ -70,6 +71,46 @@ export const syncBetterAuthUser = mutation({
   },
 });
 
+export const updateProfile = mutation({
+  args: {
+    fullName: v.string(),
+    avatarUrl: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const user = await getCurrentAppUser(ctx);
+    if (!user) throw new Error("Not signed in.");
+    const fullName = args.fullName.trim();
+    if (!fullName) throw new Error("Add a name before saving.");
+    await ctx.db.patch(user._id, {
+      fullName,
+      avatarUrl: args.avatarUrl?.trim() || user.avatarUrl,
+      updatedAt: Date.now(),
+    });
+    return user._id;
+  },
+});
+
+export const updateAnniversary = mutation({
+  args: {
+    anniversaryDate: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const user = await getCurrentAppUser(ctx);
+    if (!user) throw new Error("Not signed in.");
+    const membership = await ctx.db
+      .query("coupleMembers")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .first();
+    if (!membership) throw new Error("Pair with your partner first.");
+    if (!Number.isFinite(args.anniversaryDate)) throw new Error("Anniversary date is invalid.");
+    await ctx.db.patch(membership.coupleId, {
+      anniversaryDate: args.anniversaryDate,
+      updatedAt: Date.now(),
+    });
+    return membership.coupleId;
+  },
+});
+
 export const viewer = query({
   args: {},
   handler: async (ctx) => {
@@ -101,8 +142,12 @@ export const viewer = query({
           )
       : null;
 
+    const partnerMembership = members.find((member) => member.userId !== user._id);
+    const partner = partnerMembership ? await ctx.db.get(partnerMembership.userId) : null;
+
     return {
       user,
+      partner,
       membership,
       couple,
       memberCount: members.length,

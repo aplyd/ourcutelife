@@ -4,7 +4,7 @@ import type { JSX } from "react";
 import { useMemo, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 
-import { api } from "../../../convex/_generated/api";
+import { api } from "../../../../convex/_generated/api";
 import { useSession } from "@/lib/betterAuth";
 
 type Tone = "good" | "bad" | "mixed";

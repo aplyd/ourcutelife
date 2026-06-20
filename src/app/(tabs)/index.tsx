@@ -1,37 +1,67 @@
-import { useMutation, useQuery } from "convex/react";
+import { useQuery } from "convex/react";
 import { Redirect, router } from "expo-router";
 import type { JSX } from "react";
-import { useEffect, useState } from "react";
-import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { useEffect, useMemo, useState } from "react";
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 import AnimatedRollingNumber from "react-native-animated-rolling-numbers";
 
 import { api } from "../../../convex/_generated/api";
-import { authClient, useSession } from "@/lib/betterAuth";
+import { useSession } from "@/lib/betterAuth";
 
-function formatAnsweredAt(timestamp: number | null | undefined): string | null {
-  if (!timestamp) return null;
-  return new Intl.DateTimeFormat("en", {
-    hour: "numeric",
-    minute: "2-digit",
-  }).format(new Date(timestamp));
+type DurationParts = {
+  years: number;
+  months: number;
+  weeks: number;
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+};
+
+const toneStyles = {
+  good: "bg-emerald-100 text-emerald-900",
+  mixed: "bg-amber-100 text-amber-900",
+  bad: "bg-rose-100 text-rose-900",
+} as const;
+
+function getDurationParts(start: number | undefined, tick: number): DurationParts {
+  void tick;
+  if (!start) return { years: 0, months: 0, weeks: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
+  const totalSeconds = Math.max(0, Math.floor((Date.now() - start) / 1000));
+  const years = Math.floor(totalSeconds / 31_536_000);
+  const months = Math.floor((totalSeconds % 31_536_000) / 2_592_000);
+  const weeks = Math.floor((totalSeconds % 2_592_000) / 604_800);
+  const days = Math.floor((totalSeconds % 604_800) / 86_400);
+  const hours = Math.floor((totalSeconds % 86_400) / 3_600);
+  const minutes = Math.floor((totalSeconds % 3_600) / 60);
+  const seconds = totalSeconds % 60;
+  return { years, months, weeks, days, hours, minutes, seconds };
+}
+
+function formatDate(timestamp: number): string {
+  return new Intl.DateTimeFormat("en", { month: "short", day: "numeric" }).format(new Date(timestamp));
 }
 
 export default function TodayTab(): JSX.Element {
   const betterAuthSession = useSession();
   const viewer = useQuery(api.auth.viewer, {});
   const todayPrompt = useQuery(api.prompts.today, {});
-  const saveAnswer = useMutation(api.prompts.answer);
-  const [answer, setAnswer] = useState("");
-  const [isEditing, setIsEditing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const moments = useQuery(api.moments.listMine, {});
+  const [nowTick, setNowTick] = useState(0);
 
   useEffect(() => {
-    if (todayPrompt?.response && !isEditing) setAnswer(todayPrompt.response);
-  }, [isEditing, todayPrompt?.response]);
+    const id = setInterval(() => setNowTick((value) => value + 1), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+
+  const duration = useMemo(
+    () => getDurationParts(viewer?.couple?.anniversaryDate, nowTick),
+    [viewer?.couple?.anniversaryDate, nowTick],
+  );
 
   if (!betterAuthSession.data?.session) return <Redirect href="/auth" />;
-  if (viewer === undefined || todayPrompt === undefined) {
+  if (viewer === undefined || todayPrompt === undefined || moments === undefined) {
     return (
       <View className="flex-1 bg-[#fff8f1] items-center justify-center">
         <ActivityIndicator />
@@ -39,164 +69,122 @@ export default function TodayTab(): JSX.Element {
     );
   }
   if (!viewer?.couple) return <Redirect href="/pairing" />;
-  const promptData = todayPrompt!;
 
-  const anniversaryDate = viewer.couple.anniversaryDate;
-  const daysTogether = anniversaryDate
-    ? Math.max(0, Math.floor((Date.now() - anniversaryDate) / 86_400_000))
-    : 0;
+  const partnerName = "your person";
+  const promptData = todayPrompt;
   const hasAnswered = Boolean(promptData.response);
-  const shouldShowEditor = !hasAnswered || isEditing;
-  const answeredAt = formatAnsweredAt(promptData.answeredAt);
-  const partnerAnsweredAt = formatAnsweredAt(promptData.partnerResponse?.answeredAt ?? null);
+  const recentMoments = moments.slice(0, 5);
 
-  async function handleSaveAnswer() {
-    if (!betterAuthSession.data?.session || !answer.trim()) return;
-    setError(null);
-    setIsSaving(true);
-    try {
-      await saveAnswer({
-        promptDate: promptData.promptDate,
-        prompt: promptData.prompt,
-        response: answer,
-      });
-      setIsEditing(false);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not save today's answer.");
-    } finally {
-      setIsSaving(false);
-    }
-  }
+  let promptStatus = "Answer today's prompt together.";
+  if (promptData.partnerHasAnswered && !hasAnswered) promptStatus = `${partnerName} answered. Submit yours to see.`;
+  else if (hasAnswered && !promptData.isRevealed) promptStatus = `Waiting for ${partnerName}.`;
+  else if (promptData.isRevealed) promptStatus = "You both answered. Use it as a conversation starter.";
 
   return (
-    <ScrollView className="flex-1 bg-[#fff8f1]" contentContainerClassName="px-6 pt-16 pb-28 gap-6">
-      <View className="gap-2">
-        <Text className="text-sm font-semibold uppercase tracking-widest text-[#8c766b]">
-          Today
-        </Text>
-        <Text className="text-4xl font-bold text-[#2f211c]">Your relationship check-in</Text>
-        <Text className="text-base leading-6 text-[#6f5a50]">
-          Answer privately. Your partner's answer unlocks only after both of you have answered.
-        </Text>
-      </View>
-
-      <View className="rounded-3xl bg-white/80 p-5 border border-[#f1dfd2] gap-2">
-        <Text className="text-sm text-[#8c766b]">Together for</Text>
-        <View className="flex-row items-end gap-2">
-          <AnimatedRollingNumber
-            value={daysTogether}
-            textStyle={{ fontSize: 48, fontWeight: "800", color: "#2f211c" }}
-          />
-          <Text className="pb-2 text-lg font-semibold text-[#6f5a50]">days</Text>
+    <View className="flex-1 bg-[#fff8f1]">
+      <ScrollView className="flex-1" contentContainerClassName="px-6 pt-16 pb-32 gap-6">
+        <View className="gap-2">
+          <Text className="text-sm font-semibold uppercase tracking-widest text-[#8c766b]">Today</Text>
+          <Text className="text-4xl font-bold text-[#2f211c]">Your cute little daily reset</Text>
+          <Text className="text-base leading-6 text-[#6f5a50]">
+            Check in, answer the tiny prompt, and keep the good/hard stuff from disappearing.
+          </Text>
         </View>
-      </View>
 
-      <View className="rounded-3xl bg-[#2f211c] p-5 gap-4">
-        <Text className="text-sm font-semibold uppercase tracking-widest text-[#d8c2b4]">
-          Daily prompt
-        </Text>
-        <Text className="text-2xl font-bold leading-8 text-[#fff8f1]">{promptData.prompt}</Text>
-
-        {shouldShowEditor ? (
-          <>
-            <TextInput
-              multiline
-              className="min-h-28 rounded-2xl bg-white/95 px-4 py-3 text-base leading-6 text-[#2f211c]"
-              placeholder="Write the honest version, not the performative one."
-              textAlignVertical="top"
-              value={answer}
-              onChangeText={setAnswer}
-            />
-            <Pressable
-              className="h-11 rounded-full bg-[#fff8f1] items-center justify-center"
-              disabled={isSaving || !answer.trim()}
-              onPress={handleSaveAnswer}
-            >
-              <Text className="font-semibold text-[#2f211c]">
-                {isSaving ? "Saving…" : hasAnswered ? "Save edit" : "Save answer"}
-              </Text>
-            </Pressable>
-            {hasAnswered ? (
-              <Pressable className="items-center" onPress={() => setIsEditing(false)}>
-                <Text className="text-sm font-semibold text-[#d8c2b4]">Cancel edit</Text>
-              </Pressable>
-            ) : null}
-          </>
-        ) : (
-          <View className="gap-3">
-            <View className="rounded-2xl bg-white/10 p-3 gap-2">
-              <Text className="text-xs font-semibold uppercase tracking-widest text-[#d8c2b4]">
-                Your answer{answeredAt ? ` · ${answeredAt}` : ""}
-              </Text>
-              <Text className="text-base leading-6 text-[#fff8f1]">{promptData.response}</Text>
+        <View className="rounded-3xl bg-white/85 p-5 border border-[#f1dfd2] gap-4">
+          <View className="flex-row items-center gap-3">
+            <View className="flex-row w-16">
+              <View className="h-11 w-11 rounded-full bg-[#7c3aed] border-2 border-white items-center justify-center">
+                <Text className="font-bold text-white">You</Text>
+              </View>
+              <View className="h-11 w-11 -ml-5 rounded-full bg-[#f97316] border-2 border-white items-center justify-center">
+                <Text className="font-bold text-white">♥</Text>
+              </View>
             </View>
-            <Pressable
-              className="h-10 rounded-full border border-[#d8c2b4] items-center justify-center"
-              onPress={() => setIsEditing(true)}
-            >
-              <Text className="font-semibold text-[#fff8f1]">Edit answer</Text>
+            <View className="flex-1">
+              <Text className="text-sm font-semibold uppercase tracking-widest text-[#8c766b]">Together for</Text>
+              <Text className="text-base text-[#6f5a50]">You and {partnerName} have been together for…</Text>
+            </View>
+          </View>
+          <View className="flex-row flex-wrap gap-2">
+            {Object.entries(duration).map(([label, value]) => (
+              <View key={label} className="min-w-[86px] rounded-2xl bg-[#fff8f1] p-3 border border-[#f1dfd2]">
+                <AnimatedRollingNumber value={value} textStyle={{ fontSize: 28, fontWeight: "800", color: "#2f211c" }} />
+                <Text className="text-xs font-semibold uppercase text-[#8c766b]">{label}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+
+        <View className="rounded-3xl bg-[#2f211c] p-5 gap-4">
+          <Text className="text-sm font-semibold uppercase tracking-widest text-[#d8c2b4]">Daily prompt</Text>
+          <Text className="text-2xl font-bold leading-8 text-[#fff8f1]">{promptData.prompt}</Text>
+          <Text className="text-base leading-6 text-[#d8c2b4]">{promptStatus}</Text>
+
+          {hasAnswered ? (
+            <View className="gap-3">
+              <View className="rounded-2xl bg-white/10 p-3 gap-2">
+                <Text className="text-xs font-semibold uppercase tracking-widest text-[#d8c2b4]">Your answer</Text>
+                <Text className="text-base leading-6 text-[#fff8f1]">{promptData.response}</Text>
+              </View>
+              {promptData.isRevealed && promptData.partnerResponse ? (
+                <View className="rounded-2xl bg-white/10 p-3 gap-2">
+                  <Text className="text-xs font-semibold uppercase tracking-widest text-[#d8c2b4]">Partner answer</Text>
+                  <Text className="text-base leading-6 text-[#fff8f1]">{promptData.partnerResponse.response}</Text>
+                </View>
+              ) : null}
+            </View>
+          ) : null}
+          <Pressable className="h-11 rounded-full bg-[#fff8f1] items-center justify-center" onPress={() => router.push("/prompts/today")}>
+            <Text className="font-semibold text-[#2f211c]">{hasAnswered ? "Edit answer" : "Answer prompt"}</Text>
+          </Pressable>
+        </View>
+
+        <View className="flex-row gap-3">
+          <View className="flex-1 aspect-square rounded-[28px] bg-white/85 border border-[#f1dfd2] p-4 justify-between">
+            <Text className="text-4xl">🎮</Text>
+            <View>
+              <Text className="text-lg font-bold text-[#2f211c]">Weekly game</Text>
+              <Text className="text-sm text-[#6f5a50]">Tiny couple challenge coming soon.</Text>
+            </View>
+          </View>
+          <View className="flex-1 aspect-square rounded-[28px] bg-white/85 border border-[#f1dfd2] p-4 justify-between">
+            <Text className="text-4xl">💬</Text>
+            <View>
+              <Text className="text-lg font-bold text-[#2f211c]">Quiz</Text>
+              <Text className="text-sm text-[#6f5a50]">Conversation sparks, not homework.</Text>
+            </View>
+          </View>
+        </View>
+
+        <View className="rounded-3xl bg-white/85 p-5 border border-[#f1dfd2] gap-4">
+          <View className="flex-row items-center justify-between">
+            <Text className="text-2xl font-bold text-[#2f211c]">Recent moments</Text>
+            <Pressable onPress={() => router.push("/moments")}>
+              <Text className="font-semibold text-[#7c3aed]">See all</Text>
             </Pressable>
           </View>
-        )}
-        {error ? <Text className="text-sm text-red-200">{error}</Text> : null}
-      </View>
+          {recentMoments.length ? (
+            <View className="gap-2">
+              {recentMoments.map((moment) => (
+                <Pressable key={moment._id} className="flex-row items-center gap-3 py-2" onPress={() => router.push(`/moments/${moment._id}`)}>
+                  <Text className={`overflow-hidden rounded-full px-2 py-1 text-xs font-bold ${toneStyles[moment.tone]}`}>
+                    {moment.tone === "bad" ? "HARD" : moment.tone.toUpperCase()}
+                  </Text>
+                  <Text className="w-14 text-xs text-[#8c766b]">{formatDate(moment.happenedAt)}</Text>
+                  <Text className="flex-1 text-base font-semibold text-[#2f211c]" numberOfLines={1}>{moment.summary}</Text>
+                </Pressable>
+              ))}
+            </View>
+          ) : (
+            <Text className="text-base text-[#6f5a50]">No moments yet. Add one when something feels worth remembering.</Text>
+          )}
+        </View>
+      </ScrollView>
 
-      <View className="rounded-3xl bg-white/80 p-5 border border-[#f1dfd2] gap-3">
-        <Text className="text-sm font-semibold uppercase tracking-widest text-[#8c766b]">
-          Partner reveal
-        </Text>
-        {promptData.isRevealed && promptData.partnerResponse ? (
-          <View className="gap-2">
-            <Text className="text-xl font-bold text-[#2f211c]">
-              Your partner answered{partnerAnsweredAt ? ` at ${partnerAnsweredAt}` : ""}
-            </Text>
-            <Text className="rounded-2xl bg-[#f4ecff] p-4 text-base leading-6 text-[#2f211c]">
-              {promptData.partnerResponse.response}
-            </Text>
-          </View>
-        ) : hasAnswered ? (
-          <View className="gap-2">
-            <Text className="text-xl font-bold text-[#2f211c]">Waiting on your partner</Text>
-            <Text className="text-base leading-6 text-[#6f5a50]">
-              Your answer is saved. Their answer will appear here after they answer today's prompt.
-            </Text>
-          </View>
-        ) : promptData.partnerHasAnswered ? (
-          <View className="gap-2">
-            <Text className="text-xl font-bold text-[#2f211c]">Your partner already answered</Text>
-            <Text className="text-base leading-6 text-[#6f5a50]">
-              Answer today’s prompt to unlock what they wrote.
-            </Text>
-          </View>
-        ) : (
-          <View className="gap-2">
-            <Text className="text-xl font-bold text-[#2f211c]">
-              Both answers are private for now
-            </Text>
-            <Text className="text-base leading-6 text-[#6f5a50]">
-              Once both of you answer, you’ll be able to read each other’s responses.
-            </Text>
-          </View>
-        )}
-      </View>
-
-      <View className="rounded-3xl bg-white/80 p-5 border border-[#f1dfd2] gap-2">
-        <Text className="text-sm font-semibold uppercase tracking-widest text-[#8c766b]">
-          Weekly topic
-        </Text>
-        <Text className="text-xl font-bold leading-7 text-[#2f211c]">{promptData.weeklyTopic}</Text>
-      </View>
-
-      <Pressable
-        className="h-14 rounded-full bg-[#7c3aed] items-center justify-center"
-        onPress={() => router.push("/moments/new")}
-      >
-        <Text className="font-semibold text-white">Log a moment</Text>
+      <Pressable className="absolute bottom-8 right-6 h-16 w-16 rounded-full bg-[#7c3aed] items-center justify-center shadow-lg" onPress={() => router.push("/moments/new")}>
+        <Text className="text-4xl leading-none text-white">＋</Text>
       </Pressable>
-
-      <Pressable className="items-center" onPress={() => void authClient.signOut()}>
-        <Text className="text-sm text-[#8c766b]">Sign out</Text>
-      </Pressable>
-    </ScrollView>
+    </View>
   );
 }

@@ -49,8 +49,7 @@ export const send = mutation({
       await ctx.db.insert("coupleChatMessages", {
         coupleId: membership.coupleId,
         senderKind: "ai",
-        text:
-          "Coach note: I’m invoked-only right now. Soon I’ll help rephrase, unpack patterns, and suggest a safer next message before anything is shared.",
+        text: "Coach note: I’m invoked-only right now. Soon I’ll help rephrase, unpack patterns, and suggest a safer next message before anything is shared.",
         createdAt: now + 1,
       });
     }

@@ -39,7 +39,9 @@ function getDurationParts(start: number | undefined, tick: number): DurationPart
 }
 
 function formatDate(timestamp: number): string {
-  return new Intl.DateTimeFormat("en", { month: "short", day: "numeric" }).format(new Date(timestamp));
+  return new Intl.DateTimeFormat("en", { month: "short", day: "numeric" }).format(
+    new Date(timestamp),
+  );
 }
 
 export default function TodayTab(): JSX.Element {
@@ -53,7 +55,6 @@ export default function TodayTab(): JSX.Element {
     const id = setInterval(() => setNowTick((value) => value + 1), 1000);
     return () => clearInterval(id);
   }, []);
-
 
   const duration = useMemo(
     () => getDurationParts(viewer?.couple?.anniversaryDate, nowTick),
@@ -76,15 +77,19 @@ export default function TodayTab(): JSX.Element {
   const recentMoments = moments.slice(0, 5);
 
   let promptStatus = "Answer today's prompt together.";
-  if (promptData.partnerHasAnswered && !hasAnswered) promptStatus = `${partnerName} answered. Submit yours to see.`;
+  if (promptData.partnerHasAnswered && !hasAnswered)
+    promptStatus = `${partnerName} answered. Submit yours to see.`;
   else if (hasAnswered && !promptData.isRevealed) promptStatus = `Waiting for ${partnerName}.`;
-  else if (promptData.isRevealed) promptStatus = "You both answered. Use it as a conversation starter.";
+  else if (promptData.isRevealed)
+    promptStatus = "You both answered. Use it as a conversation starter.";
 
   return (
     <View className="flex-1 bg-[#fff8f1]">
       <ScrollView className="flex-1" contentContainerClassName="px-6 pt-16 pb-32 gap-6">
         <View className="gap-2">
-          <Text className="text-sm font-semibold uppercase tracking-widest text-[#8c766b]">Today</Text>
+          <Text className="text-sm font-semibold uppercase tracking-widest text-[#8c766b]">
+            Today
+          </Text>
           <Text className="text-4xl font-bold text-[#2f211c]">Your cute little daily reset</Text>
           <Text className="text-base leading-6 text-[#6f5a50]">
             Check in, answer the tiny prompt, and keep the good/hard stuff from disappearing.
@@ -102,14 +107,24 @@ export default function TodayTab(): JSX.Element {
               </View>
             </View>
             <View className="flex-1">
-              <Text className="text-sm font-semibold uppercase tracking-widest text-[#8c766b]">Together for</Text>
-              <Text className="text-base text-[#6f5a50]">You and {partnerName} have been together for…</Text>
+              <Text className="text-sm font-semibold uppercase tracking-widest text-[#8c766b]">
+                Together for
+              </Text>
+              <Text className="text-base text-[#6f5a50]">
+                You and {partnerName} have been together for…
+              </Text>
             </View>
           </View>
           <View className="flex-row flex-wrap gap-2">
             {Object.entries(duration).map(([label, value]) => (
-              <View key={label} className="min-w-[86px] rounded-2xl bg-[#fff8f1] p-3 border border-[#f1dfd2]">
-                <AnimatedRollingNumber value={value} textStyle={{ fontSize: 28, fontWeight: "800", color: "#2f211c" }} />
+              <View
+                key={label}
+                className="min-w-[86px] rounded-2xl bg-[#fff8f1] p-3 border border-[#f1dfd2]"
+              >
+                <AnimatedRollingNumber
+                  value={value}
+                  textStyle={{ fontSize: 28, fontWeight: "800", color: "#2f211c" }}
+                />
                 <Text className="text-xs font-semibold uppercase text-[#8c766b]">{label}</Text>
               </View>
             ))}
@@ -117,26 +132,39 @@ export default function TodayTab(): JSX.Element {
         </View>
 
         <View className="rounded-3xl bg-[#2f211c] p-5 gap-4">
-          <Text className="text-sm font-semibold uppercase tracking-widest text-[#d8c2b4]">Daily prompt</Text>
+          <Text className="text-sm font-semibold uppercase tracking-widest text-[#d8c2b4]">
+            Daily prompt
+          </Text>
           <Text className="text-2xl font-bold leading-8 text-[#fff8f1]">{promptData.prompt}</Text>
           <Text className="text-base leading-6 text-[#d8c2b4]">{promptStatus}</Text>
 
           {hasAnswered ? (
             <View className="gap-3">
               <View className="rounded-2xl bg-white/10 p-3 gap-2">
-                <Text className="text-xs font-semibold uppercase tracking-widest text-[#d8c2b4]">Your answer</Text>
+                <Text className="text-xs font-semibold uppercase tracking-widest text-[#d8c2b4]">
+                  Your answer
+                </Text>
                 <Text className="text-base leading-6 text-[#fff8f1]">{promptData.response}</Text>
               </View>
               {promptData.isRevealed && promptData.partnerResponse ? (
                 <View className="rounded-2xl bg-white/10 p-3 gap-2">
-                  <Text className="text-xs font-semibold uppercase tracking-widest text-[#d8c2b4]">Partner answer</Text>
-                  <Text className="text-base leading-6 text-[#fff8f1]">{promptData.partnerResponse.response}</Text>
+                  <Text className="text-xs font-semibold uppercase tracking-widest text-[#d8c2b4]">
+                    Partner answer
+                  </Text>
+                  <Text className="text-base leading-6 text-[#fff8f1]">
+                    {promptData.partnerResponse.response}
+                  </Text>
                 </View>
               ) : null}
             </View>
           ) : null}
-          <Pressable className="h-11 rounded-full bg-[#fff8f1] items-center justify-center" onPress={() => router.push("/prompts/today")}>
-            <Text className="font-semibold text-[#2f211c]">{hasAnswered ? "Edit answer" : "Answer prompt"}</Text>
+          <Pressable
+            className="h-11 rounded-full bg-[#fff8f1] items-center justify-center"
+            onPress={() => router.push("/prompts/today")}
+          >
+            <Text className="font-semibold text-[#2f211c]">
+              {hasAnswered ? "Edit answer" : "Answer prompt"}
+            </Text>
           </Pressable>
         </View>
 
@@ -167,22 +195,37 @@ export default function TodayTab(): JSX.Element {
           {recentMoments.length ? (
             <View className="gap-2">
               {recentMoments.map((moment) => (
-                <Pressable key={moment._id} className="flex-row items-center gap-3 py-2" onPress={() => router.push(`/moments/${moment._id}`)}>
-                  <Text className={`overflow-hidden rounded-full px-2 py-1 text-xs font-bold ${toneStyles[moment.tone]}`}>
+                <Pressable
+                  key={moment._id}
+                  className="flex-row items-center gap-3 py-2"
+                  onPress={() => router.push(`/moments/${moment._id}`)}
+                >
+                  <Text
+                    className={`overflow-hidden rounded-full px-2 py-1 text-xs font-bold ${toneStyles[moment.tone]}`}
+                  >
                     {moment.tone === "bad" ? "HARD" : moment.tone.toUpperCase()}
                   </Text>
-                  <Text className="w-14 text-xs text-[#8c766b]">{formatDate(moment.happenedAt)}</Text>
-                  <Text className="flex-1 text-base font-semibold text-[#2f211c]" numberOfLines={1}>{moment.summary}</Text>
+                  <Text className="w-14 text-xs text-[#8c766b]">
+                    {formatDate(moment.happenedAt)}
+                  </Text>
+                  <Text className="flex-1 text-base font-semibold text-[#2f211c]" numberOfLines={1}>
+                    {moment.summary}
+                  </Text>
                 </Pressable>
               ))}
             </View>
           ) : (
-            <Text className="text-base text-[#6f5a50]">No moments yet. Add one when something feels worth remembering.</Text>
+            <Text className="text-base text-[#6f5a50]">
+              No moments yet. Add one when something feels worth remembering.
+            </Text>
           )}
         </View>
       </ScrollView>
 
-      <Pressable className="absolute bottom-8 right-6 h-16 w-16 rounded-full bg-[#7c3aed] items-center justify-center shadow-lg" onPress={() => router.push("/moments/new")}>
+      <Pressable
+        className="absolute bottom-8 right-6 h-16 w-16 rounded-full bg-[#7c3aed] items-center justify-center shadow-lg"
+        onPress={() => router.push("/moments/new")}
+      >
         <Text className="text-4xl leading-none text-white">＋</Text>
       </Pressable>
     </View>

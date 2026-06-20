@@ -30,19 +30,30 @@ export default function TabsLayout(): JSX.Element {
     >
       <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Label>Today</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf={{ default: "heart.text.square", selected: "heart.text.square.fill" }} />
+        <NativeTabs.Trigger.Icon
+          sf={{ default: "heart.text.square", selected: "heart.text.square.fill" }}
+        />
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="chat">
         <NativeTabs.Trigger.Label>Chat</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf={{ default: "bubble.left.and.bubble.right", selected: "bubble.left.and.bubble.right.fill" }} />
+        <NativeTabs.Trigger.Icon
+          sf={{
+            default: "bubble.left.and.bubble.right",
+            selected: "bubble.left.and.bubble.right.fill",
+          }}
+        />
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="plans">
         <NativeTabs.Trigger.Label>Plans</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf={{ default: "square.grid.2x2", selected: "square.grid.2x2.fill" }} />
+        <NativeTabs.Trigger.Icon
+          sf={{ default: "square.grid.2x2", selected: "square.grid.2x2.fill" }}
+        />
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="me">
         <NativeTabs.Trigger.Label>Me</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf={{ default: "person.crop.circle", selected: "person.crop.circle.fill" }} />
+        <NativeTabs.Trigger.Icon
+          sf={{ default: "person.crop.circle", selected: "person.crop.circle.fill" }}
+        />
       </NativeTabs.Trigger>
     </NativeTabs>
   );

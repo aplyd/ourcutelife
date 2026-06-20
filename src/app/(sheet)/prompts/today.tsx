@@ -22,7 +22,11 @@ export default function TodayPromptSheet(): JSX.Element {
 
   if (!betterAuthSession.data?.session) return <Redirect href="/auth" />;
   if (viewer === undefined || todayPrompt === undefined) {
-    return <View className="flex-1 bg-[#fff8f1] items-center justify-center"><ActivityIndicator /></View>;
+    return (
+      <View className="flex-1 bg-[#fff8f1] items-center justify-center">
+        <ActivityIndicator />
+      </View>
+    );
   }
   if (!viewer?.couple || viewer.memberCount < 2) return <Redirect href="/pairing" />;
 
@@ -52,9 +56,13 @@ export default function TodayPromptSheet(): JSX.Element {
         <View className="h-1.5 w-12 rounded-full bg-[#d8c2b4]" />
       </View>
       <View className="gap-2">
-        <Text className="text-sm font-semibold uppercase tracking-widest text-[#8c766b]">Daily prompt</Text>
+        <Text className="text-sm font-semibold uppercase tracking-widest text-[#8c766b]">
+          Daily prompt
+        </Text>
         <Text className="text-3xl font-bold leading-10 text-[#2f211c]">{todayPrompt.prompt}</Text>
-        <Text className="text-base leading-6 text-[#6f5a50]">Brief and honest is enough. This gives the coach context, but it is not saved as a moment.</Text>
+        <Text className="text-base leading-6 text-[#6f5a50]">
+          Brief and honest is enough. This gives the coach context, but it is not saved as a moment.
+        </Text>
       </View>
       <TextInput
         multiline
@@ -65,7 +73,11 @@ export default function TodayPromptSheet(): JSX.Element {
         onChangeText={setAnswer}
       />
       {error ? <Text className="text-center text-sm text-red-700">{error}</Text> : null}
-      <Pressable className={`h-14 rounded-full items-center justify-center ${answer.trim() && !isSaving ? "bg-[#2f211c]" : "bg-[#d8c2b4]"}`} disabled={!answer.trim() || isSaving} onPress={handleSave}>
+      <Pressable
+        className={`h-14 rounded-full items-center justify-center ${answer.trim() && !isSaving ? "bg-[#2f211c]" : "bg-[#d8c2b4]"}`}
+        disabled={!answer.trim() || isSaving}
+        onPress={handleSave}
+      >
         <Text className="font-bold text-white">{isSaving ? "Saving…" : "Submit answer"}</Text>
       </Pressable>
     </ScrollView>

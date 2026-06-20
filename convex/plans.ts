@@ -142,7 +142,8 @@ export const randomByCategories = query({
           q.eq("coupleId", membership.coupleId).eq("category", category),
         )
         .collect();
-      if (ideas.length) rows.push(publicIdea(ideas[Math.floor(Math.random() * ideas.length)], false));
+      if (ideas.length)
+        rows.push(publicIdea(ideas[Math.floor(Math.random() * ideas.length)], false));
     }
     return rows;
   },

@@ -29,7 +29,7 @@ function cleanOptionalText(value: string | undefined): string | undefined {
 
 export const listMine = query({
   args: {},
-  handler: async (ctx, args) => {
+  handler: async (ctx) => {
     const user = await getCurrentAppUser(ctx);
     if (!user) throw new Error("Not signed in.");
     const membership = await requireMembership(ctx, user._id);

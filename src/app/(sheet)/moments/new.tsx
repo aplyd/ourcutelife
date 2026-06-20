@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "convex/react";
 import { Redirect, router } from "expo-router";
 import type { JSX } from "react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 
 import { api } from "../../../../convex/_generated/api";
@@ -41,9 +41,8 @@ export default function NewMomentScreen(): JSX.Element {
   const [isSaving, setIsSaving] = useState(false);
 
   const needsRepairFields = tone === "bad" || tone === "mixed";
-  const canSave = useMemo(
-    () => Boolean(betterAuthSession.data?.session && summary.trim() && feeling.trim() && !isSaving),
-    [feeling, isSaving, summary],
+  const canSave = Boolean(
+    betterAuthSession.data?.session && summary.trim() && feeling.trim() && !isSaving,
   );
 
   function toggleTag(tag: string) {

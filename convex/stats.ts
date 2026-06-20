@@ -1,4 +1,3 @@
-import { v } from "convex/values";
 import type { QueryCtx } from "./_generated/server";
 import { query } from "./_generated/server";
 import { getCurrentAppUser } from "./auth";
@@ -18,7 +17,7 @@ async function requireSession(ctx: QueryCtx) {
 
 export const mine = query({
   args: {},
-  handler: async (ctx, args) => {
+  handler: async (ctx) => {
     const { user, membership, couple } = await requireSession(ctx);
     const moments = await ctx.db
       .query("moments")

@@ -9,12 +9,12 @@ Our Cute Life helps a couple turn small daily reflections into connection, priva
 
 The app is organized around four jobs:
 
-| Tab | Job |
-| --- | --- |
+| Tab   | Job                                                 |
+| ----- | --------------------------------------------------- |
 | Today | Daily ritual, relationship snapshot, recent moments |
-| Chat | Couple + invoked AI coach conversation space |
-| Plans | Private plan/desire matching and match history |
-| Me | Profile, relationship settings, account controls |
+| Chat  | Couple + invoked AI coach conversation space        |
+| Plans | Private plan/desire matching and match history      |
+| Me    | Profile, relationship settings, account controls    |
 
 ## Global UX principles
 
@@ -74,12 +74,12 @@ Prompt answers are **not moments**. They are brief conversation starters and cou
 
 States:
 
-| State | UI |
-| --- | --- |
-| neither answered | `Answer today's prompt together.` + answer button |
+| State                        | UI                                                      |
+| ---------------------------- | ------------------------------------------------------- |
+| neither answered             | `Answer today's prompt together.` + answer button       |
 | partner answered, viewer not | `{name} answered. Submit yours to see.` + answer button |
-| viewer answered, partner not | `Waiting for {name}.` + viewer answer |
-| both answered | show viewer answer and partner answer |
+| viewer answered, partner not | `Waiting for {name}.` + viewer answer                   |
+| both answered                | show viewer answer and partner answer                   |
 
 The answer button opens a liquid glass Expo Router formsheet/modal. If formsheet presentation is unavailable in the current environment, use a modal route with equivalent behavior.
 
@@ -135,13 +135,13 @@ Layout:
 
 Categories:
 
-| Internal | UI label |
-| --- | --- |
-| food | Food |
-| drinks | Drinks |
+| Internal      | UI label      |
+| ------------- | ------------- |
+| food          | Food          |
+| drinks        | Drinks        |
 | entertainment | Entertainment |
-| activity | Activity |
-| intimacy | Intimacy |
+| activity      | Activity      |
+| intimacy      | Intimacy      |
 
 ### User-created plan item privacy
 

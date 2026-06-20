@@ -31,7 +31,12 @@ export default function PlanMatchScreen(): JSX.Element {
   }, [betterAuthSession.data?.session, seed, viewer?.couple]);
 
   if (!betterAuthSession.data?.session) return <Redirect href="/auth" />;
-  if (viewer === undefined || ideas === undefined) return <View className="flex-1 bg-[#fff8f1] items-center justify-center"><ActivityIndicator /></View>;
+  if (viewer === undefined || ideas === undefined)
+    return (
+      <View className="flex-1 bg-[#fff8f1] items-center justify-center">
+        <ActivityIndicator />
+      </View>
+    );
   if (!viewer?.couple || viewer.memberCount < 2) return <Redirect href="/pairing" />;
 
   const currentIdea = ideas[0];
@@ -49,11 +54,17 @@ export default function PlanMatchScreen(): JSX.Element {
   return (
     <View className="flex-1 bg-[#fff8f1] px-6 pt-14 pb-10 gap-6">
       <View className="flex-row items-center justify-between">
-        <Pressable className="h-11 px-4 rounded-full bg-white border border-[#e6d2c2] items-center justify-center" onPress={() => router.back()}>
+        <Pressable
+          className="h-11 px-4 rounded-full bg-white border border-[#e6d2c2] items-center justify-center"
+          onPress={() => router.back()}
+        >
           <Text className="font-bold text-[#2f211c]">Back</Text>
         </Pressable>
         <Text className="text-lg font-bold text-[#2f211c]">{label}</Text>
-        <Pressable className="h-11 px-4 rounded-full bg-white border border-[#e6d2c2] items-center justify-center" onPress={() => router.push("/plans/history")}>
+        <Pressable
+          className="h-11 px-4 rounded-full bg-white border border-[#e6d2c2] items-center justify-center"
+          onPress={() => router.push("/plans/history")}
+        >
           <Text className="font-bold text-[#2f211c]">History</Text>
         </Pressable>
       </View>
@@ -61,29 +72,53 @@ export default function PlanMatchScreen(): JSX.Element {
       {currentIdea ? (
         <View className="flex-1 rounded-[40px] bg-white/95 p-7 border border-[#f1dfd2] justify-between">
           <View className="gap-5">
-            <Text className="self-start rounded-full bg-[#f4ecff] px-4 py-2 text-sm font-bold uppercase tracking-widest text-[#5b21b6]">{label}</Text>
-            <Text className="text-4xl font-bold leading-[46px] text-[#2f211c]">{currentIdea.title}</Text>
+            <Text className="self-start rounded-full bg-[#f4ecff] px-4 py-2 text-sm font-bold uppercase tracking-widest text-[#5b21b6]">
+              {label}
+            </Text>
+            <Text className="text-4xl font-bold leading-[46px] text-[#2f211c]">
+              {currentIdea.title}
+            </Text>
             <Text className="text-lg leading-7 text-[#6f5a50]">{currentIdea.description}</Text>
             <View className="flex-row flex-wrap gap-2">
               {(currentIdea.subcategories ?? currentIdea.vibeTags ?? []).map((tag: string) => (
-                <Text key={tag} className="rounded-full bg-[#fff8f1] px-3 py-2 text-sm font-semibold text-[#6f5a50]">#{tag}</Text>
+                <Text
+                  key={tag}
+                  className="rounded-full bg-[#fff8f1] px-3 py-2 text-sm font-semibold text-[#6f5a50]"
+                >
+                  #{tag}
+                </Text>
               ))}
             </View>
           </View>
           <View className="flex-row gap-3">
-            <Pressable className="flex-1 h-16 rounded-full bg-[#f1dfd2] items-center justify-center" disabled={isWorking} onPress={() => handleVote(currentIdea._id, "pass")}>
+            <Pressable
+              className="flex-1 h-16 rounded-full bg-[#f1dfd2] items-center justify-center"
+              disabled={isWorking}
+              onPress={() => handleVote(currentIdea._id, "pass")}
+            >
               <Text className="text-lg font-bold text-[#6f5a50]">Pass</Text>
             </Pressable>
-            <Pressable className="flex-1 h-16 rounded-full bg-[#7c3aed] items-center justify-center" disabled={isWorking} onPress={() => handleVote(currentIdea._id, "like")}>
+            <Pressable
+              className="flex-1 h-16 rounded-full bg-[#7c3aed] items-center justify-center"
+              disabled={isWorking}
+              onPress={() => handleVote(currentIdea._id, "like")}
+            >
               <Text className="text-lg font-bold text-white">Like</Text>
             </Pressable>
           </View>
         </View>
       ) : (
         <View className="flex-1 rounded-[40px] bg-white/95 p-7 border border-[#f1dfd2] items-center justify-center gap-3">
-          <Text className="text-3xl font-bold text-center text-[#2f211c]">No more {label.toLowerCase()} cards</Text>
-          <Text className="text-base leading-6 text-center text-[#6f5a50]">Add your own private suggestion or check another category.</Text>
-          <Pressable className="h-12 rounded-full bg-[#7c3aed] px-5 items-center justify-center" onPress={() => router.push("/plans/new")}>
+          <Text className="text-3xl font-bold text-center text-[#2f211c]">
+            No more {label.toLowerCase()} cards
+          </Text>
+          <Text className="text-base leading-6 text-center text-[#6f5a50]">
+            Add your own private suggestion or check another category.
+          </Text>
+          <Pressable
+            className="h-12 rounded-full bg-[#7c3aed] px-5 items-center justify-center"
+            onPress={() => router.push("/plans/new")}
+          >
             <Text className="font-bold text-white">Add plan item</Text>
           </Pressable>
         </View>

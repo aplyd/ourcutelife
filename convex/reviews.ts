@@ -42,7 +42,7 @@ function safeSnippet(text: string): string {
 
 export const latestMine = query({
   args: {},
-  handler: async (ctx, args) => {
+  handler: async (ctx) => {
     const { user } = await requireSession(ctx);
     return await ctx.db
       .query("monthlyReviews")
@@ -54,8 +54,8 @@ export const latestMine = query({
 
 export const chatMessages = query({
   args: {},
-  handler: async (ctx, args) => {
-    const { user, membership } = await requireSession(ctx);
+  handler: async (ctx) => {
+    const { membership } = await requireSession(ctx);
     return await ctx.db
       .query("coupleChatMessages")
       .withIndex("by_couple_and_created_at", (q) => q.eq("coupleId", membership.coupleId))

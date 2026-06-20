@@ -1,7 +1,6 @@
 import { useQuery } from "convex/react";
 import { Redirect, router } from "expo-router";
 import type { JSX } from "react";
-import { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -14,11 +13,12 @@ import {
 
 import { api } from "../../../convex/_generated/api";
 import { authClient, useSession } from "@/lib/betterAuth";
+import { useAppTheme } from "@/lib/theme";
 
 export default function MeTab(): JSX.Element {
   const betterAuthSession = useSession();
   const viewer = useQuery(api.auth.viewer, {});
-  const [theme, setTheme] = useState<"system" | "light" | "dark">("system");
+  const { preference: theme, setPreference: setTheme } = useAppTheme();
 
   if (!betterAuthSession.data?.session) return <Redirect href="/auth" />;
   if (viewer === undefined)

@@ -1,7 +1,7 @@
-import { useQuery } from "convex/react";
-import { Redirect, useLocalSearchParams } from "expo-router";
+import { useMutation, useQuery } from "convex/react";
+import { Redirect, router, useLocalSearchParams } from "expo-router";
 import type { JSX } from "react";
-import { ActivityIndicator, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from "react-native";
 
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
@@ -37,6 +37,7 @@ export default function MomentDetailScreen(): JSX.Element {
         }
       : "skip",
   );
+  const removeMoment = useMutation(api.moments.remove);
 
   if (!betterAuthSession.data?.session) return <Redirect href="/auth" />;
 
@@ -69,6 +70,32 @@ export default function MomentDetailScreen(): JSX.Element {
         </Text>
         <Text className="text-4xl font-bold text-[#2f211c]">{toneLabel[moment.tone]} moment</Text>
         <Text className="text-base text-[#6f5a50]">{formatDate(moment.happenedAt)}</Text>
+        <View className="flex-row gap-2 pt-2">
+          <Pressable
+            className="flex-1 h-11 rounded-full bg-[#2f211c] items-center justify-center"
+            onPress={() => router.push(`/moments/edit/${moment._id}`)}
+          >
+            <Text className="font-bold text-white">Edit</Text>
+          </Pressable>
+          <Pressable
+            className="flex-1 h-11 rounded-full bg-[#fff1f2] border border-[#fecdd3] items-center justify-center"
+            onPress={() =>
+              Alert.alert("Delete moment?", "This hides the moment from your history.", [
+                { text: "Cancel" },
+                {
+                  text: "Delete",
+                  style: "destructive",
+                  onPress: () =>
+                    void removeMoment({ momentId: moment._id }).then(() =>
+                      router.replace("/moments"),
+                    ),
+                },
+              ])
+            }
+          >
+            <Text className="font-bold text-[#be123c]">Delete</Text>
+          </Pressable>
+        </View>
       </View>
 
       <View className="rounded-3xl bg-white/85 p-5 border border-[#f1dfd2] gap-3">

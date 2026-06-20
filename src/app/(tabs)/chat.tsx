@@ -14,6 +14,7 @@ import {
 } from "react-native";
 
 import { api } from "../../../convex/_generated/api";
+import { MeHeaderButton } from "@/components/MeHeaderButton";
 import { useSession } from "@/lib/betterAuth";
 
 function formatTime(timestamp: number): string {
@@ -61,7 +62,8 @@ export default function ChatTab(): JSX.Element {
       className="flex-1 bg-[#fff8f1]"
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <View className="px-6 pt-16 pb-3 gap-2 border-b border-[#f1dfd2]">
+      <MeHeaderButton />
+      <View className="px-6 pt-16 pb-3 pr-24 gap-2 border-b border-[#f1dfd2]">
         <Text className="text-sm font-semibold uppercase tracking-widest text-[#8c766b]">Chat</Text>
         <Text className="text-3xl font-bold text-[#2f211c]">You, your person, and the coach</Text>
         <Text className="text-base leading-6 text-[#6f5a50]">
@@ -69,7 +71,7 @@ export default function ChatTab(): JSX.Element {
         </Text>
       </View>
 
-      <ScrollView className="flex-1" contentContainerClassName="px-6 py-5 gap-3">
+      <ScrollView className="flex-1" contentContainerClassName="px-6 py-5 pb-40 gap-3">
         {messages.length ? (
           messages.map((message) => {
             const mine = message.senderUserId === viewer.user._id;
@@ -103,7 +105,7 @@ export default function ChatTab(): JSX.Element {
         )}
       </ScrollView>
 
-      <View className="px-4 pb-8 pt-3 gap-3 border-t border-[#f1dfd2] bg-[#fff8f1]">
+      <View className="px-4 pb-28 pt-3 gap-3 border-t border-[#f1dfd2] bg-[#fff8f1]">
         <View className="flex-row gap-2">
           {(
             [

@@ -43,17 +43,15 @@ export default function TabsLayout(): JSX.Element {
           }}
         />
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="plans">
-        <NativeTabs.Trigger.Label>Plans</NativeTabs.Trigger.Label>
+      <NativeTabs.Trigger name="swipe">
+        <NativeTabs.Trigger.Label>Swipe</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
-          sf={{ default: "square.grid.2x2", selected: "square.grid.2x2.fill" }}
+          sf={{ default: "rectangle.stack", selected: "rectangle.stack.fill" }}
         />
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="me">
-        <NativeTabs.Trigger.Label>Me</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon
-          sf={{ default: "person.crop.circle", selected: "person.crop.circle.fill" }}
-        />
+      <NativeTabs.Trigger name="plans">
+        <NativeTabs.Trigger.Label>Plans</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf={{ default: "checklist", selected: "checklist" }} />
       </NativeTabs.Trigger>
     </NativeTabs>
   );

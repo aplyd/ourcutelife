@@ -48,6 +48,7 @@ export default defineSchema({
     partnerCouldDo: v.optional(v.string()),
     authorCouldDo: v.optional(v.string()),
     tags: v.array(v.string()),
+    deletedAt: v.optional(v.number()),
   })
     .index("by_couple_and_author_and_happened_at", ["coupleId", "authorUserId", "happenedAt"])
     .index("by_couple_and_happened_at", ["coupleId", "happenedAt"]),
@@ -122,8 +123,23 @@ export default defineSchema({
     coupleId: v.id("couples"),
     ideaId: v.id("planIdeas"),
     createdAt: v.number(),
-    status: v.union(v.literal("matched"), v.literal("planned"), v.literal("done")),
+    status: v.union(
+      v.literal("matched"),
+      v.literal("planned"),
+      v.literal("done"),
+      v.literal("archived"),
+    ),
+    archivedAt: v.optional(v.number()),
   })
     .index("by_couple_and_created_at", ["coupleId", "createdAt"])
     .index("by_idea", ["ideaId"]),
+  planArchiveVotes: defineTable({
+    coupleId: v.id("couples"),
+    matchId: v.id("planMatches"),
+    userId: v.id("users"),
+    vote: v.literal("archive"),
+    createdAt: v.number(),
+  })
+    .index("by_match", ["matchId"])
+    .index("by_user_and_match", ["userId", "matchId"]),
 });

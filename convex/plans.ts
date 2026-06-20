@@ -123,7 +123,16 @@ export const list = query({
       .withIndex("by_user_and_idea", (q) => q.eq("userId", user._id))
       .collect();
     const voted = new Set(swipes.map((swipe) => swipe.ideaId));
-    return ideas.filter((idea) => !voted.has(idea._id)).map((idea) => publicIdea(idea, false));
+    const archivedMatches = await ctx.db
+      .query("planMatches")
+      .withIndex("by_couple_and_created_at", (q) => q.eq("coupleId", membership.coupleId))
+      .collect();
+    const archivedIdeaIds = new Set(
+      archivedMatches.filter((match) => match.status === "archived").map((match) => match.ideaId),
+    );
+    return ideas
+      .filter((idea) => !voted.has(idea._id) && !archivedIdeaIds.has(idea._id))
+      .map((idea) => publicIdea(idea, false));
   },
 });
 
@@ -163,8 +172,16 @@ export const matches = query({
     const rows = [];
     for (const match of matches) {
       const idea = await ctx.db.get(match.ideaId);
-      if (idea && (!args.category || idea.category === args.category)) {
-        rows.push({ ...match, idea: publicIdea(idea, true) });
+      if (
+        idea &&
+        match.status !== "archived" &&
+        (!args.category || idea.category === args.category)
+      ) {
+        const votes = await ctx.db
+          .query("planArchiveVotes")
+          .withIndex("by_match", (q) => q.eq("matchId", match._id))
+          .collect();
+        rows.push({ ...match, archiveVoteCount: votes.length, idea: publicIdea(idea, true) });
       }
     }
     return rows;
@@ -267,5 +284,69 @@ export const vote = mutation({
         });
     }
     return null;
+  },
+});
+
+export const randomMatchesByCategories = query({
+  args: {
+    categories: v.array(categoryValidator),
+  },
+  handler: async (ctx, args) => {
+    const { membership } = await requireSession(ctx);
+    const categories = Array.from(new Set(args.categories));
+    const matches = await ctx.db
+      .query("planMatches")
+      .withIndex("by_couple_and_created_at", (q) => q.eq("coupleId", membership.coupleId))
+      .collect();
+    const rows = [];
+    for (const category of categories) {
+      const categoryMatches = [];
+      for (const match of matches.filter((item) => item.status !== "archived")) {
+        const idea = await ctx.db.get(match.ideaId);
+        if (idea?.category === category)
+          categoryMatches.push({ ...match, idea: publicIdea(idea, true) });
+      }
+      if (categoryMatches.length)
+        rows.push(categoryMatches[Math.floor(Math.random() * categoryMatches.length)]);
+    }
+    return rows;
+  },
+});
+
+export const voteArchive = mutation({
+  args: {
+    matchId: v.id("planMatches"),
+  },
+  handler: async (ctx, args) => {
+    const { user, membership } = await requireSession(ctx);
+    const match = await ctx.db.get(args.matchId);
+    if (!match || match.coupleId !== membership.coupleId || match.status === "archived")
+      throw new Error("Match unavailable.");
+    const existing = await ctx.db
+      .query("planArchiveVotes")
+      .withIndex("by_user_and_match", (q) => q.eq("userId", user._id).eq("matchId", args.matchId))
+      .first();
+    if (!existing) {
+      await ctx.db.insert("planArchiveVotes", {
+        coupleId: membership.coupleId,
+        matchId: args.matchId,
+        userId: user._id,
+        vote: "archive",
+        createdAt: Date.now(),
+      });
+    }
+    const votes = await ctx.db
+      .query("planArchiveVotes")
+      .withIndex("by_match", (q) => q.eq("matchId", args.matchId))
+      .collect();
+    const memberCount = await ctx.db
+      .query("coupleMembers")
+      .withIndex("by_couple", (q) => q.eq("coupleId", membership.coupleId))
+      .collect()
+      .then((members) => members.length);
+    if (votes.length >= memberCount) {
+      await ctx.db.patch(args.matchId, { status: "archived", archivedAt: Date.now() });
+    }
+    return votes.length;
   },
 });

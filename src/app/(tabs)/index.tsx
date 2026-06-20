@@ -6,6 +6,7 @@ import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-nati
 import AnimatedRollingNumber from "react-native-animated-rolling-numbers";
 
 import { api } from "../../../convex/_generated/api";
+import { MeHeaderButton } from "@/components/MeHeaderButton";
 import { useSession } from "@/lib/betterAuth";
 
 type DurationParts = {
@@ -85,7 +86,8 @@ export default function TodayTab(): JSX.Element {
 
   return (
     <View className="flex-1 bg-[#fff8f1]">
-      <ScrollView className="flex-1" contentContainerClassName="px-6 pt-16 pb-32 gap-6">
+      <MeHeaderButton />
+      <ScrollView className="flex-1" contentContainerClassName="px-6 pt-16 pb-40 gap-6">
         <View className="gap-2">
           <Text className="text-sm font-semibold uppercase tracking-widest text-[#8c766b]">
             Today
@@ -223,7 +225,7 @@ export default function TodayTab(): JSX.Element {
       </ScrollView>
 
       <Pressable
-        className="absolute bottom-8 right-6 h-16 w-16 rounded-full bg-[#7c3aed] items-center justify-center shadow-lg"
+        className="absolute bottom-28 right-6 h-16 w-16 rounded-full bg-[#7c3aed] items-center justify-center shadow-lg"
         onPress={() => router.push("/moments/new")}
       >
         <Text className="text-4xl leading-none text-white">＋</Text>

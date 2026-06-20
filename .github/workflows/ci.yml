@@ -40,7 +40,7 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm convex:deploy --yes
+      - run: pnpm convex:deploy
 
   eas-update-ios:
     name: EAS iOS OTA update

@@ -14,7 +14,7 @@
     "doctor": "expo-doctor",
     "convex:dev": "convex dev",
     "convex:deploy": "convex deploy",
-    "update:ios": "APP_ENV=production EXPO_NO_DOTENV=1 eas update --platform ios --channel production --environment production --auto",
+    "update:ios": "APP_ENV=production EXPO_NO_DOTENV=1 eas update --platform ios --channel production --environment production --auto && APP_ENV=production EXPO_NO_DOTENV=1 eas update --platform ios --branch main --environment production --auto",
     "prebuild:ios": "expo prebuild --platform ios",
     "build:production": "APP_ENV=production EXPO_NO_DOTENV=1 eas build --profile production --clear-cache --platform ios --auto-submit"
   },

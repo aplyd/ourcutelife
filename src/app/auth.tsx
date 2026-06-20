@@ -1,4 +1,5 @@
 import { useMutation } from "convex/react";
+import * as AppleAuthentication from "expo-apple-authentication";
 import type { JSX } from "react";
 import { useState } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
@@ -21,8 +22,28 @@ export default function AuthLanding(): JSX.Element {
     setError(null);
     setIsSigningIn(true);
     try {
+      const credential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+        ],
+      });
+      if (!credential.identityToken) throw new Error("Apple did not return an identity token.");
+
       const result = await authClient.signIn.social({
         provider: "apple",
+        idToken: {
+          token: credential.identityToken,
+          user: {
+            email: credential.email ?? undefined,
+            name: credential.fullName
+              ? {
+                  firstName: credential.fullName.givenName ?? undefined,
+                  lastName: credential.fullName.familyName ?? undefined,
+                }
+              : undefined,
+          },
+        },
         callbackURL: "ourcutelife://auth",
       });
 

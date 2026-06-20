@@ -49,8 +49,9 @@ jobs:
     needs: [quality, convex-deploy]
     env:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-      EXPO_PUBLIC_CONVEX_URL: https://fleet-pig-957.convex.cloud
-      EXPO_PUBLIC_CONVEX_HTTP_ACTIONS_URL: https://fleet-pig-957.convex.site
+      EXPO_PUBLIC_CONVEX_URL: https://usable-tapir-102.convex.cloud
+      EXPO_PUBLIC_CONVEX_SITE_URL: https://usable-tapir-102.convex.site
+      EXPO_PUBLIC_CONVEX_HTTP_ACTIONS_URL: https://usable-tapir-102.convex.site
       APP_ENV: production
     steps:
       - uses: actions/checkout@v4

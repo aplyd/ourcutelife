@@ -12,6 +12,7 @@ export default function PairingScreen(): JSX.Element {
   const viewer = useQuery(api.auth.viewer, {});
   const createCoupleAndCode = useMutation(api.pairing.createCoupleAndCode);
   const joinWithCode = useMutation(api.pairing.joinWithCode);
+  const pairWithTestPartner = useMutation(api.pairing.pairWithTestPartner);
 
   const [anniversaryDateText, setAnniversaryDateText] = useState(() =>
     new Date().toISOString().slice(0, 10),
@@ -67,6 +68,24 @@ export default function PairingScreen(): JSX.Element {
       router.replace("/(tabs)");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not join with that code.");
+    } finally {
+      setIsWorking(false);
+    }
+  }
+
+  async function handlePairWithTestPartner() {
+    const anniversaryTime = new Date(`${anniversaryDateText}T00:00:00`).getTime();
+    if (!Number.isFinite(anniversaryTime)) {
+      setError("Enter the anniversary date as YYYY-MM-DD.");
+      return;
+    }
+    setError(null);
+    setIsWorking(true);
+    try {
+      await pairWithTestPartner({ anniversaryDate: anniversaryTime });
+      router.replace("/(tabs)");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not create the test pairing.");
     } finally {
       setIsWorking(false);
     }
@@ -140,6 +159,21 @@ export default function PairingScreen(): JSX.Element {
           onPress={handleJoin}
         >
           <Text className="font-semibold text-[#fff8f1]">Join partner</Text>
+        </Pressable>
+      </View>
+
+      <View className="rounded-3xl bg-[#f4ecff] p-5 gap-3 border border-[#ded0ff]">
+        <Text className="text-xl font-semibold text-[#2f211c]">TestFlight shortcut</Text>
+        <Text className="text-sm leading-5 text-[#6f5a50]">
+          Pair this account with a temporary test partner and reserve code 000-000 so you can
+          inspect the rest of the app in production.
+        </Text>
+        <Pressable
+          className="h-12 rounded-full bg-[#7c3aed] items-center justify-center"
+          disabled={isWorking}
+          onPress={handlePairWithTestPartner}
+        >
+          <Text className="font-semibold text-white">Use test partner</Text>
         </Pressable>
       </View>
 

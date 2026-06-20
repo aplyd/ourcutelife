@@ -24,6 +24,8 @@ export const createAuth = (ctx: any) =>
           ? {
               clientId: process.env.BETTER_AUTH_APPLE_CLIENT_ID,
               clientSecret: process.env.BETTER_AUTH_APPLE_CLIENT_SECRET,
+              appBundleIdentifier: "com.ourcutelife.app",
+              audience: [process.env.BETTER_AUTH_APPLE_CLIENT_ID, "com.ourcutelife.app"],
             }
           : undefined,
     },

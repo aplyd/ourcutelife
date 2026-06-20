@@ -153,3 +153,91 @@ export const joinWithCode = mutation({
     return { coupleId: pairingCode.coupleId };
   },
 });
+
+export const pairWithTestPartner = mutation({
+  args: {
+    anniversaryDate: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const user = await getCurrentAppUser(ctx);
+    if (!user) throw new Error("Not signed in.");
+    if (!Number.isFinite(args.anniversaryDate)) {
+      throw new Error("Anniversary date is invalid.");
+    }
+
+    const now = Date.now();
+    const existingMembership = await ctx.db
+      .query("coupleMembers")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .first();
+
+    let coupleId = existingMembership?.coupleId ?? null;
+    if (!coupleId) {
+      coupleId = await ctx.db.insert("couples", {
+        name: user.fullName ? `${user.fullName}'s relationship` : "Our Cute Life",
+        anniversaryDate: args.anniversaryDate,
+        createdByUserId: user._id,
+        createdAt: now,
+        updatedAt: now,
+      });
+      await ctx.db.insert("coupleMembers", {
+        coupleId,
+        userId: user._id,
+        role: "partner",
+        joinedAt: now,
+      });
+    } else {
+      await ctx.db.patch(coupleId, { anniversaryDate: args.anniversaryDate, updatedAt: now });
+    }
+
+    const activeCoupleId = coupleId;
+    const existingMembers = await ctx.db
+      .query("coupleMembers")
+      .withIndex("by_couple", (q) => q.eq("coupleId", activeCoupleId))
+      .collect();
+
+    if (existingMembers.length < 2) {
+      const testAuthUserId = `test-partner:${user._id}`;
+      const existingTestUser = await ctx.db
+        .query("users")
+        .withIndex("by_auth_user_id", (q) => q.eq("authUserId", testAuthUserId))
+        .first();
+      const testUserId =
+        existingTestUser?._id ??
+        (await ctx.db.insert("users", {
+          authUserId: testAuthUserId,
+          email: "test-partner@ourcutelife.local",
+          fullName: "Test Partner",
+          createdAt: now,
+          updatedAt: now,
+        }));
+
+      const existingTestMembership = existingMembers.some((member) => member.userId === testUserId);
+      if (!existingTestMembership) {
+        await ctx.db.insert("coupleMembers", {
+          coupleId: activeCoupleId,
+          userId: testUserId,
+          role: "partner",
+          joinedAt: now,
+        });
+      }
+    }
+
+    const activeZeroCode = await ctx.db
+      .query("pairingCodes")
+      .withIndex("by_code", (q) => q.eq("code", "000000"))
+      .collect()
+      .then((codes) => codes.find((item) => item.coupleId === activeCoupleId && !item.usedAt));
+    if (!activeZeroCode) {
+      await ctx.db.insert("pairingCodes", {
+        coupleId: activeCoupleId,
+        code: "000000",
+        createdByUserId: user._id,
+        expiresAt: now + PAIRING_CODE_TTL_MS,
+        createdAt: now,
+      });
+    }
+
+    return { coupleId: activeCoupleId, code: "000-000" };
+  },
+});

@@ -72,7 +72,7 @@ export default function PlansTab(): JSX.Element {
   return (
     <View className="flex-1 bg-[#fff8f1]">
       <MeHeaderButton />
-      <ScrollView className="flex-1" contentContainerClassName="px-6 pt-16 pb-32 gap-5">
+      <ScrollView className="flex-1" contentContainerClassName="px-3 pt-16 pb-32 gap-4">
         <View className="gap-2 pr-20">
           <Text className="text-sm font-semibold uppercase tracking-widest text-[#8c766b]">
             Plans
@@ -113,7 +113,7 @@ export default function PlansTab(): JSX.Element {
           filteredMatches.map((match) => (
             <View
               key={match._id}
-              className="rounded-3xl bg-white/90 p-5 border border-[#f1dfd2] gap-3"
+              className="rounded-3xl bg-white/90 p-4 border border-[#f1dfd2] gap-3"
             >
               <Text className="text-sm font-bold uppercase tracking-widest text-[#8c766b]">
                 {match.idea.category}
@@ -148,7 +148,7 @@ export default function PlansTab(): JSX.Element {
       </ScrollView>
 
       <Pressable
-        className="absolute bottom-28 right-6 h-16 w-16 rounded-full bg-[#7c3aed] items-center justify-center shadow-lg"
+        className="absolute bottom-28 right-3 h-16 w-16 rounded-full bg-[#7c3aed] items-center justify-center shadow-lg"
         onPress={() => router.push("/plans/new")}
       >
         <Text className="text-4xl leading-none text-white">＋</Text>

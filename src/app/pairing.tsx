@@ -129,7 +129,7 @@ export default function PairingScreen(): JSX.Element {
   }
 
   return (
-    <ScrollView className="flex-1 bg-[#fff8f1]" contentContainerClassName="px-6 py-16 gap-6">
+    <ScrollView className="flex-1 bg-[#fff8f1]" contentContainerClassName="px-3 py-16 gap-3">
       <View className="gap-2">
         <Text className="text-4xl font-bold text-[#2f211c]">Pair your space</Text>
         <Text className="text-base leading-6 text-[#6f5a50]">
@@ -137,7 +137,7 @@ export default function PairingScreen(): JSX.Element {
         </Text>
       </View>
 
-      <View className="rounded-3xl bg-white/80 p-5 gap-4 border border-[#f1dfd2]">
+      <View className="rounded-3xl bg-white/80 p-4 gap-4 border border-[#f1dfd2]">
         <Text className="text-xl font-semibold text-[#2f211c]">Create a code</Text>
         <Text className="text-sm text-[#6f5a50]">Anniversary / started dating date</Text>
         <TextInput
@@ -177,7 +177,7 @@ export default function PairingScreen(): JSX.Element {
         ) : null}
       </View>
 
-      <View className="rounded-3xl bg-white/80 p-5 gap-4 border border-[#f1dfd2]">
+      <View className="rounded-3xl bg-white/80 p-4 gap-4 border border-[#f1dfd2]">
         <Text className="text-xl font-semibold text-[#2f211c]">I have a code</Text>
         <TextInput
           autoCapitalize="none"
@@ -197,7 +197,7 @@ export default function PairingScreen(): JSX.Element {
         </Pressable>
       </View>
 
-      <View className="rounded-3xl bg-[#f4ecff] p-5 gap-3 border border-[#ded0ff]">
+      <View className="rounded-3xl bg-[#f4ecff] p-4 gap-3 border border-[#ded0ff]">
         <Text className="text-xl font-semibold text-[#2f211c]">TestFlight shortcut</Text>
         <Text className="text-sm leading-5 text-[#6f5a50]">
           Pair this account with a temporary test partner and reserve code 000-000 so you can

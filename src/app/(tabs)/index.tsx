@@ -87,7 +87,7 @@ export default function TodayTab(): JSX.Element {
   return (
     <View className="flex-1 bg-[#fff8f1]">
       <MeHeaderButton />
-      <ScrollView className="flex-1" contentContainerClassName="px-6 pt-16 pb-40 gap-6">
+      <ScrollView className="flex-1" contentContainerClassName="px-3 pt-16 pb-40 gap-3">
         <View className="gap-2">
           <Text className="text-sm font-semibold uppercase tracking-widest text-[#8c766b]">
             Today
@@ -98,7 +98,7 @@ export default function TodayTab(): JSX.Element {
           </Text>
         </View>
 
-        <View className="rounded-3xl bg-white/85 p-5 border border-[#f1dfd2] gap-4">
+        <View className="rounded-3xl bg-white/85 p-4 border border-[#f1dfd2] gap-4">
           <View className="flex-row items-center gap-3">
             <View className="flex-row w-16">
               <View className="h-11 w-11 rounded-full bg-[#7c3aed] border-2 border-white items-center justify-center">
@@ -133,7 +133,7 @@ export default function TodayTab(): JSX.Element {
           </View>
         </View>
 
-        <View className="rounded-3xl bg-[#2f211c] p-5 gap-4">
+        <View className="rounded-3xl bg-[#2f211c] p-4 gap-4">
           <Text className="text-sm font-semibold uppercase tracking-widest text-[#d8c2b4]">
             Daily prompt
           </Text>
@@ -171,7 +171,10 @@ export default function TodayTab(): JSX.Element {
         </View>
 
         <View className="flex-row gap-3">
-          <View className="flex-1 aspect-square rounded-[28px] bg-white/85 border border-[#f1dfd2] p-4 justify-between">
+          <Pressable
+            className="flex-1 aspect-square rounded-[28px] bg-white/85 border border-[#f1dfd2] p-4 justify-between"
+            onPress={() => router.push("/games/weekly")}
+          >
             <Text className="text-4xl">🎮</Text>
             <View>
               <Text className="text-lg font-bold text-[#2f211c]">
@@ -181,8 +184,11 @@ export default function TodayTab(): JSX.Element {
                 {promptData.weeklyGame.description}
               </Text>
             </View>
-          </View>
-          <View className="flex-1 aspect-square rounded-[28px] bg-white/85 border border-[#f1dfd2] p-4 justify-between">
+          </Pressable>
+          <Pressable
+            className="flex-1 aspect-square rounded-[28px] bg-white/85 border border-[#f1dfd2] p-4 justify-between"
+            onPress={() => router.push("/quizzes/today")}
+          >
             <Text className="text-4xl">💬</Text>
             <View>
               <Text className="text-lg font-bold text-[#2f211c]">{promptData.quiz.title}</Text>
@@ -190,10 +196,10 @@ export default function TodayTab(): JSX.Element {
                 {promptData.quiz.question}
               </Text>
             </View>
-          </View>
+          </Pressable>
         </View>
 
-        <View className="rounded-3xl bg-white/85 p-5 border border-[#f1dfd2] gap-4">
+        <View className="rounded-3xl bg-white/85 p-4 border border-[#f1dfd2] gap-4">
           <View className="flex-row items-center justify-between">
             <Text className="text-2xl font-bold text-[#2f211c]">Recent moments</Text>
             <Pressable onPress={() => router.push("/moments")}>
@@ -231,7 +237,7 @@ export default function TodayTab(): JSX.Element {
       </ScrollView>
 
       <Pressable
-        className="absolute bottom-28 right-6 h-16 w-16 rounded-full bg-[#7c3aed] items-center justify-center shadow-lg"
+        className="absolute bottom-28 right-3 h-16 w-16 rounded-full bg-[#7c3aed] items-center justify-center shadow-lg"
         onPress={() => router.push("/moments/new")}
       >
         <Text className="text-4xl leading-none text-white">＋</Text>

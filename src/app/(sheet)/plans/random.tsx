@@ -40,7 +40,7 @@ export default function RandomPlansScreen(): JSX.Element {
   }
 
   return (
-    <ScrollView className="flex-1 bg-[#fff8f1]" contentContainerClassName="px-6 pt-16 pb-10 gap-5">
+    <ScrollView className="flex-1 bg-[#fff8f1]" contentContainerClassName="px-3 pt-16 pb-10 gap-4">
       <View className="flex-row items-center justify-between">
         <Pressable
           className="h-11 px-4 rounded-full bg-white border border-[#e6d2c2] items-center justify-center"
@@ -67,7 +67,7 @@ export default function RandomPlansScreen(): JSX.Element {
         })}
       </View>
       {picks.map((pick) => (
-        <View key={pick._id} className="rounded-3xl bg-white/90 p-5 border border-[#f1dfd2] gap-2">
+        <View key={pick._id} className="rounded-3xl bg-white/90 p-4 border border-[#f1dfd2] gap-2">
           <Text className="text-sm font-bold uppercase tracking-widest text-[#8c766b]">
             {pick.category}
           </Text>

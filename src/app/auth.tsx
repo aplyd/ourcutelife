@@ -58,7 +58,7 @@ export default function AuthLanding(): JSX.Element {
   }
 
   return (
-    <View className="flex-1 bg-[#fff8f1] px-6 justify-center gap-8">
+    <View className="flex-1 bg-[#fff8f1] px-3 justify-center gap-4">
       <View className="gap-4">
         <Text className="text-5xl font-bold text-[#2f211c]">Our Cute Life</Text>
         <Text className="text-xl leading-8 text-[#6f5a50]">

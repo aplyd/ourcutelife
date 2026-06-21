@@ -62,7 +62,7 @@ export default function NewPlanItemScreen(): JSX.Element {
   }
 
   return (
-    <ScrollView className="flex-1 bg-[#fff8f1]" contentContainerClassName="px-6 pt-16 pb-10 gap-5">
+    <ScrollView className="flex-1 bg-[#fff8f1]" contentContainerClassName="px-3 pt-16 pb-10 gap-4">
       <View className="gap-2">
         <Text className="text-sm font-semibold uppercase tracking-widest text-[#8c766b]">
           Add plan item

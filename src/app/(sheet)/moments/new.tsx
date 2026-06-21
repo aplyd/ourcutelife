@@ -90,7 +90,7 @@ export default function NewMomentScreen(): JSX.Element {
   if (!viewer?.couple || viewer.memberCount < 2) return <Redirect href="/pairing" />;
 
   return (
-    <ScrollView className="flex-1 bg-[#fff8f1]" contentContainerClassName="px-6 pt-16 pb-10 gap-5">
+    <ScrollView className="flex-1 bg-[#fff8f1]" contentContainerClassName="px-3 pt-16 pb-10 gap-4">
       <View className="gap-2">
         <Text className="text-sm font-semibold uppercase tracking-widest text-[#8c766b]">
           New moment
@@ -155,7 +155,7 @@ export default function NewMomentScreen(): JSX.Element {
       </View>
 
       {needsRepairFields ? (
-        <View className="gap-4 rounded-3xl bg-[#fff1f2] p-5 border border-[#fecdd3]">
+        <View className="gap-4 rounded-3xl bg-[#fff1f2] p-4 border border-[#fecdd3]">
           <Text className="text-lg font-bold text-[#2f211c]">Repair reflections</Text>
           <View className="gap-2">
             <Text className="text-sm font-semibold text-[#6f5a50]">

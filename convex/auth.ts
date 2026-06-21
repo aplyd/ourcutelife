@@ -90,6 +90,39 @@ export const updateProfile = mutation({
   },
 });
 
+export const generateProfilePhotoUploadUrl = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const user = await getCurrentAppUser(ctx);
+    if (!user) throw new Error("Not signed in.");
+    return await ctx.storage.generateUploadUrl();
+  },
+});
+
+export const saveProfilePhoto = mutation({
+  args: {
+    storageId: v.id("_storage"),
+  },
+  handler: async (ctx, args) => {
+    const user = await getCurrentAppUser(ctx);
+    if (!user) throw new Error("Not signed in.");
+    const oldStorageId = user.avatarStorageId;
+    const metadata = await ctx.db.system.get("_storage", args.storageId);
+    if (!metadata) throw new Error("Uploaded image is unavailable.");
+    if (!metadata.contentType?.startsWith("image/")) throw new Error("Upload an image file.");
+    if (metadata.size > 5_000_000) throw new Error("Keep profile photos under 5 MB.");
+    const avatarUrl = await ctx.storage.getUrl(args.storageId);
+    if (!avatarUrl) throw new Error("Uploaded image is unavailable.");
+    await ctx.db.patch(user._id, {
+      avatarStorageId: args.storageId,
+      avatarUrl,
+      updatedAt: Date.now(),
+    });
+    if (oldStorageId && oldStorageId !== args.storageId) await ctx.storage.delete(oldStorageId);
+    return { storageId: args.storageId, avatarUrl };
+  },
+});
+
 export const updateAnniversary = mutation({
   args: {
     anniversaryDate: v.number(),
@@ -144,10 +177,16 @@ export const viewer = query({
 
     const partnerMembership = members.find((member) => member.userId !== user._id);
     const partner = partnerMembership ? await ctx.db.get(partnerMembership.userId) : null;
+    const userAvatarUrl = user.avatarStorageId
+      ? ((await ctx.storage.getUrl(user.avatarStorageId)) ?? user.avatarUrl)
+      : user.avatarUrl;
+    const partnerAvatarUrl = partner?.avatarStorageId
+      ? ((await ctx.storage.getUrl(partner.avatarStorageId)) ?? partner.avatarUrl)
+      : partner?.avatarUrl;
 
     return {
-      user,
-      partner,
+      user: { ...user, avatarUrl: userAvatarUrl },
+      partner: partner ? { ...partner, avatarUrl: partnerAvatarUrl } : null,
       membership,
       couple,
       memberCount: members.length,

@@ -83,7 +83,7 @@ export default function ReviewTab(): JSX.Element {
   }
 
   return (
-    <ScrollView className="flex-1 bg-[#fff8f1]" contentContainerClassName="px-6 pt-16 pb-28 gap-5">
+    <ScrollView className="flex-1 bg-[#fff8f1]" contentContainerClassName="px-3 pt-16 pb-28 gap-4">
       <View className="gap-2">
         <Text className="text-sm font-semibold uppercase tracking-widest text-[#8c766b]">
           Review
@@ -97,7 +97,7 @@ export default function ReviewTab(): JSX.Element {
         </Text>
       </View>
 
-      <View className="rounded-3xl bg-white/85 p-5 border border-[#f1dfd2] gap-3">
+      <View className="rounded-3xl bg-white/85 p-4 border border-[#f1dfd2] gap-3">
         <Text className="text-xl font-bold text-[#2f211c]">Your relationship stats</Text>
         <View className="flex-row flex-wrap gap-3">
           <Text className="rounded-2xl bg-[#f4ecff] px-4 py-3 text-[#5b21b6]">
@@ -131,7 +131,7 @@ export default function ReviewTab(): JSX.Element {
       </Pressable>
 
       {latest ? (
-        <View className="rounded-3xl bg-white/85 p-5 border border-[#f1dfd2] gap-3">
+        <View className="rounded-3xl bg-white/85 p-4 border border-[#f1dfd2] gap-3">
           <Text className="text-sm font-semibold uppercase tracking-widest text-[#8c766b]">
             {latest.month}
           </Text>

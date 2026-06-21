@@ -7,6 +7,7 @@ export default defineSchema({
     email: v.optional(v.string()),
     fullName: v.optional(v.string()),
     avatarUrl: v.optional(v.string()),
+    avatarStorageId: v.optional(v.id("_storage")),
     createdAt: v.number(),
     updatedAt: v.number(),
   }).index("by_auth_user_id", ["authUserId"]),
@@ -118,7 +119,8 @@ export default defineSchema({
     createdAt: v.number(),
   })
     .index("by_couple_and_created_at", ["coupleId", "createdAt"])
-    .index("by_couple_and_category", ["coupleId", "category"]),
+    .index("by_couple_and_category", ["coupleId", "category"])
+    .index("by_couple_and_external_id", ["coupleId", "externalId"]),
   planSwipes: defineTable({
     coupleId: v.id("couples"),
     ideaId: v.id("planIdeas"),

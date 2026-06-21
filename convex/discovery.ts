@@ -22,6 +22,7 @@ type DiscoveredPlace = {
   latitude: number;
   longitude: number;
   address?: string;
+  photoUrl?: string;
 };
 
 const overpassTags: Record<DiscoveryCategory, string[]> = {
@@ -46,6 +47,51 @@ const overpassTags: Record<DiscoveryCategory, string[]> = {
 
 function mapsUrl(lat: number, lon: number): string {
   return `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
+}
+
+async function fetchJsonWithTimeout(url: string, timeoutMs = 2500): Promise<unknown> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    if (!response.ok) return null;
+    return await response.json();
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+function normalizeImageUrl(value: string | undefined): string | undefined {
+  if (!value) return undefined;
+  const trimmed = value.trim();
+  if (trimmed.startsWith("https://")) return trimmed;
+  if (trimmed.startsWith("http://")) return trimmed.replace(/^http:/, "https:");
+  const fileName = trimmed.replace(/^File:/i, "");
+  if (fileName && /\.(jpe?g|png|webp)$/i.test(fileName))
+    return `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(fileName)}`;
+  return undefined;
+}
+
+async function imageFromWikidata(wikidataId: string | undefined): Promise<string | undefined> {
+  if (!wikidataId) return undefined;
+  const entityUrl = `https://www.wikidata.org/wiki/Special:EntityData/${encodeURIComponent(wikidataId)}.json`;
+  const json = (await fetchJsonWithTimeout(entityUrl)) as any;
+  const imageName = json?.entities?.[wikidataId]?.claims?.P18?.[0]?.mainsnak?.datavalue?.value;
+  if (typeof imageName !== "string" || !imageName) return undefined;
+  return `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(imageName)}`;
+}
+
+async function imageFromWikipedia(wikipediaTag: string | undefined): Promise<string | undefined> {
+  if (!wikipediaTag) return undefined;
+  const [lang, ...titleParts] = wikipediaTag.split(":");
+  const title = titleParts.join(":");
+  if (!lang || !title) return undefined;
+  const json = (await fetchJsonWithTimeout(
+    `https://${encodeURIComponent(lang)}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`,
+  )) as any;
+  return typeof json?.thumbnail?.source === "string" ? json.thumbnail.source : undefined;
 }
 
 function categoryFromArgs(value: string): DiscoveryCategory {
@@ -98,6 +144,7 @@ export const insertDiscovered = mutation({
         latitude: v.number(),
         longitude: v.number(),
         address: v.optional(v.string()),
+        photoUrl: v.optional(v.string()),
       }),
     ),
   },
@@ -109,14 +156,15 @@ export const insertDiscovered = mutation({
       .withIndex("by_user", (q) => q.eq("userId", user._id))
       .first();
     if (!membership) throw new Error("Pair with your partner first.");
-    const existing = await ctx.db
-      .query("planIdeas")
-      .withIndex("by_couple_and_created_at", (q) => q.eq("coupleId", membership.coupleId))
-      .collect();
-    const existingExternalIds = new Set(existing.map((idea) => idea.externalId).filter(Boolean));
     let inserted = 0;
     for (const place of args.places) {
-      if (existingExternalIds.has(place.externalId)) continue;
+      const existing = await ctx.db
+        .query("planIdeas")
+        .withIndex("by_couple_and_external_id", (q) =>
+          q.eq("coupleId", membership.coupleId).eq("externalId", place.externalId),
+        )
+        .first();
+      if (existing) continue;
       await ctx.db.insert("planIdeas", {
         coupleId: membership.coupleId,
         title: place.title,
@@ -132,6 +180,7 @@ export const insertDiscovered = mutation({
         latitude: place.latitude,
         longitude: place.longitude,
         address: place.address,
+        photoUrl: place.photoUrl,
         createdAt: Date.now(),
       });
       inserted += 1;
@@ -189,8 +238,25 @@ export const discoverNearby = action({
     const unique = Array.from(
       new Map(places.map((place) => [place.externalId, place])).values(),
     ).slice(0, 40);
+    const withPhotos = await Promise.all(
+      unique.map(async (place) => {
+        const element = (json.elements ?? []).find(
+          (item: any) => `osm:${item.type}:${item.id}` === place.externalId,
+        );
+        const tags = element?.tags ?? {};
+        const photoUrl =
+          normalizeImageUrl(typeof tags.image === "string" ? tags.image : undefined) ??
+          (await imageFromWikidata(
+            typeof tags.wikidata === "string" ? tags.wikidata : undefined,
+          )) ??
+          (await imageFromWikipedia(
+            typeof tags.wikipedia === "string" ? tags.wikipedia : undefined,
+          ));
+        return photoUrl ? { ...place, photoUrl } : place;
+      }),
+    );
     const result: { inserted: number } = await ctx.runMutation(api.discovery.insertDiscovered, {
-      places: unique,
+      places: withPhotos,
     });
     return { found: unique.length, inserted: result.inserted };
   },

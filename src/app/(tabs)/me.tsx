@@ -4,6 +4,7 @@ import type { JSX } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Image,
   Pressable,
   ScrollView,
   Text,
@@ -46,19 +47,25 @@ export default function MeTab(): JSX.Element {
   }
 
   return (
-    <ScrollView className="flex-1 bg-[#fff8f1]" contentContainerClassName="px-6 pt-16 pb-28 gap-6">
+    <ScrollView className="flex-1 bg-[#fff8f1]" contentContainerClassName="px-3 pt-16 pb-28 gap-3">
       <View className="gap-2">
         <Text className="text-sm font-semibold uppercase tracking-widest text-[#8c766b]">Me</Text>
         <Text className="text-4xl font-bold text-[#2f211c]">Profile and couple settings</Text>
       </View>
 
-      <View className="rounded-3xl bg-white/85 p-5 border border-[#f1dfd2] gap-4">
+      <View className="rounded-3xl bg-white/85 p-4 border border-[#f1dfd2] gap-4">
         <View className="items-center gap-3">
           <Pressable
-            className="h-24 w-24 rounded-full bg-[#7c3aed] items-center justify-center"
+            className="h-24 w-24 overflow-hidden rounded-full bg-[#7c3aed] items-center justify-center"
             onPress={() => router.push("/me/profile")}
           >
-            <Text className="text-3xl font-bold text-white">{name.slice(0, 1).toUpperCase()}</Text>
+            {viewer.user.avatarUrl ? (
+              <Image source={{ uri: viewer.user.avatarUrl }} className="h-24 w-24" />
+            ) : (
+              <Text className="text-3xl font-bold text-white">
+                {name.slice(0, 1).toUpperCase()}
+              </Text>
+            )}
           </Pressable>
           <Text className="text-sm text-[#8c766b]">Tap avatar to update your profile</Text>
         </View>
@@ -74,7 +81,7 @@ export default function MeTab(): JSX.Element {
         </View>
       </View>
 
-      <View className="rounded-3xl bg-white/85 p-5 border border-[#f1dfd2] gap-4">
+      <View className="rounded-3xl bg-white/85 p-4 border border-[#f1dfd2] gap-4">
         <Text className="text-2xl font-bold text-[#2f211c]">Relationship</Text>
         <View className="gap-1">
           <Text className="text-sm font-semibold text-[#6f5a50]">Partner</Text>
@@ -86,7 +93,7 @@ export default function MeTab(): JSX.Element {
         </Pressable>
       </View>
 
-      <View className="rounded-3xl bg-white/85 p-5 border border-[#f1dfd2] gap-4">
+      <View className="rounded-3xl bg-white/85 p-4 border border-[#f1dfd2] gap-4">
         <Text className="text-2xl font-bold text-[#2f211c]">Settings</Text>
         <View className="flex-row gap-2">
           {(["light", "dark", "system"] as const).map((item) => (
@@ -105,7 +112,7 @@ export default function MeTab(): JSX.Element {
         </View>
       </View>
 
-      <View className="rounded-3xl bg-white/85 p-5 border border-[#f1dfd2] gap-3">
+      <View className="rounded-3xl bg-white/85 p-4 border border-[#f1dfd2] gap-3">
         <Text className="text-2xl font-bold text-[#2f211c]">Account</Text>
         <Pressable
           className="h-12 rounded-full bg-[#2f211c] items-center justify-center"

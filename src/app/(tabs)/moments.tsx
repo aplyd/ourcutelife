@@ -23,7 +23,7 @@ export default function MomentsTab(): JSX.Element {
   const moments = useQuery(api.moments.listMine, {});
 
   return (
-    <ScrollView className="flex-1 bg-[#fff8f1]" contentContainerClassName="px-6 pt-16 pb-28 gap-5">
+    <ScrollView className="flex-1 bg-[#fff8f1]" contentContainerClassName="px-3 pt-16 pb-28 gap-4">
       <View className="gap-2">
         <Text className="text-sm font-semibold uppercase tracking-widest text-[#8c766b]">
           Moments
@@ -47,7 +47,7 @@ export default function MomentsTab(): JSX.Element {
           <ActivityIndicator />
         </View>
       ) : moments.length === 0 ? (
-        <View className="rounded-3xl bg-white/80 p-5 border border-[#f1dfd2] gap-2">
+        <View className="rounded-3xl bg-white/80 p-4 border border-[#f1dfd2] gap-2">
           <Text className="text-xl font-semibold text-[#2f211c]">No moments yet</Text>
           <Text className="text-base leading-6 text-[#6f5a50]">
             Start with one small thing that happened recently. Good, hard, or mixed all counts.
@@ -58,7 +58,7 @@ export default function MomentsTab(): JSX.Element {
           {moments.map((moment) => (
             <Pressable
               key={moment._id}
-              className="rounded-3xl bg-white/85 p-5 border border-[#f1dfd2] gap-3"
+              className="rounded-3xl bg-white/85 p-4 border border-[#f1dfd2] gap-3"
               onPress={() => router.push(`/moments/${moment._id}`)}
             >
               <View className="flex-row items-center justify-between gap-3">

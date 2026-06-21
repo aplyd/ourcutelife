@@ -1,7 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { JSX, ReactNode } from "react";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { Appearance, useColorScheme } from "react-native";
+import { useColorScheme } from "react-native";
+import { Uniwind } from "uniwind";
 
 type ThemePreference = "light" | "dark" | "system";
 type ResolvedTheme = "light" | "dark";
@@ -29,7 +30,7 @@ export function ThemeProvider({ children }: { children: ReactNode }): JSX.Elemen
     preference === "system" ? (systemScheme === "dark" ? "dark" : "light") : preference;
 
   useEffect(() => {
-    Appearance.setColorScheme((preference === "system" ? null : preference) as never);
+    Uniwind.setTheme(preference);
   }, [preference]);
 
   const value = useMemo(

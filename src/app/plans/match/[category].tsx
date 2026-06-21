@@ -52,7 +52,7 @@ export default function PlanMatchScreen(): JSX.Element {
   }
 
   return (
-    <View className="flex-1 bg-[#fff8f1] px-6 pt-14 pb-10 gap-6">
+    <View className="flex-1 bg-[#fff8f1] px-3 pt-14 pb-10 gap-3">
       <View className="flex-row items-center justify-between">
         <Pressable
           className="h-11 px-4 rounded-full bg-white border border-[#e6d2c2] items-center justify-center"
@@ -70,8 +70,8 @@ export default function PlanMatchScreen(): JSX.Element {
       </View>
 
       {currentIdea ? (
-        <View className="flex-1 rounded-[40px] bg-white/95 p-7 border border-[#f1dfd2] justify-between">
-          <View className="gap-5">
+        <View className="flex-1 rounded-[40px] bg-white/95 p-4 border border-[#f1dfd2] justify-between">
+          <View className="gap-4">
             <Text className="self-start rounded-full bg-[#f4ecff] px-4 py-2 text-sm font-bold uppercase tracking-widest text-[#5b21b6]">
               {label}
             </Text>
@@ -108,7 +108,7 @@ export default function PlanMatchScreen(): JSX.Element {
           </View>
         </View>
       ) : (
-        <View className="flex-1 rounded-[40px] bg-white/95 p-7 border border-[#f1dfd2] items-center justify-center gap-3">
+        <View className="flex-1 rounded-[40px] bg-white/95 p-4 border border-[#f1dfd2] items-center justify-center gap-3">
           <Text className="text-3xl font-bold text-center text-[#2f211c]">
             No more {label.toLowerCase()} cards
           </Text>

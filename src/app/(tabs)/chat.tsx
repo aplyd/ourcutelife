@@ -63,7 +63,7 @@ export default function ChatTab(): JSX.Element {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <MeHeaderButton />
-      <View className="px-6 pt-16 pb-3 pr-24 gap-2 border-b border-[#f1dfd2]">
+      <View className="px-3 pt-16 pb-3 pr-24 gap-2 border-b border-[#f1dfd2]">
         <Text className="text-sm font-semibold uppercase tracking-widest text-[#8c766b]">Chat</Text>
         <Text className="text-3xl font-bold text-[#2f211c]">You, your person, and the coach</Text>
         <Text className="text-base leading-6 text-[#6f5a50]">
@@ -71,7 +71,7 @@ export default function ChatTab(): JSX.Element {
         </Text>
       </View>
 
-      <ScrollView className="flex-1" contentContainerClassName="px-6 py-5 pb-40 gap-3">
+      <ScrollView className="flex-1" contentContainerClassName="px-3 py-5 pb-40 gap-3">
         {messages.length ? (
           messages.map((message) => {
             const mine = message.senderUserId === viewer.user._id;
@@ -95,7 +95,7 @@ export default function ChatTab(): JSX.Element {
             );
           })
         ) : (
-          <View className="rounded-3xl bg-white/85 border border-[#f1dfd2] p-5 gap-2">
+          <View className="rounded-3xl bg-white/85 border border-[#f1dfd2] p-4 gap-2">
             <Text className="text-xl font-bold text-[#2f211c]">Start with the raw version.</Text>
             <Text className="text-base leading-6 text-[#6f5a50]">
               Send a message, ask the coach, or ask for a safer rephrase before you share something

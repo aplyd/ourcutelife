@@ -41,7 +41,7 @@ export default function EditMomentScreen(): JSX.Element {
   if (!viewer?.couple || viewer.memberCount < 2) return <Redirect href="/pairing" />;
   if (!moment)
     return (
-      <View className="flex-1 bg-[#fff8f1] p-6">
+      <View className="flex-1 bg-[#fff8f1] p-3">
         <Text>Moment unavailable.</Text>
       </View>
     );
@@ -74,7 +74,7 @@ export default function EditMomentScreen(): JSX.Element {
   }
 
   return (
-    <ScrollView className="flex-1 bg-[#fff8f1]" contentContainerClassName="px-6 pt-8 pb-10 gap-4">
+    <ScrollView className="flex-1 bg-[#fff8f1]" contentContainerClassName="px-3 pt-8 pb-10 gap-4">
       <View className="items-center">
         <View className="h-1.5 w-12 rounded-full bg-[#d8c2b4]" />
       </View>

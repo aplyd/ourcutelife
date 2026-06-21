@@ -53,7 +53,7 @@ export default function MomentDetailScreen(): JSX.Element {
 
   if (!moment) {
     return (
-      <View className="flex-1 bg-[#fff8f1] px-6 pt-16 gap-3">
+      <View className="flex-1 bg-[#fff8f1] px-3 pt-16 gap-3">
         <Text className="text-3xl font-bold text-[#2f211c]">Moment unavailable</Text>
         <Text className="text-base leading-6 text-[#6f5a50]">
           This note either does not exist or is not yours. Raw moments are private to their author.
@@ -63,7 +63,7 @@ export default function MomentDetailScreen(): JSX.Element {
   }
 
   return (
-    <ScrollView className="flex-1 bg-[#fff8f1]" contentContainerClassName="px-6 pt-16 pb-10 gap-5">
+    <ScrollView className="flex-1 bg-[#fff8f1]" contentContainerClassName="px-3 pt-16 pb-10 gap-4">
       <View className="gap-2">
         <Text className="text-sm font-semibold uppercase tracking-widest text-[#8c766b]">
           Private moment
@@ -98,14 +98,14 @@ export default function MomentDetailScreen(): JSX.Element {
         </View>
       </View>
 
-      <View className="rounded-3xl bg-white/85 p-5 border border-[#f1dfd2] gap-3">
+      <View className="rounded-3xl bg-white/85 p-4 border border-[#f1dfd2] gap-3">
         <Text className="text-sm font-semibold uppercase tracking-widest text-[#8c766b]">
           What happened
         </Text>
         <Text className="text-xl leading-8 text-[#2f211c]">{moment.summary}</Text>
       </View>
 
-      <View className="rounded-3xl bg-white/85 p-5 border border-[#f1dfd2] gap-3">
+      <View className="rounded-3xl bg-white/85 p-4 border border-[#f1dfd2] gap-3">
         <Text className="text-sm font-semibold uppercase tracking-widest text-[#8c766b]">
           How it felt
         </Text>
@@ -113,7 +113,7 @@ export default function MomentDetailScreen(): JSX.Element {
       </View>
 
       {moment.tone === "bad" || moment.tone === "mixed" ? (
-        <View className="gap-4 rounded-3xl bg-[#fff1f2] p-5 border border-[#fecdd3]">
+        <View className="gap-4 rounded-3xl bg-[#fff1f2] p-4 border border-[#fecdd3]">
           <Text className="text-lg font-bold text-[#2f211c]">Repair reflections</Text>
           {moment.partnerCouldDo ? (
             <View className="gap-1">

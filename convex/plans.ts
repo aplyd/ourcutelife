@@ -96,6 +96,12 @@ function publicIdea(idea: any, revealCreator: boolean) {
     subcategories,
     vibeTags: subcategories,
     createdAt: idea.createdAt,
+    source: idea.source ?? null,
+    sourceUrl: idea.sourceUrl ?? null,
+    photoUrl: idea.photoUrl ?? null,
+    latitude: idea.latitude ?? null,
+    longitude: idea.longitude ?? null,
+    address: idea.address ?? null,
     createdByUserId: revealCreator ? (idea.createdByUserId ?? null) : null,
   };
 }
@@ -204,6 +210,7 @@ export const seed = mutation({
       await ctx.db.insert("planIdeas", {
         ...idea,
         vibeTags: idea.subcategories,
+        source: "seed",
         coupleId: membership.coupleId,
         createdAt: now,
       });
@@ -237,6 +244,7 @@ export const create = mutation({
       durationMinutes: 60,
       subcategories,
       vibeTags: subcategories,
+      source: "manual",
       createdAt: Date.now(),
     });
   },

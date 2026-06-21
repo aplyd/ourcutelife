@@ -33,6 +33,8 @@ const config: ExpoConfig = {
         "Our Cute Life uses your photo library so you can attach memories to your relationship timeline.",
       NSPhotoLibraryAddUsageDescription:
         "Our Cute Life can save generated or edited memories back to your photo library.",
+      NSLocationWhenInUseUsageDescription:
+        "Our Cute Life uses your location to suggest nearby date ideas, food, drinks, and activities.",
       ITSAppUsesNonExemptEncryption: false,
     },
     entitlements: {

@@ -18,15 +18,110 @@ function todayKey(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-function choosePrompt(tags: string[]): string {
-  if (tags.includes("communication")) {
-    return "What is one thing you want to say more clearly and kindly this week?";
-  }
-  if (tags.includes("quality time")) {
-    return "What would make time together feel more intentional this week?";
-  }
-  if (tags.includes("stress")) return "Where could you make life 10% easier for each other today?";
-  return "What is one small thing your partner did recently that made life easier?";
+function stableIndex(seed: string, length: number): number {
+  let hash = 0;
+  for (let index = 0; index < seed.length; index += 1)
+    hash = (hash * 31 + seed.charCodeAt(index)) >>> 0;
+  return hash % length;
+}
+
+const promptBank = [
+  {
+    principle: "appreciation",
+    prompt:
+      "What is one specific thing your partner did recently that you want them to know mattered?",
+  },
+  {
+    principle: "love maps",
+    prompt:
+      "What is one small detail about your inner world this week that your partner might not know yet?",
+  },
+  {
+    principle: "bids for connection",
+    prompt:
+      "What is one tiny way your partner could get your attention or affection today that would land well?",
+  },
+  {
+    principle: "repair",
+    prompt:
+      "Is there a small moment from this week that would feel better with a quick repair or clarification?",
+  },
+  {
+    principle: "stress reducing conversation",
+    prompt:
+      "What stress are you carrying that you do not need your partner to fix, only understand?",
+  },
+  {
+    principle: "shared meaning",
+    prompt: "What is one little ritual you want more of in our life together?",
+  },
+];
+
+const weeklyGames = [
+  {
+    title: "Bid bingo",
+    description:
+      "Each of you makes three tiny bids for connection this week. Notice and accept as many as you can.",
+    principle: "bids for connection",
+  },
+  {
+    title: "Two appreciations, one ask",
+    description:
+      "Trade two specific appreciations before making one small request. Keep the ask behavioral and doable.",
+    principle: "positive sentiment + gentle startup",
+  },
+  {
+    title: "Love map lightning round",
+    description:
+      "Take turns asking five quick questions about current stress, hopes, preferences, and tiny joys.",
+    principle: "love maps",
+  },
+  {
+    title: "Repair phrase practice",
+    description:
+      "Each partner picks one repair phrase they are willing to use this week: 'Can I try that again?' counts.",
+    principle: "repair attempts",
+  },
+];
+
+const quizzes = [
+  {
+    title: "Do I know your current stress?",
+    question:
+      "What is one thing your partner is dealing with this week that deserves more tenderness?",
+    principle: "stress reducing conversation",
+  },
+  {
+    title: "Tiny joy check",
+    question: "What small thing would make your partner's next 24 hours 5% better?",
+    principle: "turning toward",
+  },
+  {
+    title: "Ritual audit",
+    question:
+      "Which ritual should you protect this week: greeting, goodbye, meal, bedtime, or weekend reset?",
+    principle: "shared meaning",
+  },
+  {
+    title: "Repair readiness",
+    question:
+      "When conflict gets tense, what helps your partner soften: space, touch, humor, clarity, or reassurance?",
+    principle: "repair attempts",
+  },
+];
+
+function chooseGeneratedContent(promptDate: string, tags: string[]) {
+  const seed = `${promptDate}:${tags.join(",")}`;
+  const tagText = tags[0] ? ` Recent theme: ${tags[0]}.` : "";
+  const prompt = promptBank[stableIndex(seed, promptBank.length)];
+  const weeklyGame = weeklyGames[stableIndex(`${seed}:game`, weeklyGames.length)];
+  const quiz = quizzes[stableIndex(`${seed}:quiz`, quizzes.length)];
+  return {
+    prompt: `${prompt.prompt}${tagText}`,
+    promptPrinciple: prompt.principle,
+    weeklyGame,
+    quiz,
+  };
 }
 
 export const today = query({
@@ -39,9 +134,11 @@ export const today = query({
         q.eq("coupleId", membership.coupleId).eq("authorUserId", user._id),
       )
       .order("desc")
-      .take(10);
+      .take(10)
+      .then((items) => items.filter((item) => !item.deletedAt));
     const tags = Array.from(new Set(recent.flatMap((moment) => moment.tags)));
     const promptDate = todayKey();
+    const generated = chooseGeneratedContent(promptDate, tags);
     const responses = await ctx.db
       .query("promptResponses")
       .withIndex("by_couple_and_date", (q) =>
@@ -54,14 +151,15 @@ export const today = query({
       .query("coupleMembers")
       .withIndex("by_couple", (q) => q.eq("coupleId", membership.coupleId))
       .collect();
-    const prompt = ownResponse?.prompt ?? partnerResponse?.prompt ?? choosePrompt(tags);
+    const prompt = ownResponse?.prompt ?? partnerResponse?.prompt ?? generated.prompt;
 
     return {
       promptDate,
       prompt,
-      weeklyTopic: tags[0]
-        ? `This week, make ${tags[0]} easier to talk about. Each of you names one need and one appreciation.`
-        : "This week, each of you shares one appreciation and one tiny repair request.",
+      promptPrinciple: generated.promptPrinciple,
+      weeklyTopic: generated.weeklyGame.description,
+      weeklyGame: generated.weeklyGame,
+      quiz: generated.quiz,
       response: ownResponse?.response ?? null,
       answeredAt: ownResponse?.createdAt ?? null,
       partnerHasAnswered: Boolean(partnerResponse),

@@ -10,6 +10,7 @@
 
 import type * as auth from "../auth.js";
 import type * as chat from "../chat.js";
+import type * as discovery from "../discovery.js";
 import type * as health from "../health.js";
 import type * as http from "../http.js";
 import type * as moments from "../moments.js";
@@ -24,6 +25,7 @@ import type { ApiFromModules, FilterApi, FunctionReference } from "convex/server
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   chat: typeof chat;
+  discovery: typeof discovery;
   health: typeof health;
   http: typeof http;
   moments: typeof moments;

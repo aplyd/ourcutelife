@@ -1,8 +1,9 @@
-import { useMutation, useQuery } from "convex/react";
+import { useAction, useMutation, useQuery } from "convex/react";
 import { Redirect, router } from "expo-router";
+import * as Location from "expo-location";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Pressable, Text, View } from "react-native";
 
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
@@ -15,7 +16,9 @@ export default function SwipeTab(): JSX.Element {
   const ideas = useQuery(api.plans.list, {});
   const seed = useMutation(api.plans.seed);
   const vote = useMutation(api.plans.vote);
+  const discoverNearby = useAction(api.discovery.discoverNearby);
   const [isWorking, setIsWorking] = useState(false);
+  const [isDiscovering, setIsDiscovering] = useState(false);
 
   useEffect(() => {
     if (betterAuthSession.data?.session && viewer?.couple) void seed({});
@@ -41,6 +44,38 @@ export default function SwipeTab(): JSX.Element {
     }
   }
 
+  async function handleDiscoverNearby() {
+    setIsDiscovering(true);
+    try {
+      const permission = await Location.requestForegroundPermissionsAsync();
+      if (permission.status !== "granted") {
+        Alert.alert(
+          "Location needed",
+          "Enable location to find nearby food, drinks, entertainment, and activities.",
+        );
+        return;
+      }
+      const position = await Location.getCurrentPositionAsync({});
+      const result = await discoverNearby({
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+        categories: ["food", "drinks", "entertainment", "activity"],
+        radiusMeters: 3000,
+      });
+      Alert.alert(
+        "Nearby ideas added",
+        `Found ${result.found}. Added ${result.inserted} new swipe cards.`,
+      );
+    } catch (err) {
+      Alert.alert(
+        "Discovery failed",
+        err instanceof Error ? err.message : "Could not find nearby ideas.",
+      );
+    } finally {
+      setIsDiscovering(false);
+    }
+  }
+
   return (
     <View className="flex-1 bg-[#fff8f1] px-6 pt-16 pb-28 gap-6">
       <MeHeaderButton />
@@ -52,6 +87,15 @@ export default function SwipeTab(): JSX.Element {
         <Text className="text-base leading-6 text-[#6f5a50]">
           All plan ideas in random order. Your suggestion stays anonymous unless it matches.
         </Text>
+        <Pressable
+          className="self-start rounded-full bg-[#2f211c] px-4 py-2"
+          disabled={isDiscovering}
+          onPress={handleDiscoverNearby}
+        >
+          <Text className="font-bold text-white">
+            {isDiscovering ? "Finding nearby…" : "Add nearby ideas"}
+          </Text>
+        </Pressable>
       </View>
 
       {currentIdea ? (
@@ -64,6 +108,9 @@ export default function SwipeTab(): JSX.Element {
               {currentIdea.title}
             </Text>
             <Text className="text-lg leading-7 text-[#6f5a50]">{currentIdea.description}</Text>
+            {currentIdea.address ? (
+              <Text className="text-sm leading-5 text-[#8c766b]">{currentIdea.address}</Text>
+            ) : null}
             <View className="flex-row flex-wrap gap-2">
               {(currentIdea.subcategories ?? currentIdea.vibeTags ?? []).map((tag: string) => (
                 <Text

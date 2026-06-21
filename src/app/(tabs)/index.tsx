@@ -174,15 +174,21 @@ export default function TodayTab(): JSX.Element {
           <View className="flex-1 aspect-square rounded-[28px] bg-white/85 border border-[#f1dfd2] p-4 justify-between">
             <Text className="text-4xl">🎮</Text>
             <View>
-              <Text className="text-lg font-bold text-[#2f211c]">Weekly game</Text>
-              <Text className="text-sm text-[#6f5a50]">Tiny couple challenge coming soon.</Text>
+              <Text className="text-lg font-bold text-[#2f211c]">
+                {promptData.weeklyGame.title}
+              </Text>
+              <Text className="text-sm text-[#6f5a50]" numberOfLines={4}>
+                {promptData.weeklyGame.description}
+              </Text>
             </View>
           </View>
           <View className="flex-1 aspect-square rounded-[28px] bg-white/85 border border-[#f1dfd2] p-4 justify-between">
             <Text className="text-4xl">💬</Text>
             <View>
-              <Text className="text-lg font-bold text-[#2f211c]">Quiz</Text>
-              <Text className="text-sm text-[#6f5a50]">Conversation sparks, not homework.</Text>
+              <Text className="text-lg font-bold text-[#2f211c]">{promptData.quiz.title}</Text>
+              <Text className="text-sm text-[#6f5a50]" numberOfLines={4}>
+                {promptData.quiz.question}
+              </Text>
             </View>
           </View>
         </View>

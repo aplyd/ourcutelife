@@ -106,6 +106,15 @@ export default defineSchema({
     durationMinutes: v.number(),
     subcategories: v.optional(v.array(v.string())),
     vibeTags: v.array(v.string()),
+    source: v.optional(
+      v.union(v.literal("manual"), v.literal("seed"), v.literal("osm"), v.literal("ai")),
+    ),
+    externalId: v.optional(v.string()),
+    sourceUrl: v.optional(v.string()),
+    photoUrl: v.optional(v.string()),
+    latitude: v.optional(v.number()),
+    longitude: v.optional(v.number()),
+    address: v.optional(v.string()),
     createdAt: v.number(),
   })
     .index("by_couple_and_created_at", ["coupleId", "createdAt"])

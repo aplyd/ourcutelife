@@ -9,6 +9,7 @@
     "lint": "oxlint --type-aware --type-check --react-plugin --jsx-a11y-plugin .",
     "lint:fix": "oxlint --type-aware --type-check --react-plugin --jsx-a11y-plugin --fix .",
     "format": "oxfmt --write .",
+    "format:fix": "pnpm format",
     "format:check": "oxfmt --check .",
     "typecheck": "tsc --noEmit",
     "doctor": "expo-doctor",

@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! command -v pnpm >/dev/null 2>&1; then
+  echo "pnpm is required to run the format hook." >&2
+  exit 1
+fi
+
+echo "Running pnpm format:fix before commit..."
+pnpm format:fix
+
+# Re-stage tracked files that the formatter changed so agent commits include the fix.
+git diff --name-only --diff-filter=ACMR | xargs -r git add

@@ -10,4 +10,6 @@ override what you may have learned about Convex from training data.
 Convex agent skills for common tasks can be installed by running
 `npx convex ai-files install`.
 
+Agent hook: before committing or pushing code changes, run `pnpm format:fix` so CI does not fail on formatting drift. This repository also includes `.githooks/pre-commit`; enable it in local clones with `git config core.hooksPath .githooks`.
+
 <!-- convex-ai-end -->

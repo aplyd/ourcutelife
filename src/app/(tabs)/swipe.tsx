@@ -13,6 +13,7 @@ import {
   View,
 } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, {
   interpolate,
   runOnJS,
@@ -27,8 +28,16 @@ import type { Id } from "../../../convex/_generated/dataModel";
 import { MeHeaderButton } from "@/components/MeHeaderButton";
 import { useSession } from "@/lib/betterAuth";
 
-const refillThreshold = 4;
 const offscreen = 900;
+
+function badgeForIdea(idea: {
+  category: string;
+  kind?: string | null;
+  subcategories?: string[] | null;
+}) {
+  const primary = idea.subcategories?.[0]?.replace(/_/g, " ") ?? idea.category;
+  return `${primary}${idea.kind === "place" ? " nearby" : ""}`;
+}
 
 export default function SwipeTab(): JSX.Element {
   const betterAuthSession = useSession();
@@ -43,6 +52,7 @@ export default function SwipeTab(): JSX.Element {
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
   const { width } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     if (betterAuthSession.data?.session && viewer?.couple) void seed({});
@@ -95,19 +105,13 @@ export default function SwipeTab(): JSX.Element {
   );
 
   useEffect(() => {
-    if (
-      !viewer?.couple ||
-      ideas === undefined ||
-      hasTriedAutoDiscovery ||
-      ideas.length > refillThreshold
-    )
-      return;
+    if (!viewer?.couple || ideas === undefined || hasTriedAutoDiscovery || ideas.length > 0) return;
     setHasTriedAutoDiscovery(true);
     void runDiscovery(false);
   }, [hasTriedAutoDiscovery, ideas, runDiscovery, viewer?.couple]);
 
   useEffect(() => {
-    if ((ideas?.length ?? 0) > refillThreshold) setHasTriedAutoDiscovery(false);
+    if ((ideas?.length ?? 0) > 0) setHasTriedAutoDiscovery(false);
   }, [ideas?.length]);
 
   async function handleVote(ideaId: Id<"planIdeas">, nextVote: "like" | "pass") {
@@ -162,13 +166,6 @@ export default function SwipeTab(): JSX.Element {
   return (
     <View className="flex-1 bg-app-bg">
       <MeHeaderButton />
-      <View className="absolute left-3 right-3 top-14 z-10 pr-20">
-        <Text className="text-sm font-semibold uppercase tracking-widest text-white/80">Swipe</Text>
-        <Text className="text-3xl font-bold text-white">Private yes/no pile</Text>
-        <Text className="text-sm leading-5 text-white/80">
-          {isDiscovering ? "Finding more nearby cards…" : `${ideas?.length ?? 0} options left`}
-        </Text>
-      </View>
 
       <View className="flex-1">
         {nextIdeas.map((idea, index) => (
@@ -196,10 +193,13 @@ export default function SwipeTab(): JSX.Element {
               <View className="absolute inset-0 bg-black/20" />
               <View className="p-4 gap-3">
                 <Text className="self-start overflow-hidden rounded-full bg-white/85 px-3 py-2 text-xs font-bold uppercase tracking-widest text-[#5b21b6]">
-                  {currentIdea.kind} · {currentIdea.category}
+                  {badgeForIdea(currentIdea)}
                 </Text>
               </View>
-              <View className="p-4 gap-3 bg-black/35">
+              <View
+                className="p-4 gap-3 bg-black/40"
+                style={{ paddingBottom: Math.max(insets.bottom + 94, 112) }}
+              >
                 <Text className="text-4xl font-bold leading-[44px] text-white">
                   {currentIdea.title}
                 </Text>

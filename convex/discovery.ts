@@ -107,6 +107,29 @@ function formatDistance(meters: number): string {
   return `${miles < 10 ? miles.toFixed(1) : Math.round(miles)} mi`;
 }
 
+function tagValue(value: unknown): string {
+  return typeof value === "string" ? value : "";
+}
+
+function categoryFromTags(
+  tags: Record<string, unknown>,
+  fallback: DiscoveryCategory,
+): DiscoveryCategory {
+  const amenity = tagValue(tags.amenity);
+  const tourism = tagValue(tags.tourism);
+  const leisure = tagValue(tags.leisure);
+  if (/restaurant|cafe|fast_food|food_court|ice_cream/.test(amenity)) return "food";
+  if (/bar|pub|biergarten/.test(amenity)) return "drinks";
+  if (/cinema|theatre/.test(amenity) || /museum|gallery|attraction/.test(tourism))
+    return "entertainment";
+  if (
+    /park|fitness_centre|sports_centre|bowling_alley/.test(leisure) ||
+    /zoo|aquarium/.test(tourism)
+  )
+    return "activity";
+  return fallback;
+}
+
 function normalizePlace(
   element: any,
   category: DiscoveryCategory,
@@ -125,11 +148,12 @@ function normalizePlace(
   const distanceHint = Math.round(
     Math.hypot((lat - fallbackLat) * 111_000, (lon - fallbackLon) * 85_000),
   );
+  const normalizedCategory = categoryFromTags(tags, category);
   return {
     externalId: `osm:${element.type}:${element.id}`,
     title: name,
     description: `${typeTag} nearby${distanceHint ? ` · about ${formatDistance(distanceHint)} away` : ""}`,
-    category,
+    category: normalizedCategory,
     subcategories: Array.from(new Set([String(typeTag), tags.cuisine].filter(Boolean))).slice(0, 4),
     sourceUrl: tags.website ?? mapsUrl(lat, lon),
     latitude: lat,
@@ -217,13 +241,30 @@ export const discoverNearby = action({
       ),
     );
     const body = `[out:json][timeout:25];(${queries.join("")});out center tags 40;`;
-    const response = await fetch("https://overpass-api.de/api/interpreter", {
-      method: "POST",
-      headers: { "content-type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({ data: body }).toString(),
-    });
-    if (!response.ok) throw new Error(`Nearby discovery failed: ${response.status}`);
-    const json = await response.json();
+    const endpoints = [
+      "https://overpass-api.de/api/interpreter",
+      "https://overpass.kumi.systems/api/interpreter",
+      "https://overpass.openstreetmap.ru/api/interpreter",
+    ];
+    let json: any = null;
+    let lastStatus = "unavailable";
+    for (const endpoint of endpoints) {
+      try {
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: { "content-type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({ data: body }).toString(),
+        });
+        if (response.ok) {
+          json = await response.json();
+          break;
+        }
+        lastStatus = `${response.status}`;
+      } catch (err) {
+        lastStatus = err instanceof Error ? err.message : "network error";
+      }
+    }
+    if (!json) throw new Error(`Nearby discovery failed: ${lastStatus}`);
     const places: DiscoveredPlace[] = [];
     for (const element of json.elements ?? []) {
       const category =

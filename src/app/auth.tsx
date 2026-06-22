@@ -49,7 +49,7 @@ export default function AuthLanding(): JSX.Element {
 
       if (result.error) throw new Error(result.error.message ?? "Apple sign in failed.");
       await syncBetterAuthUser();
-      router.replace("/pairing");
+      router.replace("/");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Apple sign in failed.");
     } finally {

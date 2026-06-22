@@ -79,16 +79,14 @@ export default function ChatTab(): JSX.Element {
             return (
               <View
                 key={message._id}
-                className={`max-w-[86%] rounded-3xl p-4 ${coach ? "self-center bg-ink" : mine ? "self-end bg-accent" : "self-start bg-card border border-soft"}`}
+                className={`max-w-[86%] rounded-3xl p-4 ${coach ? "self-center bg-ink" : mine ? "self-end bg-card border border-accent" : "self-start bg-card border border-soft"}`}
               >
                 <Text
-                  className={`mb-1 text-xs font-bold uppercase tracking-widest ${coach || mine ? "text-white/70" : "text-muted"}`}
+                  className={`mb-1 text-xs font-bold uppercase tracking-widest ${coach ? "text-white/70" : "text-muted"}`}
                 >
                   {coach ? "Coach" : mine ? "You" : "Partner"} · {formatTime(message.createdAt)}
                 </Text>
-                <Text
-                  className={`text-base leading-6 ${coach || mine ? "text-white" : "text-ink"}`}
-                >
+                <Text className={`text-base leading-6 ${coach ? "text-white" : "text-ink"}`}>
                   {message.text}
                 </Text>
               </View>

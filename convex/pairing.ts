@@ -222,13 +222,14 @@ export const pairWithTestPartner = mutation({
       .withIndex("by_couple", (q) => q.eq("coupleId", activeCoupleId))
       .collect();
 
+    let testUserId = existingMembers.find((member) => member.userId !== user._id)?.userId ?? null;
     if (existingMembers.length < 2) {
       const testAuthUserId = `test-partner:${user._id}`;
       const existingTestUser = await ctx.db
         .query("users")
         .withIndex("by_auth_user_id", (q) => q.eq("authUserId", testAuthUserId))
         .first();
-      const testUserId =
+      testUserId =
         existingTestUser?._id ??
         (await ctx.db.insert("users", {
           authUserId: testAuthUserId,
@@ -245,6 +246,123 @@ export const pairWithTestPartner = mutation({
           userId: testUserId,
           role: "partner",
           joinedAt: now,
+        });
+      }
+    }
+
+    if (testUserId) {
+      const demoIdeas = [
+        {
+          title: "Gunther's Ice Cream",
+          description: "Classic Sacramento ice cream stop.",
+          kind: "place" as const,
+          category: "food" as const,
+          subcategories: ["ice cream", "classic"],
+          costLevel: 1,
+          durationMinutes: 45,
+        },
+        {
+          title: "Dimple Records browsing",
+          description: "Browse records and pick one album for each other.",
+          kind: "place" as const,
+          category: "entertainment" as const,
+          subcategories: ["music", "browsing"],
+          costLevel: 1,
+          durationMinutes: 45,
+        },
+        {
+          title: "Puzzle night at home",
+          description: "Phones away, snacks out, puzzle on the table.",
+          kind: "activity" as const,
+          category: "activity" as const,
+          subcategories: ["home", "cozy"],
+          costLevel: 0,
+          durationMinutes: 90,
+        },
+      ];
+      const matchedIdeaIds = [];
+      for (const idea of demoIdeas) {
+        const existingIdea = await ctx.db
+          .query("planIdeas")
+          .withIndex("by_couple_and_created_at", (q) => q.eq("coupleId", activeCoupleId))
+          .collect()
+          .then((ideas) => ideas.find((item) => item.title === idea.title));
+        const ideaId =
+          existingIdea?._id ??
+          (await ctx.db.insert("planIdeas", {
+            coupleId: activeCoupleId,
+            ...idea,
+            vibeTags: idea.subcategories,
+            source: "seed",
+            createdAt: now,
+          }));
+        matchedIdeaIds.push(ideaId);
+        for (const memberUserId of [user._id, testUserId]) {
+          const existingSwipe = await ctx.db
+            .query("planSwipes")
+            .withIndex("by_user_and_idea", (q) => q.eq("userId", memberUserId).eq("ideaId", ideaId))
+            .first();
+          if (!existingSwipe) {
+            await ctx.db.insert("planSwipes", {
+              coupleId: activeCoupleId,
+              ideaId,
+              userId: memberUserId,
+              vote: "like",
+              createdAt: now,
+            });
+          }
+        }
+        const existingMatch = await ctx.db
+          .query("planMatches")
+          .withIndex("by_idea", (q) => q.eq("ideaId", ideaId))
+          .first();
+        if (!existingMatch) {
+          await ctx.db.insert("planMatches", {
+            coupleId: activeCoupleId,
+            ideaId,
+            createdAt: now,
+            status: "matched",
+          });
+        }
+      }
+      const existingDates = await ctx.db
+        .query("datePlans")
+        .withIndex("by_couple_and_created_at", (q) => q.eq("coupleId", activeCoupleId))
+        .collect();
+      if (!existingDates.some((date) => date.title === "Gunther's → Dimple Records")) {
+        await ctx.db.insert("datePlans", {
+          coupleId: activeCoupleId,
+          title: "Gunther's → Dimple Records",
+          summary: "Ice cream first, then browse records and pick something weird for each other.",
+          itemIds: matchedIdeaIds.slice(0, 2),
+          freeformSteps: ["Get cones", "Browse one aisle each", "Trade one pick"],
+          durationMinutes: 90,
+          costLevel: 1,
+          vibeTags: ["classic", "music", "low-key"],
+          source: "seed",
+          popularityScore: 8,
+          trendingScore: 6,
+          ratingAverage: 4,
+          ratingCount: 2,
+          createdAt: now,
+        });
+      }
+      if (!existingDates.some((date) => date.title === "Gunther's to-go → puzzle night")) {
+        await ctx.db.insert("datePlans", {
+          coupleId: activeCoupleId,
+          title: "Gunther's to-go → puzzle night",
+          summary: "Grab ice cream, head home, and make the night intentionally cozy.",
+          itemIds: [matchedIdeaIds[0], matchedIdeaIds[2]],
+          freeformSteps: ["Pick up ice cream", "Put phones away", "Finish one puzzle section"],
+          durationMinutes: 120,
+          costLevel: 1,
+          vibeTags: ["cozy", "home", "dessert"],
+          source: "seed",
+          popularityScore: 7,
+          trendingScore: 7,
+          ratingAverage: 4,
+          ratingCount: 1,
+          createdAt: now,
         });
       }
     }

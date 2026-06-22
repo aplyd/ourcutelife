@@ -48,13 +48,7 @@ export default function PlansTab(): JSX.Element {
   const rateDate = useMutation(api.plans.rateDate);
 
   if (!betterAuthSession.data?.session) return <Redirect href="/auth" />;
-  if (
-    viewer === undefined ||
-    matches === undefined ||
-    randomPicks === undefined ||
-    leaderboard === undefined ||
-    ourDates === undefined
-  )
+  if (viewer === undefined || matches === undefined || ourDates === undefined)
     return (
       <View className="flex-1 bg-app-bg items-center justify-center">
         <ActivityIndicator />
@@ -66,6 +60,7 @@ export default function PlansTab(): JSX.Element {
     enabledCategories.includes(match.idea.category as Category),
   );
   const currentRandomPicks = randomPicks ?? [];
+  const currentLeaderboard = leaderboard ?? [];
 
   function toggleCategory(category: Category) {
     setEnabledCategories((current) =>
@@ -160,8 +155,8 @@ export default function PlansTab(): JSX.Element {
               );
             })}
           </View>
-          {leaderboard.length ? (
-            leaderboard.map((date) => (
+          {currentLeaderboard.length ? (
+            currentLeaderboard.map((date) => (
               <DateCard
                 key={date._id}
                 date={date}
@@ -208,7 +203,7 @@ export default function PlansTab(): JSX.Element {
           </View>
           {filteredMatches.length ? (
             filteredMatches.map((match) => {
-              const relatedDates = leaderboard
+              const relatedDates = currentLeaderboard
                 .filter((date) => date.items?.some((item) => item._id === match.idea._id))
                 .slice(0, 2);
               return (

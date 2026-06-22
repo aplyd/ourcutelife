@@ -24,7 +24,7 @@ export default function MeTab(): JSX.Element {
   if (!betterAuthSession.data?.session) return <Redirect href="/auth" />;
   if (viewer === undefined)
     return (
-      <View className="flex-1 bg-[#fff8f1] items-center justify-center">
+      <View className="flex-1 bg-app-bg items-center justify-center">
         <ActivityIndicator />
       </View>
     );
@@ -47,16 +47,16 @@ export default function MeTab(): JSX.Element {
   }
 
   return (
-    <ScrollView className="flex-1 bg-[#fff8f1]" contentContainerClassName="px-3 pt-16 pb-28 gap-3">
+    <ScrollView className="flex-1 bg-app-bg" contentContainerClassName="px-3 pt-16 pb-28 gap-3">
       <View className="gap-2">
-        <Text className="text-sm font-semibold uppercase tracking-widest text-[#8c766b]">Me</Text>
-        <Text className="text-4xl font-bold text-[#2f211c]">Profile and couple settings</Text>
+        <Text className="text-sm font-semibold uppercase tracking-widest text-muted">Me</Text>
+        <Text className="text-4xl font-bold text-ink">Profile and couple settings</Text>
       </View>
 
-      <View className="rounded-3xl bg-white/85 p-4 border border-[#f1dfd2] gap-4">
+      <View className="rounded-3xl bg-card/90 p-4 border border-soft gap-4">
         <View className="items-center gap-3">
           <Pressable
-            className="h-24 w-24 overflow-hidden rounded-full bg-[#7c3aed] items-center justify-center"
+            className="h-24 w-24 overflow-hidden rounded-full bg-accent items-center justify-center"
             onPress={() => router.push("/me/profile")}
           >
             {viewer.user.avatarUrl ? (
@@ -67,43 +67,43 @@ export default function MeTab(): JSX.Element {
               </Text>
             )}
           </Pressable>
-          <Text className="text-sm text-[#8c766b]">Tap avatar to update your profile</Text>
+          <Text className="text-sm text-muted">Tap avatar to update your profile</Text>
         </View>
         <View className="gap-2">
           <Pressable onPress={() => router.push("/me/profile")}>
-            <Text className="text-sm font-semibold text-[#6f5a50]">Name ✎</Text>
+            <Text className="text-sm font-semibold text-muted">Name ✎</Text>
             <TextInput
               editable={false}
-              className="h-12 rounded-2xl border border-[#e6d2c2] bg-[#fff8f1] px-4 text-base text-[#2f211c]"
+              className="h-12 rounded-2xl border border-soft bg-app-bg px-4 text-base text-ink"
               value={name}
             />
           </Pressable>
         </View>
       </View>
 
-      <View className="rounded-3xl bg-white/85 p-4 border border-[#f1dfd2] gap-4">
-        <Text className="text-2xl font-bold text-[#2f211c]">Relationship</Text>
+      <View className="rounded-3xl bg-card/90 p-4 border border-soft gap-4">
+        <Text className="text-2xl font-bold text-ink">Relationship</Text>
         <View className="gap-1">
-          <Text className="text-sm font-semibold text-[#6f5a50]">Partner</Text>
-          <Text className="text-lg font-bold text-[#2f211c]">{partnerName}</Text>
+          <Text className="text-sm font-semibold text-muted">Partner</Text>
+          <Text className="text-lg font-bold text-ink">{partnerName}</Text>
         </View>
         <Pressable className="gap-1" onPress={() => router.push("/me/anniversary")}>
-          <Text className="text-sm font-semibold text-[#6f5a50]">Anniversary ✎</Text>
-          <Text className="text-lg font-bold text-[#2f211c]">{anniversary}</Text>
+          <Text className="text-sm font-semibold text-muted">Anniversary ✎</Text>
+          <Text className="text-lg font-bold text-ink">{anniversary}</Text>
         </Pressable>
       </View>
 
-      <View className="rounded-3xl bg-white/85 p-4 border border-[#f1dfd2] gap-4">
-        <Text className="text-2xl font-bold text-[#2f211c]">Settings</Text>
+      <View className="rounded-3xl bg-card/90 p-4 border border-soft gap-4">
+        <Text className="text-2xl font-bold text-ink">Settings</Text>
         <View className="flex-row gap-2">
           {(["light", "dark", "system"] as const).map((item) => (
             <Pressable
               key={item}
-              className={`flex-1 rounded-full py-3 items-center ${theme === item ? "bg-[#2f211c]" : "bg-[#fff8f1] border border-[#e6d2c2]"}`}
+              className={`flex-1 rounded-full py-3 items-center ${theme === item ? "bg-ink" : "bg-app-bg border border-soft"}`}
               onPress={() => setTheme(item)}
             >
               <Text
-                className={`font-semibold capitalize ${theme === item ? "text-white" : "text-[#6f5a50]"}`}
+                className={`font-semibold capitalize ${theme === item ? "text-white" : "text-muted"}`}
               >
                 {item}
               </Text>
@@ -112,10 +112,10 @@ export default function MeTab(): JSX.Element {
         </View>
       </View>
 
-      <View className="rounded-3xl bg-white/85 p-4 border border-[#f1dfd2] gap-3">
-        <Text className="text-2xl font-bold text-[#2f211c]">Account</Text>
+      <View className="rounded-3xl bg-card/90 p-4 border border-soft gap-3">
+        <Text className="text-2xl font-bold text-ink">Account</Text>
         <Pressable
-          className="h-12 rounded-full bg-[#2f211c] items-center justify-center"
+          className="h-12 rounded-full bg-ink items-center justify-center"
           onPress={() => void authClient.signOut()}
         >
           <Text className="font-bold text-white">Sign out</Text>

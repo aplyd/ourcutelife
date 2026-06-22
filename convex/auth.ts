@@ -37,23 +37,34 @@ export async function getCurrentAppUser(ctx: QueryCtx | MutationCtx): Promise<Do
   const authUser = await authComponent.safeGetAuthUser(ctx as never);
   if (!authUser) return null;
 
-  return await ctx.db
+  const byAuthUserId = await ctx.db
     .query("users")
     .withIndex("by_auth_user_id", (q) => q.eq("authUserId", authUser._id))
     .first();
+  if (byAuthUserId) return byAuthUserId;
+  if (authUser.email) {
+    const users = await ctx.db.query("users").take(100);
+    return users.find((user) => user.email === authUser.email) ?? null;
+  }
+  return null;
 }
 
 export const syncBetterAuthUser = mutation({
   args: {},
   handler: async (ctx) => {
     const authUser = await authComponent.getAuthUser(ctx as never);
-    const existing = await ctx.db
-      .query("users")
-      .withIndex("by_auth_user_id", (q) => q.eq("authUserId", authUser._id))
-      .first();
+    const existing =
+      (await ctx.db
+        .query("users")
+        .withIndex("by_auth_user_id", (q) => q.eq("authUserId", authUser._id))
+        .first()) ??
+      (authUser.email
+        ? (await ctx.db.query("users").take(100)).find((user) => user.email === authUser.email)
+        : null);
     const now = Date.now();
     if (existing) {
       await ctx.db.patch(existing._id, {
+        authUserId: authUser._id,
         email: authUser.email ?? existing.email,
         fullName: authUser.name ?? existing.fullName,
         updatedAt: now,

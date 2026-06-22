@@ -23,6 +23,7 @@ export default function NewPlanItemScreen(): JSX.Element {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState<Category>("food");
+  const [kind, setKind] = useState<"activity" | "place">("activity");
   const [tags, setTags] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -47,6 +48,7 @@ export default function NewPlanItemScreen(): JSX.Element {
       await createPlan({
         title,
         description,
+        kind,
         category,
         subcategories: tags
           .split(/[#,]/)
@@ -65,7 +67,7 @@ export default function NewPlanItemScreen(): JSX.Element {
     <ScrollView className="flex-1 bg-[#fff8f1]" contentContainerClassName="px-3 pt-16 pb-10 gap-4">
       <View className="gap-2">
         <Text className="text-sm font-semibold uppercase tracking-widest text-[#8c766b]">
-          Add plan item
+          Add activity or place
         </Text>
         <Text className="text-4xl font-bold text-[#2f211c]">Suggest it safely</Text>
         <Text className="text-base leading-6 text-[#6f5a50]">
@@ -93,6 +95,27 @@ export default function NewPlanItemScreen(): JSX.Element {
           textAlignVertical="top"
           placeholder="Enough detail to make the swipe easy."
         />
+      </View>
+      <View className="gap-3">
+        <Text className="text-sm font-semibold text-[#6f5a50]">Type</Text>
+        <View className="flex-row gap-2">
+          {[
+            { value: "activity" as const, label: "Activity" },
+            { value: "place" as const, label: "Place" },
+          ].map((item) => (
+            <Pressable
+              key={item.value}
+              className={`rounded-full px-4 py-2 ${kind === item.value ? "bg-[#2f211c]" : "bg-white/80 border border-[#e6d2c2]"}`}
+              onPress={() => setKind(item.value)}
+            >
+              <Text
+                className={`font-semibold ${kind === item.value ? "text-white" : "text-[#6f5a50]"}`}
+              >
+                {item.label}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
       </View>
       <View className="gap-3">
         <Text className="text-sm font-semibold text-[#6f5a50]">Category</Text>

@@ -93,6 +93,7 @@ export default defineSchema({
     createdByUserId: v.optional(v.id("users")),
     title: v.string(),
     description: v.string(),
+    kind: v.optional(v.union(v.literal("activity"), v.literal("place"))),
     category: v.union(
       v.literal("food"),
       v.literal("drinks"),
@@ -153,4 +154,59 @@ export default defineSchema({
   })
     .index("by_match", ["matchId"])
     .index("by_user_and_match", ["userId", "matchId"]),
+  datePlans: defineTable({
+    coupleId: v.id("couples"),
+    title: v.string(),
+    summary: v.string(),
+    itemIds: v.array(v.id("planIdeas")),
+    freeformSteps: v.array(v.string()),
+    durationMinutes: v.number(),
+    costLevel: v.number(),
+    vibeTags: v.array(v.string()),
+    source: v.union(v.literal("seed"), v.literal("suggested"), v.literal("manual")),
+    popularityScore: v.number(),
+    trendingScore: v.number(),
+    ratingAverage: v.optional(v.number()),
+    ratingCount: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_couple_and_created_at", ["coupleId", "createdAt"])
+    .index("by_couple_and_popularity", ["coupleId", "popularityScore"])
+    .index("by_couple_and_trending", ["coupleId", "trendingScore"]),
+  datePlanLikes: defineTable({
+    coupleId: v.id("couples"),
+    datePlanId: v.id("datePlans"),
+    userId: v.id("users"),
+    createdAt: v.number(),
+  })
+    .index("by_date_plan", ["datePlanId"])
+    .index("by_user_and_date_plan", ["userId", "datePlanId"]),
+  savedDatePlans: defineTable({
+    coupleId: v.id("couples"),
+    datePlanId: v.id("datePlans"),
+    savedByUserId: v.id("users"),
+    status: v.union(
+      v.literal("saved"),
+      v.literal("scheduled"),
+      v.literal("completed"),
+      v.literal("archived"),
+    ),
+    scheduledFor: v.optional(v.number()),
+    completedAt: v.optional(v.number()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_couple_and_status", ["coupleId", "status"])
+    .index("by_couple_and_created_at", ["coupleId", "createdAt"])
+    .index("by_date_plan", ["datePlanId"]),
+  datePlanRatings: defineTable({
+    coupleId: v.id("couples"),
+    datePlanId: v.id("datePlans"),
+    userId: v.id("users"),
+    rating: v.number(),
+    tags: v.array(v.string()),
+    createdAt: v.number(),
+  })
+    .index("by_date_plan", ["datePlanId"])
+    .index("by_user_and_date_plan", ["userId", "datePlanId"]),
 });

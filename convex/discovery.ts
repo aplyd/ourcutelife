@@ -169,6 +169,7 @@ export const insertDiscovered = mutation({
         coupleId: membership.coupleId,
         title: place.title,
         description: place.description,
+        kind: "place",
         category: place.category,
         costLevel: 1,
         durationMinutes: 90,

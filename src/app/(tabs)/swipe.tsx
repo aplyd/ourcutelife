@@ -193,7 +193,7 @@ export default function SwipeTab(): JSX.Element {
               <View className="absolute inset-0 bg-black/20" />
               <View className="p-4 gap-3">
                 <Text className="self-start overflow-hidden rounded-full bg-white/85 px-3 py-2 text-xs font-bold uppercase tracking-widest text-[#5b21b6]">
-                  {currentIdea.category}
+                  {currentIdea.kind} · {currentIdea.category}
                 </Text>
               </View>
               <View className="p-4 gap-3 bg-black/35">

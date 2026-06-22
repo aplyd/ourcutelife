@@ -10,6 +10,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { authClient, useSession } from "@/lib/betterAuth";
 import { convex } from "@/lib/convex";
 import { ThemeProvider, useAppTheme } from "@/lib/theme";
+import { UpdateProvider } from "@/providers/update-provider";
 import "@/lib/notifications";
 import "../global.css";
 
@@ -63,7 +64,9 @@ export default function RootLayout(): JSX.Element {
       <ConvexBetterAuthProvider client={convex} authClient={authClient as never}>
         <HeroUINativeProvider>
           <ThemeProvider>
-            <RootStack />
+            <UpdateProvider>
+              <RootStack />
+            </UpdateProvider>
           </ThemeProvider>
         </HeroUINativeProvider>
       </ConvexBetterAuthProvider>

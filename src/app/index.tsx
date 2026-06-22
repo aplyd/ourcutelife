@@ -3,10 +3,10 @@ import type { JSX } from "react";
 
 import { useSession } from "@/lib/betterAuth";
 
-export default function EntryRoute(): JSX.Element {
+export default function EntryRoute(): JSX.Element | null {
   const betterAuthSession = useSession();
 
-  if (betterAuthSession.isPending) return <Redirect href="/auth" />;
+  if (betterAuthSession.isPending) return null;
 
   return <Redirect href={betterAuthSession.data?.session ? "/pairing" : "/auth"} />;
 }

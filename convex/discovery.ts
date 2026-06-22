@@ -100,6 +100,13 @@ function categoryFromArgs(value: string): DiscoveryCategory {
   return "activity";
 }
 
+function formatDistance(meters: number): string {
+  const feet = meters * 3.28084;
+  if (feet < 528) return `${Math.round(feet / 25) * 25} ft`;
+  const miles = feet / 5280;
+  return `${miles < 10 ? miles.toFixed(1) : Math.round(miles)} mi`;
+}
+
 function normalizePlace(
   element: any,
   category: DiscoveryCategory,
@@ -121,7 +128,7 @@ function normalizePlace(
   return {
     externalId: `osm:${element.type}:${element.id}`,
     title: name,
-    description: `${typeTag} nearby${distanceHint ? ` · about ${distanceHint}m away` : ""}`,
+    description: `${typeTag} nearby${distanceHint ? ` · about ${formatDistance(distanceHint)} away` : ""}`,
     category,
     subcategories: Array.from(new Set([String(typeTag), tags.cuisine].filter(Boolean))).slice(0, 4),
     sourceUrl: tags.website ?? mapsUrl(lat, lon),

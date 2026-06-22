@@ -35,7 +35,7 @@ export default function ChatTab(): JSX.Element {
   if (!betterAuthSession.data?.session) return <Redirect href="/auth" />;
   if (viewer === undefined || messages === undefined) {
     return (
-      <View className="flex-1 bg-[#fff8f1] items-center justify-center">
+      <View className="flex-1 bg-app-bg items-center justify-center">
         <ActivityIndicator />
       </View>
     );
@@ -59,14 +59,14 @@ export default function ChatTab(): JSX.Element {
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-[#fff8f1]"
+      className="flex-1 bg-app-bg"
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <MeHeaderButton />
-      <View className="px-3 pt-16 pb-3 pr-24 gap-2 border-b border-[#f1dfd2]">
-        <Text className="text-sm font-semibold uppercase tracking-widest text-[#8c766b]">Chat</Text>
-        <Text className="text-3xl font-bold text-[#2f211c]">You, your person, and the coach</Text>
-        <Text className="text-base leading-6 text-[#6f5a50]">
+      <View className="px-3 pt-16 pb-3 pr-24 gap-2 border-b border-soft">
+        <Text className="text-sm font-semibold uppercase tracking-widest text-muted">Chat</Text>
+        <Text className="text-3xl font-bold text-ink">You, your person, and the coach</Text>
+        <Text className="text-base leading-6 text-muted">
           The coach is invoked-only. No creepy lurking.
         </Text>
       </View>
@@ -79,15 +79,15 @@ export default function ChatTab(): JSX.Element {
             return (
               <View
                 key={message._id}
-                className={`max-w-[86%] rounded-3xl p-4 ${coach ? "self-center bg-[#2f211c]" : mine ? "self-end bg-[#7c3aed]" : "self-start bg-white border border-[#f1dfd2]"}`}
+                className={`max-w-[86%] rounded-3xl p-4 ${coach ? "self-center bg-ink" : mine ? "self-end bg-accent" : "self-start bg-card border border-soft"}`}
               >
                 <Text
-                  className={`mb-1 text-xs font-bold uppercase tracking-widest ${coach || mine ? "text-white/70" : "text-[#8c766b]"}`}
+                  className={`mb-1 text-xs font-bold uppercase tracking-widest ${coach || mine ? "text-white/70" : "text-muted"}`}
                 >
                   {coach ? "Coach" : mine ? "You" : "Partner"} · {formatTime(message.createdAt)}
                 </Text>
                 <Text
-                  className={`text-base leading-6 ${coach || mine ? "text-white" : "text-[#2f211c]"}`}
+                  className={`text-base leading-6 ${coach || mine ? "text-white" : "text-ink"}`}
                 >
                   {message.text}
                 </Text>
@@ -95,9 +95,9 @@ export default function ChatTab(): JSX.Element {
             );
           })
         ) : (
-          <View className="rounded-3xl bg-white/85 border border-[#f1dfd2] p-4 gap-2">
-            <Text className="text-xl font-bold text-[#2f211c]">Start with the raw version.</Text>
-            <Text className="text-base leading-6 text-[#6f5a50]">
+          <View className="rounded-3xl bg-card/90 border border-soft p-4 gap-2">
+            <Text className="text-xl font-bold text-ink">Start with the raw version.</Text>
+            <Text className="text-base leading-6 text-muted">
               Send a message, ask the coach, or ask for a safer rephrase before you share something
               sharp.
             </Text>
@@ -105,7 +105,7 @@ export default function ChatTab(): JSX.Element {
         )}
       </ScrollView>
 
-      <View className="px-4 pb-28 pt-3 gap-3 border-t border-[#f1dfd2] bg-[#fff8f1]">
+      <View className="px-4 pb-28 pt-3 gap-3 border-t border-soft bg-app-bg">
         <View className="flex-row gap-2">
           {(
             [
@@ -116,11 +116,11 @@ export default function ChatTab(): JSX.Element {
           ).map(([value, label]) => (
             <Pressable
               key={value}
-              className={`rounded-full px-3 py-2 ${mode === value ? "bg-[#2f211c]" : "bg-white border border-[#e6d2c2]"}`}
+              className={`rounded-full px-3 py-2 ${mode === value ? "bg-ink" : "bg-card border border-soft"}`}
               onPress={() => setMode(value)}
             >
               <Text
-                className={`text-sm font-semibold ${mode === value ? "text-white" : "text-[#6f5a50]"}`}
+                className={`text-sm font-semibold ${mode === value ? "text-white" : "text-muted"}`}
               >
                 {label}
               </Text>
@@ -130,13 +130,13 @@ export default function ChatTab(): JSX.Element {
         <View className="flex-row gap-2 items-end">
           <TextInput
             multiline
-            className="max-h-32 flex-1 rounded-3xl border border-[#e6d2c2] bg-white px-4 py-3 text-base text-[#2f211c]"
+            className="max-h-32 flex-1 rounded-3xl border border-soft bg-card px-4 py-3 text-base text-ink"
             placeholder="Write the honest version…"
             value={text}
             onChangeText={setText}
           />
           <Pressable
-            className="h-12 rounded-full bg-[#7c3aed] px-5 items-center justify-center"
+            className="h-12 rounded-full bg-accent px-5 items-center justify-center"
             disabled={!text.trim() || isSending}
             onPress={handleSend}
           >

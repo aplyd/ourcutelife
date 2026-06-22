@@ -15,7 +15,36 @@ import {
 } from "react-native";
 
 import { api } from "../../../../convex/_generated/api";
+import type { Id } from "../../../../convex/_generated/dataModel";
 import { useSession } from "@/lib/betterAuth";
+
+type UploadResponse = { storageId: Id<"_storage"> };
+
+function uploadLocalImage(
+  uploadUrl: string,
+  uri: string,
+  mimeType: string,
+): Promise<UploadResponse> {
+  return new Promise((resolve, reject) => {
+    const request = new XMLHttpRequest();
+    request.open("POST", uploadUrl);
+    request.setRequestHeader("Content-Type", mimeType);
+    request.onload = () => {
+      if (request.status < 200 || request.status >= 300) {
+        reject(new Error(`Upload failed: ${request.status}`));
+        return;
+      }
+      try {
+        const payload = JSON.parse(request.responseText) as { storageId: string };
+        resolve({ storageId: payload.storageId as Id<"_storage"> });
+      } catch {
+        reject(new Error("Upload response was invalid."));
+      }
+    };
+    request.onerror = () => reject(new Error("Upload failed."));
+    request.send({ uri, type: mimeType, name: "profile-photo.jpg" } as never);
+  });
+}
 
 export default function EditProfileSheet(): JSX.Element {
   const betterAuthSession = useSession();
@@ -65,14 +94,11 @@ export default function EditProfileSheet(): JSX.Element {
 
       const asset = picked.assets[0];
       const uploadUrl = await generateUploadUrl({});
-      const blob = await fetch(asset.uri).then((res) => res.blob());
-      const response = await fetch(uploadUrl, {
-        method: "POST",
-        headers: { "Content-Type": asset.mimeType ?? "image/jpeg" },
-        body: blob,
-      });
-      if (!response.ok) throw new Error(`Upload failed: ${response.status}`);
-      const { storageId } = await response.json();
+      const { storageId } = await uploadLocalImage(
+        uploadUrl,
+        asset.uri,
+        asset.mimeType ?? "image/jpeg",
+      );
       const saved = await saveProfilePhoto({ storageId });
       setAvatarUrl(saved.avatarUrl);
     } catch (err) {

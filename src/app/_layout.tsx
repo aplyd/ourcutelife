@@ -7,7 +7,7 @@ import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
 import { HeroUINativeProvider } from "heroui-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
-import { authClient } from "@/lib/betterAuth";
+import { authClient, useSession } from "@/lib/betterAuth";
 import { convex } from "@/lib/convex";
 import { ThemeProvider, useAppTheme } from "@/lib/theme";
 import "@/lib/notifications";
@@ -17,6 +17,11 @@ void SplashScreen.preventAutoHideAsync();
 
 function RootStack(): JSX.Element {
   const { resolvedTheme } = useAppTheme();
+  const betterAuthSession = useSession();
+
+  useEffect(() => {
+    if (!betterAuthSession.isPending) void SplashScreen.hideAsync();
+  }, [betterAuthSession.isPending]);
 
   return (
     <>
@@ -53,10 +58,6 @@ function RootStack(): JSX.Element {
 }
 
 export default function RootLayout(): JSX.Element {
-  useEffect(() => {
-    void SplashScreen.hideAsync();
-  }, []);
-
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ConvexBetterAuthProvider client={convex} authClient={authClient as never}>

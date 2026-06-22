@@ -160,12 +160,12 @@ export default function SwipeTab(): JSX.Element {
   if (!viewer?.couple || viewer.memberCount < 2) return <Redirect href="/pairing" />;
 
   return (
-    <View className="flex-1 bg-app-bg px-3 pt-14 pb-24 gap-3">
+    <View className="flex-1 bg-app-bg">
       <MeHeaderButton />
-      <View className="pr-20">
-        <Text className="text-sm font-semibold uppercase tracking-widest text-muted">Swipe</Text>
-        <Text className="text-3xl font-bold text-ink">Private yes/no pile</Text>
-        <Text className="text-sm leading-5 text-muted">
+      <View className="absolute left-3 right-3 top-14 z-10 pr-20">
+        <Text className="text-sm font-semibold uppercase tracking-widest text-white/80">Swipe</Text>
+        <Text className="text-3xl font-bold text-white">Private yes/no pile</Text>
+        <Text className="text-sm leading-5 text-white/80">
           {isDiscovering ? "Finding more nearby cards…" : `${ideas?.length ?? 0} options left`}
         </Text>
       </View>
@@ -186,10 +186,13 @@ export default function SwipeTab(): JSX.Element {
             >
               {currentIdea.photoUrl ? (
                 <Image
+                  resizeMode="cover"
                   source={{ uri: currentIdea.photoUrl }}
-                  className="absolute inset-0 h-full w-full"
+                  style={{ bottom: 0, left: 0, position: "absolute", right: 0, top: 0 }}
                 />
-              ) : null}
+              ) : (
+                <View className="absolute inset-0 bg-accent" />
+              )}
               <View className="absolute inset-0 bg-black/20" />
               <View className="p-4 gap-3">
                 <Text className="self-start overflow-hidden rounded-full bg-white/85 px-3 py-2 text-xs font-bold uppercase tracking-widest text-[#5b21b6]">
@@ -213,22 +216,6 @@ export default function SwipeTab(): JSX.Element {
                       #{tag}
                     </Text>
                   ))}
-                </View>
-                <View className="flex-row gap-3 pt-2">
-                  <Pressable
-                    className="flex-1 h-14 rounded-full bg-white/85 items-center justify-center"
-                    disabled={isWorking}
-                    onPress={() => commitSwipe("pass")}
-                  >
-                    <Text className="text-lg font-bold text-[#6f5a50]">Pass</Text>
-                  </Pressable>
-                  <Pressable
-                    className="flex-1 h-14 rounded-full bg-accent items-center justify-center"
-                    disabled={isWorking}
-                    onPress={() => commitSwipe("like")}
-                  >
-                    <Text className="text-lg font-bold text-white">Like</Text>
-                  </Pressable>
                 </View>
               </View>
             </Animated.View>

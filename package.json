@@ -20,6 +20,7 @@
     "build:production": "APP_ENV=production EXPO_NO_DOTENV=1 eas build --profile production --clear-cache --platform ios --auto-submit"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^3.0.74",
     "@better-auth/expo": "1.6.19",
     "@convex-dev/better-auth": "0.12.4",
     "@expo/metro-runtime": "~56.0.13",
@@ -30,6 +31,7 @@
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@shopify/flash-list": "2.0.2",
     "@shopify/react-native-skia": "^2.6.2",
+    "ai": "^6.0.208",
     "app-icon-badge": "^0.1.2",
     "better-auth": "1.6.19",
     "convex": "^1.41.0",

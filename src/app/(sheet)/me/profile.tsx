@@ -143,7 +143,7 @@ export default function EditProfileSheet(): JSX.Element {
           )}
         </Pressable>
         <Pressable
-          className="rounded-full bg-ink px-4 py-2"
+          className="rounded-full bg-accent px-4 py-2"
           disabled={isUploadingPhoto}
           onPress={handlePickPhoto}
         >
@@ -165,7 +165,7 @@ export default function EditProfileSheet(): JSX.Element {
       </View>
       {error ? <Text className="text-center text-sm text-red-700">{error}</Text> : null}
       <Pressable
-        className={`h-14 rounded-full items-center justify-center ${fullName.trim() && !isSaving ? "bg-ink" : "bg-soft"}`}
+        className={`h-14 rounded-full items-center justify-center ${fullName.trim() && !isSaving ? "bg-accent" : "bg-soft"}`}
         disabled={!fullName.trim() || isSaving}
         onPress={handleSave}
       >

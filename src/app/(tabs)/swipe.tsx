@@ -240,7 +240,7 @@ export default function SwipeTab(): JSX.Element {
               </Text>
             </Pressable>
             <Pressable
-              className="h-12 rounded-full bg-ink px-5 items-center justify-center"
+              className="h-12 rounded-full bg-accent px-5 items-center justify-center"
               onPress={() => router.push("/plans/new")}
             >
               <Text className="font-bold text-app-bg">Add plan item</Text>

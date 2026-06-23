@@ -1,9 +1,10 @@
 import { useMutation, useQuery } from "convex/react";
 import { Redirect } from "expo-router";
 import type { JSX } from "react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -12,6 +13,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { api } from "../../../convex/_generated/api";
 import { MeHeaderButton } from "@/components/MeHeaderButton";
@@ -31,6 +33,24 @@ export default function ChatTab(): JSX.Element {
   const [text, setText] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [mode, setMode] = useState<"normal" | "coach" | "rephrase">("normal");
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const scrollRef = useRef<ScrollView | null>(null);
+  const insets = useSafeAreaInsets();
+
+  useEffect(() => {
+    const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+    const show = Keyboard.addListener(showEvent, () => setKeyboardVisible(true));
+    const hide = Keyboard.addListener(hideEvent, () => setKeyboardVisible(false));
+    return () => {
+      show.remove();
+      hide.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    requestAnimationFrame(() => scrollRef.current?.scrollToEnd({ animated: true }));
+  }, [messages?.length, keyboardVisible]);
 
   if (!betterAuthSession.data?.session) return <Redirect href="/auth" />;
   if (viewer === undefined || messages === undefined) {
@@ -61,17 +81,16 @@ export default function ChatTab(): JSX.Element {
     <KeyboardAvoidingView
       className="flex-1 bg-app-bg"
       behavior={Platform.OS === "ios" ? "padding" : undefined}
+      keyboardVerticalOffset={0}
     >
-      <MeHeaderButton />
-      <View className="px-3 pt-16 pb-3 pr-24 gap-2 border-b border-soft">
-        <Text className="text-sm font-semibold uppercase tracking-widest text-muted">Chat</Text>
-        <Text className="text-3xl font-bold text-ink">You, your person, and the coach</Text>
-        <Text className="text-base leading-6 text-muted">
-          The coach is invoked-only. No creepy lurking.
-        </Text>
-      </View>
-
-      <ScrollView className="flex-1" contentContainerClassName="px-3 py-5 pb-40 gap-3">
+      <ScrollView
+        ref={scrollRef}
+        className="flex-1"
+        contentContainerClassName="px-3 gap-3"
+        contentContainerStyle={{ paddingBottom: 132, paddingTop: Math.max(insets.top + 56, 76) }}
+        keyboardShouldPersistTaps="handled"
+        onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: true })}
+      >
         {messages.length ? (
           messages.map((message) => {
             const mine = message.senderUserId === viewer.user._id;
@@ -79,10 +98,16 @@ export default function ChatTab(): JSX.Element {
             return (
               <View
                 key={message._id}
-                className={`max-w-[86%] rounded-3xl p-4 ${coach ? "self-center bg-ink" : mine ? "self-end bg-card border border-accent" : "self-start bg-card border border-soft"}`}
+                className={`max-w-[86%] rounded-3xl p-4 ${
+                  coach
+                    ? "self-center border border-accent bg-accent"
+                    : mine
+                      ? "self-end border border-accent bg-card"
+                      : "self-start border border-soft bg-card"
+                }`}
               >
                 <Text
-                  className={`mb-1 text-xs font-bold uppercase tracking-widest ${coach ? "text-white/70" : "text-muted"}`}
+                  className={`mb-1 text-xs font-bold uppercase tracking-widest ${coach ? "text-white/75" : "text-muted"}`}
                 >
                   {coach ? "Coach" : mine ? "You" : "Partner"} · {formatTime(message.createdAt)}
                 </Text>
@@ -93,17 +118,19 @@ export default function ChatTab(): JSX.Element {
             );
           })
         ) : (
-          <View className="rounded-3xl bg-card/90 border border-soft p-4 gap-2">
+          <View className="self-center max-w-[90%] rounded-3xl border border-soft bg-card/90 p-4 gap-2">
             <Text className="text-xl font-bold text-ink">Start with the raw version.</Text>
             <Text className="text-base leading-6 text-muted">
-              Send a message, ask the coach, or ask for a safer rephrase before you share something
-              sharp.
+              Send directly, ask the coach, or get a safer rephrase before sharing something sharp.
             </Text>
           </View>
         )}
       </ScrollView>
 
-      <View className="px-4 pb-28 pt-3 gap-3 border-t border-soft bg-app-bg">
+      <View
+        className="absolute left-0 right-0 px-3 gap-2"
+        style={{ bottom: keyboardVisible ? 8 : Math.max(insets.bottom + 70, 82) }}
+      >
         <View className="flex-row gap-2">
           {(
             [
@@ -114,7 +141,7 @@ export default function ChatTab(): JSX.Element {
           ).map(([value, label]) => (
             <Pressable
               key={value}
-              className={`rounded-full px-3 py-2 ${mode === value ? "bg-ink" : "bg-card border border-soft"}`}
+              className={`rounded-full px-3 py-2 shadow-sm ${mode === value ? "bg-accent" : "bg-card border border-soft"}`}
               onPress={() => setMode(value)}
             >
               <Text
@@ -128,13 +155,14 @@ export default function ChatTab(): JSX.Element {
         <View className="flex-row gap-2 items-end">
           <TextInput
             multiline
-            className="max-h-32 flex-1 rounded-3xl border border-soft bg-card px-4 py-3 text-base text-ink"
+            className="max-h-32 flex-1 rounded-3xl border border-soft bg-card px-4 py-3 text-base text-ink shadow-sm"
             placeholder="Write the honest version…"
+            placeholderTextColor="#8c766b"
             value={text}
             onChangeText={setText}
           />
           <Pressable
-            className="h-12 rounded-full bg-accent px-5 items-center justify-center"
+            className="h-12 rounded-full bg-accent px-5 items-center justify-center shadow-sm"
             disabled={!text.trim() || isSending}
             onPress={handleSend}
           >
@@ -142,6 +170,7 @@ export default function ChatTab(): JSX.Element {
           </Pressable>
         </View>
       </View>
+      <MeHeaderButton />
     </KeyboardAvoidingView>
   );
 }

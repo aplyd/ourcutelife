@@ -131,7 +131,7 @@ export default function TodayTab(): JSX.Element {
           </View>
         </View>
 
-        <View className="rounded-3xl bg-ink p-4 gap-4">
+        <View className="rounded-3xl bg-accent p-4 gap-4">
           <Text className="text-sm font-semibold uppercase tracking-widest text-[#d8c2b4]">
             Daily prompt
           </Text>

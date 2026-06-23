@@ -41,7 +41,7 @@ export default function TodayQuizScreen(): JSX.Element {
         <Text className="text-base leading-6 text-muted">{quiz.principle}</Text>
       </View>
 
-      <View className="rounded-[36px] bg-ink p-5 gap-4">
+      <View className="rounded-[36px] bg-accent p-5 gap-4">
         <Text className="text-sm font-bold uppercase tracking-widest text-white/60">
           Guess first
         </Text>

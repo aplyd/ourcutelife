@@ -99,7 +99,7 @@ export default function MeTab(): JSX.Element {
           {(["light", "dark", "system"] as const).map((item) => (
             <Pressable
               key={item}
-              className={`flex-1 rounded-full py-3 items-center ${theme === item ? "bg-ink" : "bg-app-bg border border-soft"}`}
+              className={`flex-1 rounded-full py-3 items-center ${theme === item ? "bg-accent" : "bg-app-bg border border-soft"}`}
               onPress={() => setTheme(item)}
             >
               <Text
@@ -115,7 +115,7 @@ export default function MeTab(): JSX.Element {
       <View className="rounded-3xl bg-card/90 p-4 border border-soft gap-3">
         <Text className="text-2xl font-bold text-ink">Account</Text>
         <Pressable
-          className="h-12 rounded-full bg-ink items-center justify-center"
+          className="h-12 rounded-full bg-accent items-center justify-center"
           onPress={() => void authClient.signOut()}
         >
           <Text className="font-bold text-white">Sign out</Text>

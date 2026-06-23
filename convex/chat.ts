@@ -1,6 +1,7 @@
 import { v } from "convex/values";
+import { internal } from "./_generated/api";
 import type { MutationCtx, QueryCtx } from "./_generated/server";
-import { mutation, query } from "./_generated/server";
+import { internalMutation, mutation, query } from "./_generated/server";
 import { getCurrentAppUser } from "./auth";
 
 async function requireSession(ctx: QueryCtx | MutationCtx) {
@@ -46,14 +47,33 @@ export const send = mutation({
     });
 
     if (args.asCoachPrompt) {
-      await ctx.db.insert("coupleChatMessages", {
+      await ctx.scheduler.runAfter(0, internal.chatActions.respondToCoachPrompt, {
         coupleId: membership.coupleId,
-        senderKind: "ai",
-        text: "Coach note: I’m invoked-only right now. Soon I’ll help rephrase, unpack patterns, and suggest a safer next message before anything is shared.",
-        createdAt: now + 1,
+        userId: user._id,
+        prompt: text,
+        mode: text.toLowerCase().startsWith("rephrase this before i send it:")
+          ? "rephrase"
+          : "coach",
       });
     }
 
     return messageId;
+  },
+});
+
+export const insertAiMessage = internalMutation({
+  args: {
+    coupleId: v.id("couples"),
+    text: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const text = args.text.trim();
+    if (!text) return null;
+    return await ctx.db.insert("coupleChatMessages", {
+      coupleId: args.coupleId,
+      senderKind: "ai",
+      text,
+      createdAt: Date.now(),
+    });
   },
 });

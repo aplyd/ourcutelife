@@ -160,7 +160,7 @@ export default function PlansTab(): JSX.Element {
               return (
                 <Pressable
                   key={item.value}
-                  className={`rounded-full px-4 py-2 ${active ? "bg-ink" : "bg-card border border-soft"}`}
+                  className={`rounded-full px-4 py-2 ${active ? "bg-accent" : "bg-card border border-soft"}`}
                   onPress={() => setDateSort(item.value)}
                 >
                   <Text
@@ -197,7 +197,7 @@ export default function PlansTab(): JSX.Element {
             <View className="flex-row items-center justify-between">
               <Text className="text-lg font-bold text-ink">Filter</Text>
               <Pressable
-                className="h-10 w-10 rounded-full bg-ink items-center justify-center"
+                className="h-10 w-10 rounded-full bg-accent items-center justify-center"
                 onPress={showDicePicks}
               >
                 <Text className="text-xl">🎲</Text>
@@ -209,7 +209,7 @@ export default function PlansTab(): JSX.Element {
                 return (
                   <Pressable
                     key={item.value}
-                    className={`rounded-full px-4 py-2 ${active ? "bg-ink" : "bg-app-bg border border-soft"}`}
+                    className={`rounded-full px-4 py-2 ${active ? "bg-accent" : "bg-app-bg border border-soft"}`}
                     onPress={() => toggleCategory(item.value)}
                   >
                     <Text className={active ? "text-app-bg" : "text-muted"}>{item.label}</Text>
@@ -368,7 +368,7 @@ function DateCard({
 
 function Action({ label, onPress }: { label: string; onPress: () => void }) {
   return (
-    <Pressable className="rounded-full bg-ink px-4 py-2" onPress={onPress}>
+    <Pressable className="rounded-full bg-accent px-4 py-2" onPress={onPress}>
       <Text className="font-bold text-app-bg">{label}</Text>
     </Pressable>
   );

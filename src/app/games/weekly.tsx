@@ -47,7 +47,7 @@ export default function WeeklyGameScreen(): JSX.Element {
         <Text className="font-semibold text-accent">← Back</Text>
       </Pressable>
 
-      <View className="rounded-[36px] bg-ink p-5 gap-4 overflow-hidden">
+      <View className="rounded-[36px] bg-accent p-5 gap-4 overflow-hidden">
         <Text className="text-sm font-semibold uppercase tracking-widest text-white/60">
           Weekly game
         </Text>

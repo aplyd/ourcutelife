@@ -1,5 +1,6 @@
 import { useAction, useMutation, useQuery } from "convex/react";
 import { Redirect, router } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import * as Location from "expo-location";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -37,6 +38,12 @@ function badgeForIdea(idea: {
 }) {
   const primary = idea.subcategories?.[0]?.replace(/_/g, " ") ?? idea.category;
   return `${primary}${idea.kind === "place" ? " nearby" : ""}`;
+}
+
+function photoForIdea(idea: { title: string; category: string; photoUrl?: string | null }) {
+  if (idea.photoUrl) return idea.photoUrl;
+  const query = encodeURIComponent(`${idea.title} ${idea.category} date night`);
+  return `https://source.unsplash.com/1200x1800/?${query}`;
 }
 
 export default function SwipeTab(): JSX.Element {
@@ -164,34 +171,29 @@ export default function SwipeTab(): JSX.Element {
   if (!viewer?.couple || viewer.memberCount < 2) return <Redirect href="/pairing" />;
 
   return (
-    <View className="flex-1 bg-app-bg">
-      <MeHeaderButton />
-
+    <View className="flex-1 bg-black">
+      <StatusBar style="light" />
       <View className="flex-1">
         {nextIdeas.map((idea, index) => (
           <View
             key={idea._id}
-            className="absolute inset-0 overflow-hidden rounded-[36px] border border-soft bg-card/90"
+            className="absolute inset-0 overflow-hidden bg-card/90"
             style={{ transform: [{ scale: 0.95 - index * 0.04 }, { translateY: 14 + index * 16 }] }}
           />
         ))}
         {currentIdea ? (
           <GestureDetector gesture={gesture}>
             <Animated.View
-              className="absolute inset-0 overflow-hidden rounded-[36px] border border-soft bg-card justify-between"
+              className="absolute inset-0 overflow-hidden bg-card justify-between"
               style={cardStyle}
             >
-              {currentIdea.photoUrl ? (
-                <Image
-                  resizeMode="cover"
-                  source={{ uri: currentIdea.photoUrl }}
-                  style={{ bottom: 0, left: 0, position: "absolute", right: 0, top: 0 }}
-                />
-              ) : (
-                <View className="absolute inset-0 bg-accent" />
-              )}
+              <Image
+                resizeMode="cover"
+                source={{ uri: photoForIdea(currentIdea) }}
+                style={{ bottom: 0, left: 0, position: "absolute", right: 0, top: 0 }}
+              />
               <View className="absolute inset-0 bg-black/20" />
-              <View className="p-4 gap-3">
+              <View className="px-4 gap-3" style={{ paddingTop: Math.max(insets.top + 78, 112) }}>
                 <Text className="self-start overflow-hidden rounded-full bg-white/85 px-3 py-2 text-xs font-bold uppercase tracking-widest text-[#5b21b6]">
                   {badgeForIdea(currentIdea)}
                 </Text>
@@ -246,6 +248,7 @@ export default function SwipeTab(): JSX.Element {
           </View>
         )}
       </View>
+      <MeHeaderButton />
     </View>
   );
 }

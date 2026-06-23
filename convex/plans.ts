@@ -427,6 +427,11 @@ async function ensureDateForPair(
   });
 }
 
+function isLowQualitySwipeIdea(idea: Doc<"planIdeas">): boolean {
+  const tags = [...(idea.subcategories ?? []), ...idea.vibeTags].map((tag) => tag.toLowerCase());
+  return idea.source === "osm" && tags.some((tag) => tag === "park" || tag.includes("playground"));
+}
+
 export const list = query({
   args: { category: v.optional(categoryValidator) },
   handler: async (ctx, args) => {
@@ -456,7 +461,10 @@ export const list = query({
       archivedMatches.filter((match) => match.status === "archived").map((match) => match.ideaId),
     );
     return ideas
-      .filter((idea) => !voted.has(idea._id) && !archivedIdeaIds.has(idea._id))
+      .filter(
+        (idea) =>
+          !voted.has(idea._id) && !archivedIdeaIds.has(idea._id) && !isLowQualitySwipeIdea(idea),
+      )
       .map((idea) => publicIdea(idea, false));
   },
 });

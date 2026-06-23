@@ -10,8 +10,8 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { authClient, useSession } from "@/lib/betterAuth";
 import { convex } from "@/lib/convex";
 import { ThemeProvider, useAppTheme } from "@/lib/theme";
+import { ensureDailyPromptReminder } from "@/lib/notifications";
 import { UpdateProvider } from "@/providers/update-provider";
-import "@/lib/notifications";
 import "../global.css";
 
 void SplashScreen.preventAutoHideAsync();
@@ -23,6 +23,10 @@ function RootStack(): JSX.Element {
   useEffect(() => {
     if (!betterAuthSession.isPending) void SplashScreen.hideAsync();
   }, [betterAuthSession.isPending]);
+
+  useEffect(() => {
+    if (betterAuthSession.data?.session) void ensureDailyPromptReminder();
+  }, [betterAuthSession.data?.session]);
 
   return (
     <>

@@ -15,7 +15,7 @@ export function MeHeaderButton(): JSX.Element {
   const partner = viewer?.partner;
 
   return (
-    <Pressable className="absolute right-6 top-14 z-20" onPress={() => router.push("/me")}>
+    <Pressable className="absolute right-6 top-14 z-50" onPress={() => router.push("/account")}>
       <View className="flex-row w-16">
         <View className="h-11 w-11 overflow-hidden rounded-full bg-accent border-2 border-card items-center justify-center">
           {user?.avatarUrl ? (

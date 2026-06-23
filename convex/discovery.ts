@@ -38,10 +38,12 @@ const overpassTags: Record<DiscoveryCategory, string[]> = {
     'way["tourism"~"museum|gallery|attraction"]',
   ],
   activity: [
-    'node["leisure"~"park|fitness_centre|sports_centre|bowling_alley"]',
-    'way["leisure"~"park|fitness_centre|sports_centre|bowling_alley"]',
-    'node["tourism"~"zoo|aquarium"]',
-    'way["tourism"~"zoo|aquarium"]',
+    'node["leisure"~"fitness_centre|sports_centre|bowling_alley|escape_game"]',
+    'way["leisure"~"fitness_centre|sports_centre|bowling_alley|escape_game"]',
+    'node["tourism"~"zoo|aquarium|theme_park"]',
+    'way["tourism"~"zoo|aquarium|theme_park"]',
+    'node["amenity"~"arts_centre|community_centre"]',
+    'way["amenity"~"arts_centre|community_centre"]',
   ],
 };
 
@@ -123,8 +125,8 @@ function categoryFromTags(
   if (/cinema|theatre/.test(amenity) || /museum|gallery|attraction/.test(tourism))
     return "entertainment";
   if (
-    /park|fitness_centre|sports_centre|bowling_alley/.test(leisure) ||
-    /zoo|aquarium/.test(tourism)
+    /fitness_centre|sports_centre|bowling_alley|escape_game/.test(leisure) ||
+    /zoo|aquarium|theme_park/.test(tourism)
   )
     return "activity";
   return fallback;

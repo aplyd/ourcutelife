@@ -104,6 +104,174 @@ async function requireSession(ctx: QueryCtx | MutationCtx) {
   return { user, membership };
 }
 
+export const seedDemoPartnerData = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const { user, membership } = await requireSession(ctx);
+    const now = Date.now();
+    const coupleId = membership.coupleId;
+
+    const testAuthUserId = `test-partner:${user._id}`;
+    let testUser = await ctx.db
+      .query("users")
+      .withIndex("by_auth_user_id", (q) => q.eq("authUserId", testAuthUserId))
+      .first();
+    if (!testUser) {
+      const testUserId = await ctx.db.insert("users", {
+        authUserId: testAuthUserId,
+        email: "test-partner@ourcutelife.local",
+        fullName: "Test Partner",
+        createdAt: now,
+        updatedAt: now,
+      });
+      testUser = await ctx.db.get(testUserId);
+    }
+    if (!testUser) throw new Error("Could not create test partner.");
+
+    const existingTestMembership = await ctx.db
+      .query("coupleMembers")
+      .withIndex("by_couple_and_user", (q) => q.eq("coupleId", coupleId).eq("userId", testUser._id))
+      .first();
+    if (!existingTestMembership) {
+      await ctx.db.insert("coupleMembers", {
+        coupleId,
+        userId: testUser._id,
+        role: "partner",
+        joinedAt: now,
+      });
+    }
+
+    const demoIdeas: Array<{
+      title: string;
+      description: string;
+      kind: PlanKind;
+      category: PlanCategory;
+      subcategories: string[];
+      costLevel: number;
+      durationMinutes: number;
+    }> = [
+      {
+        title: "Gunther's Ice Cream",
+        description: "Classic Sacramento ice cream stop.",
+        kind: "place",
+        category: "food",
+        subcategories: ["ice cream", "classic"],
+        costLevel: 1,
+        durationMinutes: 45,
+      },
+      {
+        title: "Dimple Records browsing",
+        description: "Browse records and pick one album for each other.",
+        kind: "place",
+        category: "entertainment",
+        subcategories: ["music", "browsing"],
+        costLevel: 1,
+        durationMinutes: 45,
+      },
+      {
+        title: "Puzzle night at home",
+        description: "Phones away, snacks out, puzzle on the table.",
+        kind: "activity",
+        category: "activity",
+        subcategories: ["home", "cozy"],
+        costLevel: 0,
+        durationMinutes: 90,
+      },
+    ];
+
+    const existingIdeas = await ctx.db
+      .query("planIdeas")
+      .withIndex("by_couple_and_created_at", (q) => q.eq("coupleId", coupleId))
+      .collect();
+    const ideaIds = [];
+    for (const idea of demoIdeas) {
+      const existingIdea = existingIdeas.find((item) => item.title === idea.title);
+      const ideaId =
+        existingIdea?._id ??
+        (await ctx.db.insert("planIdeas", {
+          coupleId,
+          ...idea,
+          vibeTags: idea.subcategories,
+          source: "seed",
+          createdAt: now,
+        }));
+      ideaIds.push(ideaId);
+
+      for (const memberUserId of [user._id, testUser._id]) {
+        const existingSwipe = await ctx.db
+          .query("planSwipes")
+          .withIndex("by_user_and_idea", (q) => q.eq("userId", memberUserId).eq("ideaId", ideaId))
+          .first();
+        if (!existingSwipe) {
+          await ctx.db.insert("planSwipes", {
+            coupleId,
+            ideaId,
+            userId: memberUserId,
+            vote: "like",
+            createdAt: now,
+          });
+        }
+      }
+
+      const existingMatch = await ctx.db
+        .query("planMatches")
+        .withIndex("by_idea", (q) => q.eq("ideaId", ideaId))
+        .first();
+      if (!existingMatch) {
+        await ctx.db.insert("planMatches", {
+          coupleId,
+          ideaId,
+          createdAt: now,
+          status: "matched",
+        });
+      }
+    }
+
+    const existingDates = await ctx.db
+      .query("datePlans")
+      .withIndex("by_couple_and_created_at", (q) => q.eq("coupleId", coupleId))
+      .collect();
+    if (!existingDates.some((date) => date.title === "Gunther's → Dimple Records")) {
+      await ctx.db.insert("datePlans", {
+        coupleId,
+        title: "Gunther's → Dimple Records",
+        summary: "Ice cream first, then browse records and pick something weird for each other.",
+        itemIds: ideaIds.slice(0, 2),
+        freeformSteps: ["Get cones", "Browse one aisle each", "Trade one pick"],
+        durationMinutes: 90,
+        costLevel: 1,
+        vibeTags: ["classic", "music", "low-key"],
+        source: "seed",
+        popularityScore: 8,
+        trendingScore: 6,
+        ratingAverage: 4,
+        ratingCount: 2,
+        createdAt: now,
+      });
+    }
+    if (!existingDates.some((date) => date.title === "Gunther's to-go → puzzle night")) {
+      await ctx.db.insert("datePlans", {
+        coupleId,
+        title: "Gunther's to-go → puzzle night",
+        summary: "Grab ice cream, head home, and make the night intentionally cozy.",
+        itemIds: [ideaIds[0], ideaIds[2]],
+        freeformSteps: ["Pick up ice cream", "Put phones away", "Finish one puzzle section"],
+        durationMinutes: 120,
+        costLevel: 1,
+        vibeTags: ["cozy", "home", "dessert"],
+        source: "seed",
+        popularityScore: 7,
+        trendingScore: 7,
+        ratingAverage: 4,
+        ratingCount: 1,
+        createdAt: now,
+      });
+    }
+
+    return { ideaCount: ideaIds.length };
+  },
+});
+
 function normalizeTags(tags: string[]): string[] {
   return Array.from(new Set(tags.map((tag) => tag.trim().replace(/^#/, "")).filter(Boolean))).slice(
     0,

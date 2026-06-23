@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "convex/react";
 import { Redirect, router } from "expo-router";
 import type { JSX } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from "react-native";
 
 import { api } from "../../../convex/_generated/api";
@@ -34,6 +34,7 @@ export default function PlansTab(): JSX.Element {
     categories.map((item) => item.value),
   );
   const [dateSort, setDateSort] = useState<DateSort>("suggested");
+  const [hasRequestedDemoSeed, setHasRequestedDemoSeed] = useState(false);
   const matches = useQuery(api.plans.matches, {});
   const randomPicks = useQuery(api.plans.randomMatchesByCategories, {
     categories: enabledCategories,
@@ -46,6 +47,22 @@ export default function PlansTab(): JSX.Element {
   const scheduleDate = useMutation(api.plans.scheduleDate);
   const completeDate = useMutation(api.plans.completeDate);
   const rateDate = useMutation(api.plans.rateDate);
+  const seedDemoPartnerData = useMutation(api.plans.seedDemoPartnerData);
+
+  useEffect(() => {
+    if (
+      hasRequestedDemoSeed ||
+      viewer === undefined ||
+      matches === undefined ||
+      ourDates === undefined ||
+      !viewer?.couple ||
+      matches.length > 0 ||
+      ourDates.length > 0
+    )
+      return;
+    setHasRequestedDemoSeed(true);
+    void seedDemoPartnerData();
+  }, [hasRequestedDemoSeed, matches, ourDates, seedDemoPartnerData, viewer]);
 
   if (!betterAuthSession.data?.session) return <Redirect href="/auth" />;
   if (viewer === undefined || matches === undefined || ourDates === undefined)

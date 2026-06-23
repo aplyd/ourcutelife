@@ -1,7 +1,11 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
+import { Platform } from "react-native";
 
-const dailyPromptReminderKey = "ourcutelife:daily-prompt-reminder-id";
+type PushPlatform = "ios" | "android" | "web" | "unknown";
+
+const deviceIdKey = "ourcutelife:push-device-id";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -18,27 +22,32 @@ export async function requestNotificationPermissions() {
   return Notifications.requestPermissionsAsync();
 }
 
-export async function ensureDailyPromptReminder() {
+async function getDeviceId() {
+  const existing = await AsyncStorage.getItem(deviceIdKey);
+  if (existing) return existing;
+
+  const created = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  await AsyncStorage.setItem(deviceIdKey, created);
+  return created;
+}
+
+export async function getServerPushRegistration() {
   const permission = await requestNotificationPermissions();
-  if (!permission.granted) return;
+  if (!permission.granted) return null;
 
-  const existingId = await AsyncStorage.getItem(dailyPromptReminderKey);
-  const scheduled = await Notifications.getAllScheduledNotificationsAsync();
-  if (existingId && scheduled.some((notification) => notification.identifier === existingId))
-    return;
+  const projectId = Constants.easConfig?.projectId ?? Constants.expoConfig?.extra?.eas?.projectId;
+  if (typeof projectId !== "string") throw new Error("Missing EAS project ID for push token.");
 
-  const id = await Notifications.scheduleNotificationAsync({
-    content: {
-      title: "Daily prompt",
-      body: "Take two minutes to answer today's relationship prompt.",
-      data: { url: "/prompts/today" },
-    },
-    trigger: {
-      type: Notifications.SchedulableTriggerInputTypes.DAILY,
-      hour: 19,
-      minute: 0,
-    },
-  });
+  const token = await Notifications.getExpoPushTokenAsync({ projectId });
+  const platform: PushPlatform =
+    Platform.OS === "ios" || Platform.OS === "android" || Platform.OS === "web"
+      ? Platform.OS
+      : "unknown";
 
-  await AsyncStorage.setItem(dailyPromptReminderKey, id);
+  return {
+    token: token.data,
+    platform,
+    deviceId: await getDeviceId(),
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  };
 }

@@ -10,6 +10,7 @@
 
 import type * as auth from "../auth.js";
 import type * as chat from "../chat.js";
+import type * as crons from "../crons.js";
 import type * as discovery from "../discovery.js";
 import type * as health from "../health.js";
 import type * as http from "../http.js";
@@ -17,6 +18,7 @@ import type * as moments from "../moments.js";
 import type * as pairing from "../pairing.js";
 import type * as plans from "../plans.js";
 import type * as prompts from "../prompts.js";
+import type * as push from "../push.js";
 import type * as reviews from "../reviews.js";
 import type * as stats from "../stats.js";
 
@@ -25,6 +27,7 @@ import type { ApiFromModules, FilterApi, FunctionReference } from "convex/server
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   chat: typeof chat;
+  crons: typeof crons;
   discovery: typeof discovery;
   health: typeof health;
   http: typeof http;
@@ -32,6 +35,7 @@ declare const fullApi: ApiFromModules<{
   pairing: typeof pairing;
   plans: typeof plans;
   prompts: typeof prompts;
+  push: typeof push;
   reviews: typeof reviews;
   stats: typeof stats;
 }>;

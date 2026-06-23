@@ -89,6 +89,25 @@ export default defineSchema({
   })
     .index("by_user_and_date", ["userId", "promptDate"])
     .index("by_couple_and_date", ["coupleId", "promptDate"]),
+  pushTokens: defineTable({
+    userId: v.id("users"),
+    token: v.string(),
+    platform: v.union(
+      v.literal("ios"),
+      v.literal("android"),
+      v.literal("web"),
+      v.literal("unknown"),
+    ),
+    deviceId: v.optional(v.string()),
+    timezone: v.optional(v.string()),
+    enabled: v.boolean(),
+    lastPromptReminderDate: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_token", ["token"])
+    .index("by_enabled", ["enabled"]),
   planIdeas: defineTable({
     coupleId: v.id("couples"),
     createdByUserId: v.optional(v.id("users")),

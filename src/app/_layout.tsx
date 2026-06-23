@@ -1,3 +1,4 @@
+import { useMutation } from "convex/react";
 import type { JSX } from "react";
 import { useEffect } from "react";
 import { Stack } from "expo-router";
@@ -7,10 +8,11 @@ import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
 import { HeroUINativeProvider } from "heroui-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
+import { api } from "../../convex/_generated/api";
 import { authClient, useSession } from "@/lib/betterAuth";
 import { convex } from "@/lib/convex";
 import { ThemeProvider, useAppTheme } from "@/lib/theme";
-import { ensureDailyPromptReminder } from "@/lib/notifications";
+import { getServerPushRegistration } from "@/lib/notifications";
 import { UpdateProvider } from "@/providers/update-provider";
 import "../global.css";
 
@@ -19,14 +21,29 @@ void SplashScreen.preventAutoHideAsync();
 function RootStack(): JSX.Element {
   const { resolvedTheme } = useAppTheme();
   const betterAuthSession = useSession();
+  const registerPushToken = useMutation(api.push.registerToken);
 
   useEffect(() => {
     if (!betterAuthSession.isPending) void SplashScreen.hideAsync();
   }, [betterAuthSession.isPending]);
 
   useEffect(() => {
-    if (betterAuthSession.data?.session) void ensureDailyPromptReminder();
-  }, [betterAuthSession.data?.session]);
+    if (!betterAuthSession.data?.session) return;
+
+    let cancelled = false;
+    void getServerPushRegistration()
+      .then((registration) => {
+        if (!registration || cancelled) return;
+        void registerPushToken(registration);
+      })
+      .catch(() => {
+        // Push registration is opportunistic; don't block app launch if permission/network fails.
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [betterAuthSession.data?.session, registerPushToken]);
 
   return (
     <>

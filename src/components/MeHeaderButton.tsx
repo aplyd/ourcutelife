@@ -1,4 +1,4 @@
-import { useQuery } from "convex/react";
+import { useAppQuery } from "@/lib/devMock";
 import { router } from "expo-router";
 import type { JSX } from "react";
 import { Image, Pressable, Text, View } from "react-native";
@@ -10,7 +10,7 @@ function initial(value: string | null | undefined, fallback: string): string {
 }
 
 export function MeHeaderButton(): JSX.Element {
-  const viewer = useQuery(api.auth.viewer, {});
+  const viewer = useAppQuery(api.auth.viewer, {});
   const user = viewer?.user;
   const partner = viewer?.partner;
 

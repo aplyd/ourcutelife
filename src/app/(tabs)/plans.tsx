@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "convex/react";
+import { useAppMutation, useAppQuery } from "@/lib/devMock";
 import { Redirect, router } from "expo-router";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
@@ -29,25 +29,25 @@ const dateSorts: Array<{ value: DateSort; label: string }> = [
 
 export default function PlansTab(): JSX.Element {
   const betterAuthSession = useSession();
-  const viewer = useQuery(api.auth.viewer, {});
+  const viewer = useAppQuery(api.auth.viewer, {});
   const [enabledCategories, setEnabledCategories] = useState<Category[]>(
     categories.map((item) => item.value),
   );
   const [dateSort, setDateSort] = useState<DateSort>("suggested");
   const [hasRequestedDemoSeed, setHasRequestedDemoSeed] = useState(false);
-  const matches = useQuery(api.plans.matches, {});
-  const randomPicks = useQuery(api.plans.randomMatchesByCategories, {
+  const matches = useAppQuery(api.plans.matches, {});
+  const randomPicks = useAppQuery(api.plans.randomMatchesByCategories, {
     categories: enabledCategories,
   });
-  const leaderboard = useQuery(api.plans.dateLeaderboard, { sort: dateSort });
-  const ourDates = useQuery(api.plans.ourDates, {});
-  const voteArchive = useMutation(api.plans.voteArchive);
-  const likeDate = useMutation(api.plans.likeDate);
-  const saveDate = useMutation(api.plans.saveDate);
-  const scheduleDate = useMutation(api.plans.scheduleDate);
-  const completeDate = useMutation(api.plans.completeDate);
-  const rateDate = useMutation(api.plans.rateDate);
-  const seedDemoPartnerData = useMutation(api.plans.seedDemoPartnerData);
+  const leaderboard = useAppQuery(api.plans.dateLeaderboard, { sort: dateSort });
+  const ourDates = useAppQuery(api.plans.ourDates, {});
+  const voteArchive = useAppMutation(api.plans.voteArchive);
+  const likeDate = useAppMutation(api.plans.likeDate);
+  const saveDate = useAppMutation(api.plans.saveDate);
+  const scheduleDate = useAppMutation(api.plans.scheduleDate);
+  const completeDate = useAppMutation(api.plans.completeDate);
+  const rateDate = useAppMutation(api.plans.rateDate);
+  const seedDemoPartnerData = useAppMutation(api.plans.seedDemoPartnerData);
 
   useEffect(() => {
     if (

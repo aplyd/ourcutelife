@@ -1,4 +1,4 @@
-import { useMutation } from "convex/react";
+import { useAppMutation } from "@/lib/devMock";
 import * as AppleAuthentication from "expo-apple-authentication";
 import type { JSX } from "react";
 import { useState } from "react";
@@ -10,7 +10,7 @@ import { authClient, useSession } from "@/lib/betterAuth";
 
 export default function AuthLanding(): JSX.Element {
   const betterAuthSession = useSession();
-  const syncBetterAuthUser = useMutation(api.auth.syncBetterAuthUser);
+  const syncBetterAuthUser = useAppMutation(api.auth.syncBetterAuthUser);
   const [error, setError] = useState<string | null>(null);
   const [isSigningIn, setIsSigningIn] = useState(false);
 

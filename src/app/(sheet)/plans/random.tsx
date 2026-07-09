@@ -1,4 +1,4 @@
-import { useQuery } from "convex/react";
+import { useAppQuery } from "@/lib/devMock";
 import { Redirect, router } from "expo-router";
 import type { JSX } from "react";
 import { useState } from "react";
@@ -18,9 +18,9 @@ const categories: Array<{ value: Category; label: string }> = [
 
 export default function RandomPlansScreen(): JSX.Element {
   const betterAuthSession = useSession();
-  const viewer = useQuery(api.auth.viewer, {});
+  const viewer = useAppQuery(api.auth.viewer, {});
   const [selected, setSelected] = useState<Category[]>(["food", "activity"]);
-  const picks = useQuery(api.plans.randomByCategories, { categories: selected });
+  const picks = useAppQuery(api.plans.randomByCategories, { categories: selected });
 
   if (!betterAuthSession.data?.session) return <Redirect href="/auth" />;
   if (viewer === undefined || picks === undefined)

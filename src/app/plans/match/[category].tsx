@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "convex/react";
+import { useAppMutation, useAppQuery } from "@/lib/devMock";
 import { Redirect, router, useLocalSearchParams } from "expo-router";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
@@ -20,10 +20,10 @@ const labels: Record<Category, string> = {
 export default function PlanMatchScreen(): JSX.Element {
   const { category } = useLocalSearchParams<{ category: Category }>();
   const betterAuthSession = useSession();
-  const viewer = useQuery(api.auth.viewer, {});
-  const ideas = useQuery(api.plans.list, category ? { category } : "skip");
-  const seed = useMutation(api.plans.seed);
-  const vote = useMutation(api.plans.vote);
+  const viewer = useAppQuery(api.auth.viewer, {});
+  const ideas = useAppQuery(api.plans.list, category ? { category } : "skip");
+  const seed = useAppMutation(api.plans.seed);
+  const vote = useAppMutation(api.plans.vote);
   const [isWorking, setIsWorking] = useState(false);
 
   useEffect(() => {

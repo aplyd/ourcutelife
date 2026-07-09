@@ -4,6 +4,8 @@ import { createAuthClient } from "better-auth/react";
 import { expoClient } from "@better-auth/expo/client";
 import { convexClient } from "@convex-dev/better-auth/client/plugins";
 
+import { isDevMockAuthEnabled, mockSession } from "@/lib/devMock";
+
 const convexSiteUrl =
   process.env.EXPO_PUBLIC_CONVEX_SITE_URL ??
   process.env.EXPO_PUBLIC_CONVEX_HTTP_ACTIONS_URL ??
@@ -27,4 +29,8 @@ export const authClient = createAuthClient({
   ],
 });
 
-export const { useSession } = authClient;
+export function useSession() {
+  const realSession = authClient.useSession();
+  if (isDevMockAuthEnabled) return mockSession;
+  return realSession;
+}

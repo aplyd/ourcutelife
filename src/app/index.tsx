@@ -1,4 +1,4 @@
-import { useQuery } from "convex/react";
+import { useAppQuery } from "@/lib/devMock";
 import { Redirect } from "expo-router";
 import type { JSX } from "react";
 
@@ -7,7 +7,7 @@ import { useSession } from "@/lib/betterAuth";
 
 export default function EntryRoute(): JSX.Element | null {
   const betterAuthSession = useSession();
-  const viewer = useQuery(
+  const viewer = useAppQuery(
     api.auth.viewer,
     betterAuthSession.data?.session && !betterAuthSession.isPending ? {} : "skip",
   );

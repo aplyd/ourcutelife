@@ -1,4 +1,4 @@
-import { useMutation } from "convex/react";
+import { useAppMutation } from "@/lib/devMock";
 import type { JSX } from "react";
 import { useEffect } from "react";
 import { Stack } from "expo-router";
@@ -21,7 +21,7 @@ void SplashScreen.preventAutoHideAsync();
 function RootStack(): JSX.Element {
   const { resolvedTheme } = useAppTheme();
   const betterAuthSession = useSession();
-  const registerPushToken = useMutation(api.push.registerToken);
+  const registerPushToken = useAppMutation(api.push.registerToken);
 
   useEffect(() => {
     if (!betterAuthSession.isPending) void SplashScreen.hideAsync();

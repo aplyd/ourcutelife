@@ -1,4 +1,4 @@
-import { useQuery } from "convex/react";
+import { useAppQuery } from "@/lib/devMock";
 import { Redirect, router } from "expo-router";
 import type { JSX } from "react";
 import { useState } from "react";
@@ -11,8 +11,8 @@ const choices = ["space", "touch", "humor", "clarity", "reassurance"];
 
 export default function TodayQuizScreen(): JSX.Element {
   const betterAuthSession = useSession();
-  const viewer = useQuery(api.auth.viewer, {});
-  const todayPrompt = useQuery(api.prompts.today, {});
+  const viewer = useAppQuery(api.auth.viewer, {});
+  const todayPrompt = useAppQuery(api.prompts.today, {});
   const [guess, setGuess] = useState<string | null>(null);
   const [revealed, setRevealed] = useState(false);
 

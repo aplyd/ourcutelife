@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "convex/react";
+import { useAppMutation, useAppQuery } from "@/lib/devMock";
 import { Redirect, router } from "expo-router";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
@@ -9,9 +9,9 @@ import { useSession } from "@/lib/betterAuth";
 
 export default function TodayPromptSheet(): JSX.Element {
   const betterAuthSession = useSession();
-  const viewer = useQuery(api.auth.viewer, {});
-  const todayPrompt = useQuery(api.prompts.today, {});
-  const saveAnswer = useMutation(api.prompts.answer);
+  const viewer = useAppQuery(api.auth.viewer, {});
+  const todayPrompt = useAppQuery(api.prompts.today, {});
+  const saveAnswer = useAppMutation(api.prompts.answer);
   const [answer, setAnswer] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);

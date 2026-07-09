@@ -1,4 +1,4 @@
-import { useQuery } from "convex/react";
+import { useAppQuery } from "@/lib/devMock";
 import { Redirect, router } from "expo-router";
 import type { JSX } from "react";
 import {
@@ -18,7 +18,7 @@ import { useAppTheme } from "@/lib/theme";
 
 export default function MeTab(): JSX.Element {
   const betterAuthSession = useSession();
-  const viewer = useQuery(api.auth.viewer, {});
+  const viewer = useAppQuery(api.auth.viewer, {});
   const { preference: theme, setPreference: setTheme } = useAppTheme();
 
   if (!betterAuthSession.data?.session) return <Redirect href="/auth" />;

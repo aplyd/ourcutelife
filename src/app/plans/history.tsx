@@ -1,4 +1,4 @@
-import { useQuery } from "convex/react";
+import { useAppQuery } from "@/lib/devMock";
 import { Redirect, router } from "expo-router";
 import type { JSX } from "react";
 import { useState } from "react";
@@ -19,9 +19,9 @@ const categories: Array<{ value?: Category; label: string }> = [
 
 export default function PlanHistoryScreen(): JSX.Element {
   const betterAuthSession = useSession();
-  const viewer = useQuery(api.auth.viewer, {});
+  const viewer = useAppQuery(api.auth.viewer, {});
   const [category, setCategory] = useState<Category | undefined>();
-  const matches = useQuery(api.plans.matches, { category });
+  const matches = useAppQuery(api.plans.matches, { category });
 
   if (!betterAuthSession.data?.session) return <Redirect href="/auth" />;
   if (viewer === undefined || matches === undefined)

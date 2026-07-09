@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "convex/react";
+import { useAppMutation, useAppQuery } from "@/lib/devMock";
 import { Redirect, router } from "expo-router";
 import type { JSX } from "react";
 import { useState } from "react";
@@ -28,8 +28,8 @@ const suggestedTags = [
 
 export default function NewMomentScreen(): JSX.Element {
   const betterAuthSession = useSession();
-  const viewer = useQuery(api.auth.viewer, {});
-  const createMoment = useMutation(api.moments.create);
+  const viewer = useAppQuery(api.auth.viewer, {});
+  const createMoment = useAppMutation(api.moments.create);
   const [happenedAtText, setHappenedAtText] = useState(() => new Date().toISOString().slice(0, 10));
   const [summary, setSummary] = useState("");
   const [feeling, setFeeling] = useState("");

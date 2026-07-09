@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "convex/react";
+import { useAppMutation, useAppQuery } from "@/lib/devMock";
 import { Redirect, router } from "expo-router";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
@@ -32,10 +32,10 @@ function formatPairingInput(value: string): string {
 
 export default function PairingScreen(): JSX.Element {
   const betterAuthSession = useSession();
-  const viewer = useQuery(api.auth.viewer, {});
-  const createCoupleAndCode = useMutation(api.pairing.createCoupleAndCode);
-  const joinWithCode = useMutation(api.pairing.joinWithCode);
-  const pairWithTestPartner = useMutation(api.pairing.pairWithTestPartner);
+  const viewer = useAppQuery(api.auth.viewer, {});
+  const createCoupleAndCode = useAppMutation(api.pairing.createCoupleAndCode);
+  const joinWithCode = useAppMutation(api.pairing.joinWithCode);
+  const pairWithTestPartner = useAppMutation(api.pairing.pairWithTestPartner);
 
   const [anniversaryDateText, setAnniversaryDateText] = useState(() =>
     new Date().toISOString().slice(0, 10),

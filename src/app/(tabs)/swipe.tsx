@@ -1,4 +1,5 @@
-import { useAction, useMutation, useQuery } from "convex/react";
+import { useAction } from "convex/react";
+import { useAppMutation, useAppQuery } from "@/lib/devMock";
 import { Redirect, router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import * as Location from "expo-location";
@@ -48,10 +49,10 @@ function photoForIdea(idea: { title: string; category: string; photoUrl?: string
 
 export default function SwipeTab(): JSX.Element {
   const betterAuthSession = useSession();
-  const viewer = useQuery(api.auth.viewer, {});
-  const ideas = useQuery(api.plans.list, {});
-  const seed = useMutation(api.plans.seed);
-  const vote = useMutation(api.plans.vote);
+  const viewer = useAppQuery(api.auth.viewer, {});
+  const ideas = useAppQuery(api.plans.list, {});
+  const seed = useAppMutation(api.plans.seed);
+  const vote = useAppMutation(api.plans.vote);
   const discoverNearby = useAction(api.discovery.discoverNearby);
   const [isWorking, setIsWorking] = useState(false);
   const [isDiscovering, setIsDiscovering] = useState(false);

@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "convex/react";
+import { useAppMutation, useAppQuery } from "@/lib/devMock";
 import { Redirect } from "expo-router";
 import type { JSX } from "react";
 import { useEffect, useRef, useState } from "react";
@@ -27,9 +27,9 @@ function formatTime(timestamp: number): string {
 
 export default function ChatTab(): JSX.Element {
   const betterAuthSession = useSession();
-  const viewer = useQuery(api.auth.viewer, {});
-  const messages = useQuery(api.chat.list, {});
-  const send = useMutation(api.chat.send);
+  const viewer = useAppQuery(api.auth.viewer, {});
+  const messages = useAppQuery(api.chat.list, {});
+  const send = useAppMutation(api.chat.send);
   const [text, setText] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [mode, setMode] = useState<"normal" | "coach" | "rephrase">("normal");

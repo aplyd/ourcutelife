@@ -1,4 +1,4 @@
-import { useQuery } from "convex/react";
+import { useAppQuery } from "@/lib/devMock";
 import { Redirect, router } from "expo-router";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
@@ -47,9 +47,9 @@ function formatDate(timestamp: number): string {
 
 export default function TodayTab(): JSX.Element {
   const betterAuthSession = useSession();
-  const viewer = useQuery(api.auth.viewer, {});
-  const todayPrompt = useQuery(api.prompts.today, {});
-  const moments = useQuery(api.moments.listMine, {});
+  const viewer = useAppQuery(api.auth.viewer, {});
+  const todayPrompt = useAppQuery(api.prompts.today, {});
+  const moments = useAppQuery(api.moments.listMine, {});
   const [nowTick, setNowTick] = useState(0);
 
   useEffect(() => {

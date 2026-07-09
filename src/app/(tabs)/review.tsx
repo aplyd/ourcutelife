@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "convex/react";
+import { useAppMutation, useAppQuery } from "@/lib/devMock";
 import { Redirect } from "expo-router";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
@@ -11,15 +11,15 @@ import { useSession } from "@/lib/betterAuth";
 
 export default function ReviewTab(): JSX.Element {
   const betterAuthSession = useSession();
-  const viewer = useQuery(api.auth.viewer, {});
+  const viewer = useAppQuery(api.auth.viewer, {});
   const canLoad = Boolean(
     betterAuthSession.data?.session && viewer?.couple && viewer.memberCount >= 2,
   );
-  const reviews = useQuery(api.reviews.latestMine, canLoad ? {} : "skip");
-  const chatRows = useQuery(api.reviews.chatMessages, canLoad ? {} : "skip");
-  const stats = useQuery(api.stats.mine, canLoad ? {} : "skip");
-  const generateReview = useMutation(api.reviews.generateMine);
-  const shareReview = useMutation(api.reviews.share);
+  const reviews = useAppQuery(api.reviews.latestMine, canLoad ? {} : "skip");
+  const chatRows = useAppQuery(api.reviews.chatMessages, canLoad ? {} : "skip");
+  const stats = useAppQuery(api.stats.mine, canLoad ? {} : "skip");
+  const generateReview = useAppMutation(api.reviews.generateMine);
+  const shareReview = useAppMutation(api.reviews.share);
   const [isWorking, setIsWorking] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

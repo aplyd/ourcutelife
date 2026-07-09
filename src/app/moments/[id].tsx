@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "convex/react";
+import { useAppMutation, useAppQuery } from "@/lib/devMock";
 import { Redirect, router, useLocalSearchParams } from "expo-router";
 import type { JSX } from "react";
 import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from "react-native";
@@ -25,11 +25,11 @@ function formatDate(timestamp: number): string {
 export default function MomentDetailScreen(): JSX.Element {
   const { id } = useLocalSearchParams<{ id: string }>();
   const betterAuthSession = useSession();
-  const viewer = useQuery(api.auth.viewer, {});
+  const viewer = useAppQuery(api.auth.viewer, {});
   const canLoadMoment = Boolean(
     betterAuthSession.data?.session && viewer?.couple && viewer.memberCount >= 2,
   );
-  const moment = useQuery(
+  const moment = useAppQuery(
     api.moments.getMine,
     canLoadMoment
       ? {
@@ -37,7 +37,7 @@ export default function MomentDetailScreen(): JSX.Element {
         }
       : "skip",
   );
-  const removeMoment = useMutation(api.moments.remove);
+  const removeMoment = useAppMutation(api.moments.remove);
 
   if (!betterAuthSession.data?.session) return <Redirect href="/auth" />;
 

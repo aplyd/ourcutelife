@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "convex/react";
+import { useAppMutation, useAppQuery } from "@/lib/devMock";
 import { Redirect, router } from "expo-router";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
@@ -18,8 +18,8 @@ const categories: Array<{ value: Category; label: string }> = [
 
 export default function NewPlanItemScreen(): JSX.Element {
   const betterAuthSession = useSession();
-  const viewer = useQuery(api.auth.viewer, {});
-  const createPlan = useMutation(api.plans.create);
+  const viewer = useAppQuery(api.auth.viewer, {});
+  const createPlan = useAppMutation(api.plans.create);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState<Category>("food");

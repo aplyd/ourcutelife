@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "convex/react";
+import { useAppMutation, useAppQuery } from "@/lib/devMock";
 import { Redirect, router } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import type { JSX } from "react";
@@ -48,10 +48,10 @@ function uploadLocalImage(
 
 export default function EditProfileSheet(): JSX.Element {
   const betterAuthSession = useSession();
-  const viewer = useQuery(api.auth.viewer, {});
-  const updateProfile = useMutation(api.auth.updateProfile);
-  const generateUploadUrl = useMutation(api.auth.generateProfilePhotoUploadUrl);
-  const saveProfilePhoto = useMutation(api.auth.saveProfilePhoto);
+  const viewer = useAppQuery(api.auth.viewer, {});
+  const updateProfile = useAppMutation(api.auth.updateProfile);
+  const generateUploadUrl = useAppMutation(api.auth.generateProfilePhotoUploadUrl);
+  const saveProfilePhoto = useAppMutation(api.auth.saveProfilePhoto);
   const [fullName, setFullName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
   const [error, setError] = useState<string | null>(null);

@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "convex/react";
+import { useAppMutation, useAppQuery } from "@/lib/devMock";
 import { Redirect, router, useLocalSearchParams } from "expo-router";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
@@ -13,9 +13,9 @@ type Tone = "good" | "bad" | "mixed";
 export default function EditMomentScreen(): JSX.Element {
   const { id } = useLocalSearchParams<{ id: string }>();
   const betterAuthSession = useSession();
-  const viewer = useQuery(api.auth.viewer, {});
-  const moment = useQuery(api.moments.getMine, id ? { momentId: id as Id<"moments"> } : "skip");
-  const updateMoment = useMutation(api.moments.update);
+  const viewer = useAppQuery(api.auth.viewer, {});
+  const moment = useAppQuery(api.moments.getMine, id ? { momentId: id as Id<"moments"> } : "skip");
+  const updateMoment = useAppMutation(api.moments.update);
   const [summary, setSummary] = useState("");
   const [feeling, setFeeling] = useState("");
   const [tone, setTone] = useState<Tone>("good");

@@ -1,4 +1,4 @@
-import { useQuery } from "convex/react";
+import { useAppQuery } from "@/lib/devMock";
 import { router } from "expo-router";
 import type { JSX } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
@@ -20,7 +20,7 @@ function formatDate(timestamp: number): string {
 }
 
 export default function MomentsTab(): JSX.Element {
-  const moments = useQuery(api.moments.listMine, {});
+  const moments = useAppQuery(api.moments.listMine, {});
 
   return (
     <ScrollView className="flex-1 bg-[#fff8f1]" contentContainerClassName="px-3 pt-16 pb-28 gap-4">

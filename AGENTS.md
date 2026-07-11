@@ -16,6 +16,7 @@ Agent hook: before committing or pushing code changes, run `pnpm format:fix` so 
 
 # GSD / loop-engineering conventions
 
+- Read `AGENT_WORKFLOW.md` after this router for the standard execution loop, validation/review expectations, and definition of done.
 - Use `.planning/` as canonical project roadmap and agent state.
 - Treat Apple Notes/Reminders as intake only; normalize useful items into `.planning/INBOX.md`, roadmap, phase context, or task plans before acting.
 - Read `.planning/STATE.md`, `.planning/ROADMAP.md`, and `.planning/DECISIONS.md` before deciding next work.

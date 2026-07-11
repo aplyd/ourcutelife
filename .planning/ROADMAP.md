@@ -43,7 +43,20 @@ Current implementation order:
 - [x] Rebuild/reinstall dev app on the iOS 26.5 simulator and run Argent Today → Chat → Plans → Me walkthrough evidence.
 - [ ] Consider date-plan dedupe-key hardening after MVP semantics/verification are stable.
 
-## Phase 3 — Polish, verification, and shipping
+## Phase 3 — Agentic engineering foundation
+
+**Status:** active
+**Goal:** Add repo-local workflow docs, validation/review tools, testing/visual/performance guidance, and feedback capture so autonomous agents can work with less context loss and less false confidence.
+
+Current implementation order:
+
+- [x] Add `AGENT_WORKFLOW.md` and `docs/agent/*` foundation docs.
+- [x] Add `tools/agent_validate` and `tools/agent_review` wrappers.
+- [ ] Add worksheet template and git-tag convention.
+- [ ] Add scripted Argent visual-regression baseline flow.
+- [ ] Add real test harness plan beyond lint/typecheck/Argent smoke.
+
+## Phase 4 — Polish, verification, and shipping
 
 **Status:** pending
 **Goal:** Run focused QA on core flows, fix gaps, and prepare PR/release notes.

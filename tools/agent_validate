@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+echo "== git status =="
+git status --short --branch
+
+echo "== format check =="
+pnpm format:check
+
+echo "== lint =="
+pnpm lint
+
+echo "== typecheck =="
+pnpm typecheck
+
+echo "== whitespace diff check =="
+git diff --check
+
+echo "agent_validate: ok"

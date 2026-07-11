@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+if git diff --quiet && git diff --cached --quiet; then
+  echo "agent_review: no local diff to review"
+  exit 0
+fi
+
+echo "== review packet =="
+echo "Repo: $(basename "$PWD")"
+echo "Files changed:"
+(git diff --name-only; git diff --cached --name-only) | sort -u
+
+echo
+echo "Security grep over added lines:"
+if (git diff --cached -- . ':!tools/agent_review'; git diff -- . ':!tools/agent_review') | grep '^+' | grep -Ei "(api_key|secret|password|token|passwd)\s*=\s*['\"][^'\"]{6,}['\"]|os\.system\(|subprocess.*shell=True|\beval\(|\bexec\(|pickle\.loads?\(|execute\(f\"|\.format\(.*SELECT|\.format\(.*INSERT"; then
+  echo "agent_review: potential blocking security pattern found"
+  exit 1
+else
+  echo "No obvious added-line security patterns found. Dispatch an independent reviewer for meaningful code changes."
+fi

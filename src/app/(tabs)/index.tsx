@@ -72,7 +72,7 @@ export default function TodayTab(): JSX.Element {
   }
   if (!viewer?.couple) return <Redirect href="/pairing" />;
 
-  const partnerName = "your person";
+  const partnerName = viewer.partner?.fullName ?? viewer.partner?.email ?? "your person";
   const promptData = todayPrompt;
   const hasAnswered = Boolean(promptData.response);
   const recentMoments = moments.slice(0, 5);

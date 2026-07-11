@@ -41,7 +41,7 @@ export default function PlanHistoryScreen(): JSX.Element {
         >
           <Text className="font-bold text-[#2f211c]">Back</Text>
         </Pressable>
-        <Text className="text-lg font-bold text-[#2f211c]">Match history</Text>
+        <Text className="text-lg font-bold text-[#2f211c]">Matched plan items</Text>
         <View className="w-16" />
       </View>
       <View className="flex-row flex-wrap gap-2">
@@ -64,7 +64,7 @@ export default function PlanHistoryScreen(): JSX.Element {
             className="rounded-3xl bg-white/90 p-4 border border-[#f1dfd2] gap-2"
           >
             <Text className="text-sm font-bold uppercase tracking-widest text-[#8c766b]">
-              {match.idea.category}
+              {match.idea.kind} · {match.idea.category}
             </Text>
             <Text className="text-2xl font-bold text-[#2f211c]">{match.idea.title}</Text>
             <Text className="text-base leading-6 text-[#6f5a50]">{match.idea.description}</Text>
@@ -82,7 +82,7 @@ export default function PlanHistoryScreen(): JSX.Element {
         ))
       ) : (
         <Text className="text-base text-[#6f5a50]">
-          No matches yet. Go swipe something you both want.
+          No matched plan items yet. Go swipe activities and places you both want.
         </Text>
       )}
     </ScrollView>

@@ -2,14 +2,14 @@
 
 ## Phase 1 — Relationship app restructure
 
-**Status:** audit_complete
+**Status:** implemented_pending_fresh_argent_walkthrough
 **Goal:** Implement the accepted product spec that reorganizes the app around Today, Chat, Plans, and Me with private-until-mutual and invoked-AI principles.
 
 Source spec: `docs/product-spec-relationship-app-restructure.md`
 
 Audit: `phases/01-relationship-app-restructure/01-01-AUDIT.md`
 
-First implementation slice: expose Me in the bottom tab bar and demote the old Swipe tab from primary navigation. Code/static checks passed; Argent walkthrough remains pending because simulator launch failed.
+Implementation status: bottom tabs are aligned around Today, Chat, Plans, and Me. Code/static checks passed. Argent can now launch an installed `com.ourcutelife.app` on an iOS 26.5 simulator, but the remaining verification gap is rebuilding/reinstalling the latest source edits and repeating the full walkthrough against that fresh build.
 
 Potential task slices:
 
@@ -22,7 +22,7 @@ Potential task slices:
 
 ## Phase 2 — Date plans restructure
 
-**Status:** pending_discussion
+**Status:** active
 **Goal:** Separate plan items from dates; add date templates, Our Dates state, recommendations, and date lifecycle queries/UI.
 
 Source spec: `docs/product-spec-date-plans-restructure.md`
@@ -34,6 +34,14 @@ Potential task slices:
 - UI copy and Plans tab restructure around matched plan items vs dates.
 - Our Dates MVP screen and lifecycle actions.
 - Verification with tests/typecheck and Argent simulator walkthrough.
+
+Current implementation order:
+
+- [x] Audit backend/UI semantics for plan items vs dates.
+- [x] Tighten date decoration so private unmatched partner-created plan items are not revealed through date surfaces.
+- [x] Polish remaining visible copy for plan-item/date terminology in swipe/history routes.
+- [x] Rebuild/reinstall dev app on the iOS 26.5 simulator and run Argent Today → Chat → Plans → Me walkthrough evidence.
+- [ ] Consider date-plan dedupe-key hardening after MVP semantics/verification are stable.
 
 ## Phase 3 — Polish, verification, and shipping
 

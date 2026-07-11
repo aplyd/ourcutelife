@@ -41,6 +41,7 @@ export default function PlanMatchScreen(): JSX.Element {
 
   const currentIdea = ideas[0];
   const label = labels[category] ?? "Plans";
+  const planItemLabel = `${label} plan items`;
 
   async function handleVote(ideaId: Id<"planIdeas">, nextVote: "like" | "pass") {
     setIsWorking(true);
@@ -60,7 +61,7 @@ export default function PlanMatchScreen(): JSX.Element {
         >
           <Text className="font-bold text-[#2f211c]">Back</Text>
         </Pressable>
-        <Text className="text-lg font-bold text-[#2f211c]">{label}</Text>
+        <Text className="text-lg font-bold text-[#2f211c]">{planItemLabel}</Text>
         <Pressable
           className="h-11 px-4 rounded-full bg-white border border-[#e6d2c2] items-center justify-center"
           onPress={() => router.push("/plans/history")}
@@ -73,7 +74,7 @@ export default function PlanMatchScreen(): JSX.Element {
         <View className="flex-1 rounded-[40px] bg-white/95 p-4 border border-[#f1dfd2] justify-between">
           <View className="gap-4">
             <Text className="self-start rounded-full bg-[#f4ecff] px-4 py-2 text-sm font-bold uppercase tracking-widest text-[#5b21b6]">
-              {label}
+              {planItemLabel}
             </Text>
             <Text className="text-4xl font-bold leading-[46px] text-[#2f211c]">
               {currentIdea.title}
@@ -110,7 +111,7 @@ export default function PlanMatchScreen(): JSX.Element {
       ) : (
         <View className="flex-1 rounded-[40px] bg-white/95 p-4 border border-[#f1dfd2] items-center justify-center gap-3">
           <Text className="text-3xl font-bold text-center text-[#2f211c]">
-            No more {label.toLowerCase()} cards
+            No more {label.toLowerCase()} plan item cards
           </Text>
           <Text className="text-base leading-6 text-center text-[#6f5a50]">
             Add your own private suggestion or check another category.

@@ -311,6 +311,14 @@ function publicIdea(idea: Doc<"planIdeas">, revealCreator: boolean) {
   };
 }
 
+function canRevealDateItem(
+  idea: Doc<"planIdeas">,
+  viewerUserId: Id<"users">,
+  matchedIds: Set<Id<"planIdeas">>,
+) {
+  return !idea.createdByUserId || idea.createdByUserId === viewerUserId || matchedIds.has(idea._id);
+}
+
 async function matchedIdeaIds(ctx: QueryCtx, coupleId: Id<"couples">) {
   const matches = await ctx.db
     .query("planMatches")
@@ -331,7 +339,9 @@ async function decorateDatePlan(
   const items = [];
   for (const itemId of plan.itemIds.slice(0, 8)) {
     const idea = await ctx.db.get(itemId);
-    if (idea) items.push(publicIdea(idea, true));
+    if (idea && canRevealDateItem(idea, viewerUserId, matchedIds)) {
+      items.push(publicIdea(idea, matchedIds.has(idea._id)));
+    }
   }
   const likes = await ctx.db
     .query("datePlanLikes")

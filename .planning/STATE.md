@@ -1,32 +1,37 @@
 # State
 
-Updated: 2026-07-11T10:00:00-07:00
+Updated: 2026-07-11T10:23:00-07:00
 
 ## Current position
 
-Phase 1 relationship-app restructure is code-complete enough for visual verification. Bottom tabs are `Today | Chat | Plans | Me`; Today, Moments, Daily Prompt, and Me/account surfaces match the accepted Phase 1 shape. The remaining Phase 1 gap is environmental: Argent simulator walkthrough is blocked by local iOS dev-build/runtime setup, not by the app route code.
+Phase 1 relationship-app restructure is committed locally and code-complete enough for visual verification. Phase 2 date-plans restructure has started with a backend/UI semantic audit and first privacy hardening slice: date-plan decoration now avoids revealing partner-created unmatched plan items in date surfaces.
 
 ## What exists
 
 - Canonical project context: `AGENTS.md`, `.planning/PROJECT.md`, `.planning/REQUIREMENTS.md`.
-- Active phase context: `.planning/phases/01-relationship-app-restructure/CONTEXT.md`.
-- Phase 1 audit: `.planning/phases/01-relationship-app-restructure/01-01-AUDIT.md`.
-- Bottom-tab alignment summary: `.planning/phases/01-relationship-app-restructure/01-02-SUMMARY.md`.
-- Phase 1 follow-up gap audit: `.planning/phases/01-relationship-app-restructure/01-03-PHASE1-GAP-AUDIT.md`.
+- Phase 1 context/audits/summaries under `.planning/phases/01-relationship-app-restructure/`.
+- Phase 2 audit: `.planning/phases/02-date-plans-restructure/02-01-AUDIT.md`.
 - Product specs:
   - `docs/product-spec-relationship-app-restructure.md`
   - `docs/product-spec-date-plans-restructure.md`
 - App config declares iOS bundle id `com.ourcutelife.app`.
-- Today now uses the partner's available profile/email in copy instead of a hard-coded fallback.
+- Today uses the partner's available profile/email in copy instead of a hard-coded fallback.
+- Plans backend has plan-item/date tables and queries; `convex/plans.ts` now filters private unmatched partner-created items out of decorated date items.
 
 ## Verification / latest work
 
-- Previous simulator work confirmed Argent sees booted simulator `iPhone 17 Pro` (`824CD99D-5266-4C34-BA9F-9083334BF218`) but `com.ourcutelife.app` is not installed.
-- Previous `EXPO_PUBLIC_MOCK_AUTH=1 pnpm exec expo run:ios --device "iPhone 17 Pro"` and `EXPO_PUBLIC_MOCK_AUTH=1 pnpm exec expo run:ios` failed because Expo selected device-style signing and no local iOS signing certificate is available.
-- Previous `pnpm exec expo prebuild --platform ios --no-install` completed with no git changes.
-- Previous `xcodebuild -workspace ios/ourcutelife.xcworkspace -scheme ourcutelife -showdestinations` offered no simulator destinations; only Austin's physical iPhone / generic iOS device were listed, blocked by missing iOS 26.5 device support.
-- Previous `xcodebuild -showsdks` showed iOS/iOS Simulator SDK 26.5 while available booted simulator runtime is iOS 26.4.
-- Latest code/planning slice verification pending in this working tree: `pnpm format:check`, `pnpm lint`, `pnpm typecheck`, `git diff --check`.
+Latest local verification after Phase 2 privacy slice:
+
+- `pnpm format:check` — passed.
+- `pnpm lint` — passed with 0 warnings/errors.
+- `pnpm typecheck` — passed.
+- `git diff --check` — passed.
+
+Previous simulator work confirmed Argent sees booted simulator `iPhone 17 Pro` (`824CD99D-5266-4C34-BA9F-9083334BF218`) but `com.ourcutelife.app` is not installed.
+Previous `EXPO_PUBLIC_MOCK_AUTH=1 pnpm exec expo run:ios --device "iPhone 17 Pro"` and `EXPO_PUBLIC_MOCK_AUTH=1 pnpm exec expo run:ios` failed because Expo selected device-style signing and no local iOS signing certificate is available.
+Previous `pnpm exec expo prebuild --platform ios --no-install` completed with no git changes.
+Previous `xcodebuild -workspace ios/ourcutelife.xcworkspace -scheme ourcutelife -showdestinations` offered no simulator destinations; only Austin's physical iPhone / generic iOS device were listed, blocked by missing iOS 26.5 device support.
+Previous `xcodebuild -showsdks` showed iOS/iOS Simulator SDK 26.5 while available booted simulator runtime is iOS 26.4.
 
 ## Current blocker
 
@@ -40,10 +45,10 @@ Likely unblock: install a matching iOS 26.5 simulator runtime in Xcode Settings 
 
 ## Next safe actions
 
-1. Run local code verification for the Phase 1 cleanup/audit slice, then commit it.
-2. Re-run simulator/dev-build verification after installing/selecting a matching iOS simulator runtime.
-3. Once launchable, use Argent to capture Today → Chat → Plans → Me walkthrough evidence and update `01-02-SUMMARY.md` / `01-03-PHASE1-GAP-AUDIT.md`.
-4. If simulator remains blocked, begin Phase 2 Plans privacy/date-item separation audit from `docs/product-spec-date-plans-restructure.md`.
+1. Commit the Phase 2 date-plan privacy slice.
+2. Continue Phase 2 by verifying Plans tab labels/buttons consistently distinguish plan items from dates.
+3. Re-run simulator/dev-build verification after installing/selecting a matching iOS simulator runtime.
+4. Once launchable, use Argent to capture Today → Chat → Plans → Me and Plans tab walkthrough evidence.
 
 ## Blockers / questions
 

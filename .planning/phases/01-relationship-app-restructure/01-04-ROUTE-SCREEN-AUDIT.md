@@ -1,6 +1,6 @@
 # 01-04 Route/screen audit — Phase 1 and remaining primary surfaces
 
-Updated: 2026-07-12T00:00:00-07:00
+Updated: 2026-07-12T10:11:36-07:00
 
 ## Scope
 
@@ -35,11 +35,11 @@ Files inspected:
    - `/swipe` redirects to `/plans`, where Phase 2 plan-item/date work is consolidated.
    - `/review` redirects to `/chat`, matching the spec direction that AI-mediated reflection/review belongs under Chat when revived.
 2. **Plans root is Phase 2+ rather than Phase 1-only:** `src/app/(tabs)/plans.tsx` already includes Our Dates/date-leaderboard behavior from the date-plans restructure. That is acceptable for Phase 2 work, but Phase 1 acceptance should not rely on Plans root visual QA beyond confirming the Plans tab exists and does not crash.
-3. **Argent/device proof is partially complete:** direct `xcodebuild` plus Argent reinstall/launch now verifies the four bottom tabs and the Today Add Moment sheet on iPhone 17 Pro / iOS 26.5 with mock auth. Remaining before calling navigation fully clean: Today prompt-route and moment-history route taps.
+3. **Argent/device proof now covers the remaining Today route taps:** direct `xcodebuild` plus Argent reinstall/launch previously verified the four bottom tabs and the Today Add Moment sheet on iPhone 17 Pro / iOS 26.5 with mock auth. The latest Argent run additionally verified that Today `Answer prompt` opens the daily prompt sheet and `Recent moments` → `See all` opens the `/moments` history screen.
 
 ## Suggested next safe action
 
-Verify the remaining Today prompt and moment-history route taps on-device. The four-tab spine and Today Add Moment sheet are already covered by the latest Argent run.
+Phase 1 navigation is visually verified enough to move forward. Next safe work is either a small Phase 2 Plans/date-plan audit slice or a narrowly scoped fix if another simulator/dev-build issue appears.
 
 ## Verification
 
@@ -50,3 +50,5 @@ Verify the remaining Today prompt and moment-history route taps on-device. The f
 - Device verification: `EXPO_PUBLIC_MOCK_AUTH=1 xcodebuild -workspace ios/ourcutelife.xcworkspace -scheme ourcutelife -configuration Debug -destination 'id=F736E64F-ED8F-475C-BD05-7C156B568F74' -derivedDataPath ios/build build` passed with `** BUILD SUCCEEDED **`.
 - Device verification: Argent `reinstall-app` and `launch-app` passed for `com.ourcutelife.app` on iPhone 17 Pro / iOS 26.5.
 - Device verification: Argent described Today, Chat, Plans, and Me tab screens and the Today Add Moment sheet.
+- Device verification: Argent launched `com.ourcutelife.app`, scrolled Today so `Answer prompt` was clear of the tab bar, tapped it, and described the daily prompt sheet with `Write your answer…` and `Submit answer` visible.
+- Device verification: Argent dismissed the prompt sheet, tapped `Recent moments` → `See all`, and described the `/moments` screen with `MOMENTS`, `Your private relationship journal`, `Log a moment`, and the mock `GOOD` timeline item visible.

@@ -19,7 +19,8 @@
     "prebuild:ios": "expo prebuild --platform ios",
     "build:production": "APP_ENV=production EXPO_NO_DOTENV=1 eas build --profile production --clear-cache --platform ios --auto-submit",
     "agent:validate": "tools/agent_validate",
-    "agent:review": "tools/agent_review"
+    "agent:review": "tools/agent_review",
+    "agent:sweep": "tools/agent_commit_sweep"
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.74",

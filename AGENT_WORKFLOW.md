@@ -19,7 +19,8 @@ Summary:
 5. Run the app when relevant; mobile/UI work should use Argent simulator/device verification when available.
 6. Verify with `tools/agent_validate`, targeted checks, and `git diff --check`.
 7. Review meaningful code changes with `tools/agent_review` plus an independent reviewer when possible.
-8. Commit coherent changes and update `.planning/STATE.md` with evidence, blockers, and next actions.
+8. Sweep recent committed work with `tools/agent_commit_sweep` before trusting a milestone or handing off a local branch.
+9. Commit coherent changes and update `.planning/STATE.md` with evidence, blockers, and next actions.
 
 ## Definition of done
 

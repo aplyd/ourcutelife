@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+usage() {
+  cat <<'USAGE'
+Usage: tools/agent_commit_sweep [<git-range>]
+
+Reviews recent commits for autonomous-agent hygiene:
+- which commits/files changed
+- whether commit messages mention verification evidence
+- added-line security/destructive-operation patterns worth reviewing
+
+If no range is provided, the script sweeps commits ahead of the upstream branch.
+When there are no ahead commits, it sweeps the last 5 commits.
+USAGE
+}
+
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+  usage
+  exit 0
+fi
+
+range="${1:-}"
+if [[ -z "$range" ]]; then
+  if upstream=$(git rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>/dev/null); then
+    ahead_count=$(git rev-list --count "${upstream}..HEAD")
+    if [[ "$ahead_count" != "0" ]]; then
+      range="${upstream}..HEAD"
+    fi
+  fi
+fi
+
+if [[ -n "$range" ]]; then
+  if ! git rev-parse --verify --quiet "$range" >/dev/null && ! git rev-list --quiet "$range" >/dev/null 2>&1; then
+    echo "agent_commit_sweep: invalid git range: $range" >&2
+    exit 2
+  fi
+  commit_args=("$range")
+  diff_args=("$range")
+  range_label="$range"
+else
+  commit_args=(--max-count=5 HEAD)
+  diff_args=(HEAD~5..HEAD)
+  range_label="last 5 commits"
+fi
+
+echo "== git status =="
+git status --short --branch
+
+echo
+echo "== commit sweep: $range_label =="
+git log --oneline --decorate --no-merges "${commit_args[@]}"
+
+echo
+echo "== files touched =="
+git diff --name-status "${diff_args[@]}" | sort -u || true
+
+echo
+echo "== verification evidence mentioned in commits =="
+if git log --format='%h %s%n%b' "${commit_args[@]}" | grep -Ei "(verification|validated|tested|pnpm|npm run|tools/agent_|lint|typecheck|format|argos|argent|simulator|screenshot|walkthrough)"; then
+  true
+else
+  echo "No explicit verification evidence found in swept commit messages. Check .planning/STATE.md or worksheet notes before trusting the milestone."
+fi
+
+echo
+echo "== added-line security/destructive-operation sweep =="
+blocking_hits=$(git diff --unified=0 "${diff_args[@]}" -- . ':!pnpm-lock.yaml' \
+  | grep '^+' \
+  | grep -Eiv '^\+\+\+' \
+  | grep -Ei "(api_key|secret|password|token|passwd)\s*=\s*['\"][^'\"]{6,}['\"]|EXPO_PUBLIC_.*(KEY|SECRET|TOKEN)\s*=\s*['\"][^'\"]{6,}['\"]" || true)
+
+if [[ -n "$blocking_hits" ]]; then
+  echo "$blocking_hits"
+  echo "agent_commit_sweep: blocking secret-like assignment found."
+  exit 1
+else
+  echo "No obvious added-line secret assignments found."
+fi
+
+advisory_hits=$(git diff --unified=0 "${diff_args[@]}" -- . ':!pnpm-lock.yaml' \
+  | grep '^+' \
+  | grep -Eiv '^\+\+\+' \
+  | grep -Ei "\bstripe\b|\bdeploy\b|\bdelete(All|Many)?\b|\bdrop table\b|\btruncate\b|production migration" || true)
+
+if [[ -n "$advisory_hits" ]]; then
+  echo
+  echo "Advisory hits to review manually:"
+  echo "$advisory_hits"
+fi
+
+echo
+echo "agent_commit_sweep: ok"

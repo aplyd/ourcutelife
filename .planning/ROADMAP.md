@@ -52,6 +52,7 @@ Current implementation order:
 
 - [x] Add `AGENT_WORKFLOW.md` and `docs/agent/*` foundation docs.
 - [x] Add `tools/agent_validate` and `tools/agent_review` wrappers.
+- [x] Add recent-commit sweep script.
 - [ ] Add worksheet template and git-tag convention.
 - [ ] Add scripted Argent visual-regression baseline flow.
 - [ ] Add real test harness plan beyond lint/typecheck/Argent smoke.

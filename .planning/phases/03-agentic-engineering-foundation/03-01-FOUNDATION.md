@@ -17,13 +17,13 @@ Start the repo-local agentic engineering foundation phase so ourcutelife agents 
 - `docs/agent/FEEDBACK.md` — process-improvement log.
 - `tools/agent_validate` — repo validation wrapper around format/lint/typecheck/diff checks.
 - `tools/agent_review` — local review packet/security-grep helper.
-- `package.json` scripts: `agent:validate`, `agent:review`.
+- `tools/agent_commit_sweep` — recent-commit hygiene sweep for changed files, verification mentions, and risky added lines.
+- `package.json` scripts: `agent:validate`, `agent:review`, `agent:sweep`.
 
 ## Remaining foundation gaps
 
 - No behavioral test harness yet.
 - No scripted visual regression baseline yet.
-- No periodic recent-commit sweep script yet.
 - `tools/agent_review` is a local helper, not a full cross-model review dispatcher.
 - No worksheet template/git-tag flow yet.
 

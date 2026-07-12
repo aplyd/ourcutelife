@@ -2,7 +2,7 @@
 
 ## Phase 1 — Relationship app restructure
 
-**Status:** implemented_pending_fresh_argent_walkthrough
+**Status:** implemented_pending_remaining_today_route_taps
 **Goal:** Implement the accepted product spec that reorganizes the app around Today, Chat, Plans, and Me with private-until-mutual and invoked-AI principles.
 
 Source spec: `docs/product-spec-relationship-app-restructure.md`

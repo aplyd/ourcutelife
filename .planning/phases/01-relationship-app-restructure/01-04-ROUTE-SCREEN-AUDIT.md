@@ -31,17 +31,22 @@ Files inspected:
 
 ### Remaining route/spec mismatches to resolve before calling navigation fully clean
 
-1. **Legacy tab-directory routes still exist:** `src/app/(tabs)/swipe.tsx` and `src/app/(tabs)/review.tsx` remain under the tabs route group even though the accepted tab spine is only Today, Chat, Plans, Me.
-   - `swipe.tsx` overlaps with `/plans/match/[category]` and the Phase 2 plan-item swipe model.
-   - `review.tsx` exposes monthly AI review generation/sharing behavior that the spec lists as deferred under Chat.
-   - Recommended next slice: decide whether these should be deleted, moved to non-tab/internal routes, or explicitly hidden/redirected so they cannot appear as stale product surfaces.
+1. **Legacy tab-directory routes are now guarded:** `src/app/(tabs)/swipe.tsx` and `src/app/(tabs)/review.tsx` remain as compatibility route files, but they now immediately redirect to accepted product surfaces instead of exposing stale tab-directory screens.
+   - `/swipe` redirects to `/plans`, where Phase 2 plan-item/date work is consolidated.
+   - `/review` redirects to `/chat`, matching the spec direction that AI-mediated reflection/review belongs under Chat when revived.
 2. **Plans root is Phase 2+ rather than Phase 1-only:** `src/app/(tabs)/plans.tsx` already includes Our Dates/date-leaderboard behavior from the date-plans restructure. That is acceptable for Phase 2 work, but Phase 1 acceptance should not rely on Plans root visual QA beyond confirming the Plans tab exists and does not crash.
-3. **Argent/device proof remains the final Phase 1 gate:** no simulator walkthrough was performed in this audit. The still-needed walkthrough is the same as `01-03`: launch with mock auth if needed, verify the four bottom tabs, Today scrolling/FAB/prompt/moment history routes, and Me account/settings controls.
+3. **Argent/device proof is partially complete:** direct `xcodebuild` plus Argent reinstall/launch now verifies the four bottom tabs and the Today Add Moment sheet on iPhone 17 Pro / iOS 26.5 with mock auth. Remaining before calling navigation fully clean: Today prompt-route and moment-history route taps.
 
 ## Suggested next safe action
 
-Resolve the stale `(tabs)/swipe.tsx` and `(tabs)/review.tsx` routing decision in a bounded slice before deeper UI polish. Prefer a non-destructive redirect/hide approach first if there is uncertainty about whether Austin still wants those screens preserved.
+Verify the remaining Today prompt and moment-history route taps on-device. The four-tab spine and Today Add Moment sheet are already covered by the latest Argent run.
 
 ## Verification
 
-- Documentation-only audit. Run `pnpm format:check .planning/phases/01-relationship-app-restructure/01-04-ROUTE-SCREEN-AUDIT.md` or repo format check after this file is updated.
+- Code/docs slice verification: `pnpm typecheck` passed.
+- Code/docs slice verification: `pnpm format:check` passed.
+- Code/docs slice verification: `git diff --check` passed.
+- Review: `tools/agent_review` passed with no obvious added-line security patterns.
+- Device verification: `EXPO_PUBLIC_MOCK_AUTH=1 xcodebuild -workspace ios/ourcutelife.xcworkspace -scheme ourcutelife -configuration Debug -destination 'id=F736E64F-ED8F-475C-BD05-7C156B568F74' -derivedDataPath ios/build build` passed with `** BUILD SUCCEEDED **`.
+- Device verification: Argent `reinstall-app` and `launch-app` passed for `com.ourcutelife.app` on iPhone 17 Pro / iOS 26.5.
+- Device verification: Argent described Today, Chat, Plans, and Me tab screens and the Today Add Moment sheet.

@@ -1,69 +1,51 @@
 # State
 
-Updated: 2026-07-12T03:36:00-07:00
+Updated: 2026-07-12T07:06:39-07:00
 
 ## Current position
 
-Phase 1 relationship-app restructure is committed locally and code-complete enough for visual verification. Phase 2 date-plans restructure has first privacy/copy/simulator verification slices committed locally. Phase 3 agentic engineering foundation is active; the first docs/tooling slice and recent-commit sweep script slice are committed locally.
+Our Cute Life is in the relationship-app restructure lane. Phase 1 has been audited against the locked four-tab spine (Today, Chat, Plans, Me). The remaining stale tab-directory route decision is resolved with compatibility redirects, and a fresh iOS 26.5 Argent walkthrough now verifies the main four-tab spine plus the Today add-moment sheet under mock auth.
 
 ## What exists
 
 - Canonical project context: `AGENTS.md`, `AGENT_WORKFLOW.md`, `.planning/PROJECT.md`, `.planning/REQUIREMENTS.md`.
-- Product specs:
-  - `docs/product-spec-relationship-app-restructure.md`
-  - `docs/product-spec-date-plans-restructure.md`
-- Agent foundation docs under `docs/agent/`: coding conventions, testing, review, visual verification, performance, feedback.
-- Repo agent tools: `tools/agent_validate`, `tools/agent_review`, `tools/agent_commit_sweep`; package scripts `agent:validate`, `agent:review`, `agent:sweep`.
-- Phase 1 planning/audits/summaries under `.planning/phases/01-relationship-app-restructure/`, including latest route audit `.planning/phases/01-relationship-app-restructure/01-04-ROUTE-SCREEN-AUDIT.md`.
-- Phase 2 planning/audit under `.planning/phases/02-date-plans-restructure/`.
-- Phase 3 foundation slice: `.planning/phases/03-agentic-engineering-foundation/03-01-FOUNDATION.md`.
-- Fresh iOS 26.5 simulator build/install verification works via direct `xcodebuild` plus Argent reinstall/launch.
+- Product specs: `docs/product-spec-relationship-app-restructure.md` and `docs/product-spec-date-plans-restructure.md`.
+- Phase 1 context/audits/summaries under `.planning/phases/01-relationship-app-restructure/`.
+- Phase 2 context/audit under `.planning/phases/02-date-plans-restructure/`.
+- Agent foundation docs under `docs/agent/` plus repo validation/review/sweep helper scripts.
 
-## Verification / latest work
+## Latest work
 
-Latest watchdog slice:
+- Coordinator verified and committed the route-guard + Argent walkthrough slice as `fix: redirect legacy relationship tabs`.
+- Replaced `src/app/(tabs)/swipe.tsx` with a small redirect to `/plans` so the legacy swipe tab-directory route no longer presents an off-spine tab surface.
+- Replaced `src/app/(tabs)/review.tsx` with a small redirect to `/chat` so deferred monthly review behavior is not exposed as a stale tab-directory surface.
+- Updated `.planning/phases/01-relationship-app-restructure/01-04-ROUTE-SCREEN-AUDIT.md` to record the route decision and move the suggested next action to device walkthrough verification.
+- Built the iOS simulator target directly with `EXPO_PUBLIC_MOCK_AUTH=1` and used Argent on iPhone 17 Pro / iOS 26.5 to reinstall/launch the dev build.
+- Captured Argent walkthrough evidence that Today, Chat, Plans, and Me render as the bottom-tab spine, and that Today’s FAB opens the New Moment sheet.
 
-- Coordinator verified and committed the route/screen audit as `docs: audit relationship app routes`.
-- Added `.planning/phases/01-relationship-app-restructure/01-04-ROUTE-SCREEN-AUDIT.md` after inspecting remaining primary tab routes and adjacent plan routes.
-- Confirmed visible native tab triggers in `src/app/(tabs)/_layout.tsx` are exactly `Today`, `Chat`, `Plans`, and `Me`.
-- Confirmed Today and Me still align with Phase 1 at code-inspection level.
-- Identified a remaining navigation/spec cleanup item: legacy route files `src/app/(tabs)/swipe.tsx` and `src/app/(tabs)/review.tsx` still live under the tabs route group even though they are not part of the accepted four-tab spine. They should be deleted, moved, redirected, or explicitly hidden in a later bounded slice after choosing the safest preservation path.
+## Verification
 
-Verification for latest slice:
+Verification for latest route-guard + Argent walkthrough slice:
 
-- `npx oxfmt --check .planning/STATE.md .planning/phases/01-relationship-app-restructure/01-04-ROUTE-SCREEN-AUDIT.md` passed.
+- `EXPO_PUBLIC_MOCK_AUTH=1 xcodebuild -workspace ios/ourcutelife.xcworkspace -scheme ourcutelife -configuration Debug -destination 'id=F736E64F-ED8F-475C-BD05-7C156B568F74' -derivedDataPath ios/build build` passed with `** BUILD SUCCEEDED **`.
+- Argent `reinstall-app` and `launch-app` passed for `com.ourcutelife.app` on `F736E64F-ED8F-475C-BD05-7C156B568F74`.
+- Argent screen evidence: Today screenshot `img_59a7e6216d7a.png`, Chat `img_16706b7a4ef1.png`, Plans `img_3646b9bcb973.png`, Me `img_2d9ee5d5ed8c.png`, New Moment sheet `img_9a1b56839fba.png`.
+- `pnpm typecheck` passed.
+- `pnpm format:check` passed.
 - `git diff --check` passed.
+- `tools/agent_review` passed with no obvious added-line security patterns.
 
-Recent committed app slice:
+## Current blockers
 
-- Commit `c3c92a9` tightened remaining plan-item/date language and recorded fresh simulator verification.
-- `pnpm format:fix`, `pnpm format:check`, `pnpm lint`, `pnpm typecheck`, and `git diff --check` passed.
-- Direct `xcodebuild` + Argent reinstall/launch verified fresh Today → Chat → Plans → Me tab navigation on iOS 26.5 simulator.
+No hard blocker for local code/planning slices. Phase 1 still needs remaining Today prompt/moment-history route taps verified before calling navigation fully verified. The direct `xcodebuild` + Argent reinstall/launch path works; Expo CLI device selection may still misclassify the simulator UDID as a physical device and fail on signing certificates.
 
-Recent foundation slice verified for local commit:
-
-- Added `tools/agent_commit_sweep` plus `pnpm agent:sweep` to review recent commits for changed files, verification mentions, secret-like assignments, and advisory deploy/destructive-operation terms.
-- Updated `AGENT_WORKFLOW.md`, `.planning/ROADMAP.md`, and `.planning/phases/03-agentic-engineering-foundation/03-01-FOUNDATION.md` to reference the sweep flow.
-- Verification run: `pnpm format:fix` passed.
-- Verification run: `bash -n tools/agent_commit_sweep` passed.
-- Verification run: `tools/agent_commit_sweep` passed; it swept the last 5 commits, found verification mentions in `c3c92a9` and `d419ddf`, no secret assignments, and one advisory docs-only deploy/secrets policy line.
-- Verification run: `pnpm agent:sweep` passed with the same evidence.
-- Verification run: `pnpm format:check AGENT_WORKFLOW.md .planning/ROADMAP.md .planning/phases/03-agentic-engineering-foundation/03-01-FOUNDATION.md package.json` passed.
-- Verification run: `git diff --check` passed.
-- Review run: `tools/agent_review` passed for tracked diffs; the new script was additionally inspected with `git diff --no-index -- /dev/null tools/agent_commit_sweep`.
-
-## Current blocker
-
-No hard simulator blocker remains for the iOS 26.5 `iPhone 17 Pro`: direct `xcodebuild` to the simulator destination, Argent reinstall, launch, and tab walkthrough all passed. Expo CLI `pnpm exec expo run:ios --device "F736E64F-ED8F-475C-BD05-7C156B568F74"` still misclassifies the UDID as a physical-device build and fails on missing signing certificates, so use the direct `xcodebuild` + Argent reinstall path for simulator verification unless Expo device selection is fixed.
-
-Do not deploy production, run production migrations, change paid-service settings, touch credentials/secrets/billing, delete data, or message customers/users without Austin approval.
+Do not deploy, run production migrations, change Stripe/live settings, touch credentials/secrets/billing, delete data, or message customers/users without Austin approval.
 
 ## Next safe actions
 
-1. Resolve the legacy `(tabs)/swipe.tsx` and `(tabs)/review.tsx` route decision in a small non-destructive slice, likely by preserving code but moving/redirecting the routes if they are not intended product surfaces.
-2. Add worksheet template and git-tag convention.
-3. Add scripted Argent visual-regression baseline flow.
-4. Implement the first pure unit harness slice: identify/extract one small pure validator/helper, add Vitest plus `pnpm test:unit`, and verify the test can fail for a local mutation.
+1. Verify the remaining Today prompt and moment-history route taps on-device; the four-tab spine and Add Moment sheet are now covered.
+2. If remaining Today route taps pass, call Phase 1 navigation device verification complete and continue Phase 2 date-plans restructure.
+3. Keep using the direct `xcodebuild` + Argent reinstall path for simulator evidence unless Expo device selection is fixed.
 
 ## Blockers / questions
 

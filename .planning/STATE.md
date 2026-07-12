@@ -1,6 +1,6 @@
 # State
 
-Updated: 2026-07-11T19:19:42-07:00
+Updated: 2026-07-11T21:49:40-07:00
 
 ## Current position
 
@@ -36,6 +36,14 @@ Recent foundation slice verified for local commit:
 - Verification run: `git diff --check` passed.
 - Review run: `tools/agent_review` passed for tracked diffs; the new script was additionally inspected with `git diff --no-index -- /dev/null tools/agent_commit_sweep`.
 
+Latest test-harness planning slice:
+
+- Added a behavioral test harness plan to `docs/agent/TESTING.md`, covering a staged Vitest unit harness, route/component smoke tests, Convex/server testing constraints, Argent/direct-xcode device smoke evidence, and validation integration boundaries.
+- Updated `.planning/ROADMAP.md` and `.planning/phases/03-agentic-engineering-foundation/03-01-FOUNDATION.md` to mark the test harness plan complete while keeping the actual behavioral harness as a remaining implementation gap.
+- Verification run: `pnpm exec oxfmt --check docs/agent/TESTING.md .planning/ROADMAP.md .planning/phases/03-agentic-engineering-foundation/03-01-FOUNDATION.md .planning/STATE.md` passed.
+- Verification run: `git diff --check` passed.
+- Review run: `tools/agent_review` passed with no obvious added-line security patterns.
+
 ## Current blocker
 
 No hard simulator blocker remains for the iOS 26.5 `iPhone 17 Pro`: direct `xcodebuild` to the simulator destination, Argent reinstall, launch, and tab walkthrough all passed. Expo CLI `pnpm exec expo run:ios --device "F736E64F-ED8F-475C-BD05-7C156B568F74"` still misclassifies the UDID as a physical-device build and fails on missing signing certificates, so use the direct `xcodebuild` + Argent reinstall path for simulator verification unless Expo device selection is fixed.
@@ -44,7 +52,7 @@ No hard simulator blocker remains for the iOS 26.5 `iPhone 17 Pro`: direct `xcod
 
 1. Add worksheet template and git-tag convention.
 2. Add scripted Argent visual-regression baseline flow.
-3. Continue Phase 2 with date-plan dedupe-key hardening after foundation basics are committed.
+3. Implement the first pure unit harness slice: identify/extract one small pure validator/helper, add Vitest plus `pnpm test:unit`, and verify the test can fail for a local mutation.
 
 ## Blockers / questions
 

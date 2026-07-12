@@ -1,6 +1,6 @@
 # 03-01 Agentic engineering foundation
 
-Updated: 2026-07-11T16:05:00-07:00
+Updated: 2026-07-11T21:49:40-07:00
 
 ## Scope
 
@@ -19,6 +19,7 @@ Start the repo-local agentic engineering foundation phase so ourcutelife agents 
 - `tools/agent_review` — local review packet/security-grep helper.
 - `tools/agent_commit_sweep` — recent-commit hygiene sweep for changed files, verification mentions, and risky added lines.
 - `package.json` scripts: `agent:validate`, `agent:review`, `agent:sweep`.
+- `docs/agent/TESTING.md` — behavioral test harness plan for pure unit tests, route/component smoke tests, Convex/server tests, and Argent device smoke evidence.
 
 ## Remaining foundation gaps
 
@@ -26,6 +27,7 @@ Start the repo-local agentic engineering foundation phase so ourcutelife agents 
 - No scripted visual regression baseline yet.
 - `tools/agent_review` is a local helper, not a full cross-model review dispatcher.
 - No worksheet template/git-tag flow yet.
+- No scheduled/cron enforcement for recent-commit sweeps yet.
 
 ## Verification plan
 

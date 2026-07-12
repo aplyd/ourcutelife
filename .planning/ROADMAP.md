@@ -55,7 +55,7 @@ Current implementation order:
 - [x] Add recent-commit sweep script.
 - [ ] Add worksheet template and git-tag convention.
 - [ ] Add scripted Argent visual-regression baseline flow.
-- [ ] Add real test harness plan beyond lint/typecheck/Argent smoke.
+- [x] Add real test harness plan beyond lint/typecheck/Argent smoke.
 
 ## Phase 4 — Polish, verification, and shipping
 

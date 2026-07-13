@@ -3,6 +3,7 @@ import type { Doc, Id } from "./_generated/dataModel";
 import type { MutationCtx, QueryCtx } from "./_generated/server";
 import { mutation, query } from "./_generated/server";
 import { getCurrentAppUser } from "./auth";
+import { canRevealDatePlanItem } from "./planPrivacy";
 
 const categoryValidator = v.union(
   v.literal("food"),
@@ -316,7 +317,12 @@ function canRevealDateItem(
   viewerUserId: Id<"users">,
   matchedIds: Set<Id<"planIdeas">>,
 ) {
-  return !idea.createdByUserId || idea.createdByUserId === viewerUserId || matchedIds.has(idea._id);
+  return canRevealDatePlanItem({
+    itemId: idea._id,
+    createdByUserId: idea.createdByUserId ?? null,
+    viewerUserId,
+    matchedItemIds: matchedIds,
+  });
 }
 
 async function matchedIdeaIds(ctx: QueryCtx, coupleId: Id<"couples">) {

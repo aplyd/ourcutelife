@@ -18,10 +18,11 @@ tools/agent_validate
 
 ## Test inventory
 
-| Area            | Command/file                 | What it proves               | Notes                               |
-| --------------- | ---------------------------- | ---------------------------- | ----------------------------------- |
-| Repo validation | `tools/agent_validate`       | Formatting/lint/type smoke   | Not a substitute for behavior tests |
-| Mobile smoke    | Argent simulator walkthrough | Screens launch and route nav | Needs committed worksheet evidence  |
+| Area            | Command/file                 | What it proves               | Notes                                                 |
+| --------------- | ---------------------------- | ---------------------------- | ----------------------------------------------------- |
+| Repo validation | `tools/agent_validate`       | Formatting/lint/type smoke   | Not a substitute for behavior tests                   |
+| Unit tests      | `pnpm test:unit`             | Pure helper behavior         | Current coverage: date-plan item privacy reveal rules |
+| Mobile smoke    | Argent simulator walkthrough | Screens launch and route nav | Needs committed worksheet evidence                    |
 
 ## Behavioral test harness plan
 

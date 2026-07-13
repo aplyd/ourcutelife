@@ -12,6 +12,7 @@
     "format:fix": "pnpm format",
     "format:check": "oxfmt --check .",
     "typecheck": "tsc --noEmit",
+    "test:unit": "rm -rf .tmp/unit-tests && tsc --ignoreConfig tests/unit/*.test.ts convex/planPrivacy.ts --module Node16 --target ES2022 --moduleResolution node16 --types node --skipLibCheck --esModuleInterop --outDir .tmp/unit-tests && node --test .tmp/unit-tests/tests/unit/*.test.js",
     "doctor": "expo-doctor",
     "convex:dev": "convex dev",
     "convex:deploy": "convex deploy",

@@ -1,6 +1,6 @@
 # State
 
-Updated: 2026-07-12T13:16:24-07:00
+Updated: 2026-07-12T19:25:56-07:00
 
 ## Current position
 
@@ -16,6 +16,14 @@ ourcutelife is on `main` with local commits ahead of origin. Phase 1 relationshi
 
 ## Latest work / verification
 
+- Added a no-new-dependency `pnpm test:unit` starter harness for pure TypeScript helpers.
+- Extracted date-plan item privacy reveal logic into `convex/planPrivacy.ts` and kept `convex/plans.ts` using that helper for date decoration.
+- Added `tests/unit/date-plan-privacy.test.ts` covering public/seed items, viewer-created items, hidden unmatched partner-created items, and matched partner-created reveal behavior.
+- Updated `docs/agent/TESTING.md`, `.planning/ROADMAP.md`, and `.planning/phases/03-agentic-engineering-foundation/03-01-FOUNDATION.md` to record the new unit harness and remaining harness gaps.
+- Verification for this unit-harness slice: `pnpm test:unit` passed with 4 tests passing; `pnpm format:fix`, `pnpm format:check`, `pnpm lint`, `pnpm typecheck`, and `git diff --check` passed; `tools/agent_review` passed for tracked-file diff, with a manual security search over the new untracked helper/test files also clean.
+
+## Previous work / verification
+
 - Rechecked dirty state before work: `git status --short --branch` showed `## main...origin/main [ahead 5]` and no dirty files.
 - Confirmed Argent is available and iPhone 17 Pro / iOS 26.5 simulator is booted (`F736E64F-ED8F-475C-BD05-7C156B568F74`).
 - Launched installed dev build with Argent: `launch-app com.ourcutelife.app` succeeded.
@@ -25,6 +33,9 @@ ourcutelife is on `main` with local commits ahead of origin. Phase 1 relationshi
 - Scrolled Plans with Argent and described the lower section. Evidence showed:
   - `Matched Items` with subtitle `History of mutual yeses. These are ingredients, not dates.`
   - category filters `Food`, `Drinks`, `Entertainment`, `Activity`, `Intimacy` and empty copy `No matched activities or places in the selected categories yet.`
+- Added `.planning/phases/02-date-plans-restructure/02-02-ROUTE-COPY-AUDIT.md` after inspecting `src/app/(tabs)/plans.tsx`, `/plans/match/[category]`, `/plans/history`, `/plans/new`, and `/plans/random` against the date-plans spec.
+- Audit conclusion: remaining Plans route copy now consistently separates plan items from dates; no immediate runtime-code change is needed for terminology.
+- Verification for this planning/audit slice: `pnpm format:check`, `pnpm lint`, `pnpm typecheck`, and `git diff --check` passed; `tools/agent_review` passed for tracked-file diff.
 
 ## Current blockers
 
@@ -32,8 +43,8 @@ No hard blocker for local code/planning slices. Argent reports an available upda
 
 ## Next safe actions
 
-1. Continue Phase 2 with a narrow code/readability slice around Plans/date-plan semantics, preserving the already-implemented privacy behavior in `convex/plans.ts`.
-2. Add or update a bounded Phase 2 audit note for any remaining UI copy mismatch after inspecting `src/app/(tabs)/plans.tsx`, `/plans/match/[category]`, and plan sheet screens.
+1. Consider the Phase 2 date-plan dedupe-key hardening slice only if the current MVP semantics stay stable.
+2. Expand the unit harness around the next pure helper only when it avoids React Native/Convex runtime coupling.
 3. If changing mobile UI, rerun targeted `pnpm format:check`, `pnpm lint`, `pnpm typecheck`, `git diff --check`, and an Argent walkthrough/screenshot for the changed route.
 
 ## Blockers / questions

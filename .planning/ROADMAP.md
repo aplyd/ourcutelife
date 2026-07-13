@@ -41,6 +41,7 @@ Current implementation order:
 - [x] Tighten date decoration so private unmatched partner-created plan items are not revealed through date surfaces.
 - [x] Polish remaining visible copy for plan-item/date terminology in swipe/history routes.
 - [x] Rebuild/reinstall dev app on the iOS 26.5 simulator and run Argent Today → Chat → Plans → Me walkthrough evidence.
+- [x] Audit remaining Plans route copy for plan-item/date terminology mismatches.
 - [ ] Consider date-plan dedupe-key hardening after MVP semantics/verification are stable.
 
 ## Phase 3 — Agentic engineering foundation
@@ -56,6 +57,7 @@ Current implementation order:
 - [ ] Add worksheet template and git-tag convention.
 - [ ] Add scripted Argent visual-regression baseline flow.
 - [x] Add real test harness plan beyond lint/typecheck/Argent smoke.
+- [x] Add no-new-dependency unit harness starter for date-plan privacy helper coverage.
 
 ## Phase 4 — Polish, verification, and shipping
 

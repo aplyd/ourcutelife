@@ -2,6 +2,7 @@ node_modules/
 .expo/
 dist/
 build/
+.tmp/
 ios/
 android/
 *.local

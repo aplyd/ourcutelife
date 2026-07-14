@@ -325,7 +325,9 @@ function DateCard({
       <View className="flex-row items-center justify-between gap-3">
         <Text className="flex-1 text-2xl font-bold text-ink">{date.title}</Text>
         <Text className="rounded-full bg-[#ecfeff] px-3 py-1 text-xs font-bold uppercase text-[#0e7490]">
-          {date.savedStatus ?? (date.likedByViewer ? "liked" : "date")}
+          {date.savedStatus === "completed" && date.ratingAverage
+            ? "rated"
+            : (date.savedStatus ?? (date.likedByViewer ? "liked" : "date"))}
         </Text>
       </View>
       <Text className="text-base leading-6 text-muted">{date.summary}</Text>

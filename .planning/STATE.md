@@ -1,10 +1,10 @@
 # State
 
-Updated: 2026-07-14T09:52:14-07:00
+Updated: 2026-07-14T10:00:09-07:00
 
 ## Current position
 
-Our Cute Life is on `main` with local commits ahead of origin. Current autonomous lane is Phase 2 date-plans restructure after Phase 1 relationship-app navigation/screens received simulator evidence. Date cards now expose the actual day for completed dates and the day/time for scheduled dates, and the mock-auth simulator can exercise date lifecycle changes visibly.
+Our Cute Life is on `main` with local commits ahead of origin. Current autonomous lane is Phase 2 date-plans restructure after Phase 1 relationship-app navigation/screens received simulator evidence. Date cards now visibly distinguish rated dates from merely completed dates, expose the actual day for completed dates and the day/time for scheduled dates, and the mock-auth simulator can exercise date lifecycle changes visibly.
 
 ## What exists
 
@@ -17,6 +17,9 @@ Our Cute Life is on `main` with local commits ahead of origin. Current autonomou
 
 ## Latest work / verification
 
+- Date cards now show a `RATED` lifecycle badge once a completed date has rating data, rather than continuing to present it as only `COMPLETED`.
+- Argent proof on iPhone 17 Pro / iOS 26.5 rated the mock Coffee walk and described both the `RATED` badge and `★ 4.0`; the post-walkthrough debugger log registry had 0 entries.
+- Verification on 2026-07-14: `pnpm format:fix`, `pnpm format:check`, `pnpm typecheck`, `pnpm lint` (0 warnings/errors), `pnpm test:unit` (17 passing), `git diff --check`, live mock-auth rating walkthrough, and `tools/agent_review` passed.
 - Added the completion day directly to completed date cards so `Our Dates` preserves when a finished date happened instead of showing only a `COMPLETED` badge.
 - Argent proof on iPhone 17 Pro / iOS 26.5 completed the mock Coffee walk and described both the `COMPLETED` status and `Completed Tue, Jul 14` card text; the post-walkthrough debugger log registry had 0 entries.
 - Verification on 2026-07-14: `pnpm format:fix`, `pnpm format:check`, `pnpm typecheck`, `pnpm lint` (0 warnings/errors), `pnpm test:unit` (17 passing), `git diff --check`, mock-auth Debug `xcodebuild` (`BUILD SUCCEEDED`), Argent reinstall, and live completion walkthrough.

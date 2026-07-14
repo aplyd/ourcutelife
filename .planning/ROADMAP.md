@@ -45,6 +45,10 @@ Current implementation order:
 - [x] Add date-plan dedupe-key hardening after MVP semantics/verification are stable.
 - [x] Draft the safe backfill plan for existing date plans that lack `itemKey`.
 - [x] Add/run a no-live-service validation path for the item-key backfill before any approved live migration.
+- [x] Make mock-auth date lifecycle actions stateful for reliable simulator walkthroughs.
+- [x] Show scheduled/completed timing and rated lifecycle state directly on date cards.
+- [x] Present affordability tiers as `Free`/`$`/`$$` instead of literal-looking dollar amounts.
+- [ ] Audit the next bounded accepted-spec Plans/date UX mismatch before changing production behavior.
 
 ## Phase 3 — Agentic engineering foundation
 

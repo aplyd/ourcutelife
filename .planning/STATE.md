@@ -1,10 +1,10 @@
 # State
 
-Updated: 2026-07-14T02:52:51-07:00
+Updated: 2026-07-14T06:22:33-07:00
 
 ## Current position
 
-Our Cute Life is on `main` with local commits ahead of origin and one uncommitted Phase 2 mock-runtime verification improvement. Current autonomous lane is Phase 2 date-plans restructure after Phase 1 relationship-app navigation/screens received simulator evidence. The mock-auth simulator can now exercise date lifecycle changes visibly, removing the previous no-op limitation for Plans walkthroughs.
+Our Cute Life is on `main` with local commits ahead of origin. Current autonomous lane is Phase 2 date-plans restructure after Phase 1 relationship-app navigation/screens received simulator evidence. Scheduled dates now expose their actual day and time on the date card, and the mock-auth simulator can exercise date lifecycle changes visibly.
 
 ## What exists
 
@@ -17,12 +17,16 @@ Our Cute Life is on `main` with local commits ahead of origin and one uncommitte
 
 ## Latest work / verification
 
+- Added the scheduled day and time directly to scheduled date cards so `Our Dates` communicates when a plan will happen rather than only showing a status badge.
+- Argent proof on iPhone 17 Pro / iOS 26.5 scheduled the mock Coffee walk and described both the `SCHEDULED` status and `Scheduled Tue, Jul 14 at 7:00 PM` card text.
+- Verification on 2026-07-14: `pnpm format:fix`, `pnpm typecheck`, `pnpm lint` (0 warnings/errors), `pnpm test:unit` (17 passing), `git diff --check`, mock-auth Debug `xcodebuild` (`BUILD SUCCEEDED`), Argent reinstall/restart, and live scheduling walkthrough.
+
+## Previous work / verification
+
 - Made the mock-auth Plans runtime stateful for date likes, saves, scheduling, completion, and rating so simulator actions visibly update the date card rather than silently no-op.
 - Added complete date-card fixture fields so the simulator shows meaningful duration, cost, matched count, and saved lifecycle state.
 - Argent proof on iPhone 17 Pro / iOS 26.5 exercised `Our Dates` through saved → completed → scheduled → completed; the status badge updated at each transition and scheduling cleared the prior completion in the mock runtime.
 - Verification on 2026-07-14: `pnpm format:fix`, `pnpm typecheck`, `pnpm lint` (0 warnings/errors), `pnpm test:unit` (17 passing), `git diff --check`, clean app restart, and post-walkthrough debugger log registry (0 entries).
-
-## Previous work / verification
 
 - Added a pure `shouldCreateDatePlanForItems` decision boundary and wired both single-item and pair date generation through it, so the legacy fallback dedupe behavior is directly testable without a live Convex environment.
 - Added three creation-path tests proving an existing single-item date is skipped, pair order does not create a duplicate, and a genuinely new item bundle is allowed.
@@ -42,8 +46,8 @@ No hard blocker for local code/planning slices. Do not deploy, run production mi
 
 ## Next safe actions
 
-1. Add focused automated coverage for the stateful mock mutation reducer if the mock runtime expands further.
-2. Audit the next bounded Phase 2 Plans/date UX mismatch against the accepted spec before changing production behavior.
+1. Audit the next bounded Phase 2 Plans/date UX mismatch against the accepted spec before changing production behavior.
+2. Add focused automated coverage for the stateful mock mutation reducer if the mock runtime expands further.
 3. Keep the optional `itemKey` backfill local/dry-run only until Austin explicitly approves any live migration.
 
 ## Blockers / questions

@@ -329,6 +329,11 @@ function DateCard({
         </Text>
       </View>
       <Text className="text-base leading-6 text-muted">{date.summary}</Text>
+      {date.savedStatus === "scheduled" && date.scheduledFor ? (
+        <Text className="text-sm font-semibold text-ink">
+          Scheduled {formatScheduledDate(date.scheduledFor)}
+        </Text>
+      ) : null}
       {itemNames ? <Text className="text-sm font-semibold text-ink">{itemNames}</Text> : null}
       {date.freeformSteps?.length ? (
         <Text className="text-sm leading-5 text-muted">+ {date.freeformSteps.join(" · ")}</Text>
@@ -372,6 +377,16 @@ function Action({ label, onPress }: { label: string; onPress: () => void }) {
       <Text className="font-bold text-app-bg">{label}</Text>
     </Pressable>
   );
+}
+
+function formatScheduledDate(timestamp: number) {
+  return new Date(timestamp).toLocaleString(undefined, {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
 }
 
 function EmptyCopy({ text }: { text: string }) {

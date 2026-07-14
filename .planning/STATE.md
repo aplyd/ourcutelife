@@ -1,10 +1,10 @@
 # State
 
-Updated: 2026-07-14T13:04:46-07:00
+Updated: 2026-07-14T16:08:26-07:00
 
 ## Current position
 
-Our Cute Life is on `main` with local commits ahead of origin. Current autonomous lane is Phase 2 date-plans restructure after Phase 1 relationship-app navigation/screens received simulator evidence. Date cards now visibly distinguish rated dates from merely completed dates, expose lifecycle timing, and present cost tiers as `Free`/`$`/`$$` rather than misleading dollar amounts; the mock-auth simulator can exercise date lifecycle changes visibly.
+Our Cute Life is on `main` with local commits ahead of origin. Current autonomous lane is Phase 2 date-plans restructure after Phase 1 relationship-app navigation/screens received simulator evidence. Explore Dates now stays focused on choosing a recommendation through Like or Save; scheduling, completion, and rating remain actions on the couple-owned Our Dates list.
 
 ## What exists
 
@@ -17,6 +17,9 @@ Our Cute Life is on `main` with local commits ahead of origin. Current autonomou
 
 ## Latest work / verification
 
+- Removed Schedule, Complete, and quick-rate controls from Explore Dates cards so a recommendation cannot visually skip the accepted Like/Save → Our Dates decision flow; lifecycle controls remain available on the same date in Our Dates.
+- Argent proof on Plans / iPhone 17 Pro / iOS 26.5 described the Explore Coffee walk card with only Like and Saved controls, while the Our Dates copy retained Schedule, Complete, and rating controls.
+- Verification on 2026-07-14: `pnpm format:fix`, `pnpm format:check`, `pnpm typecheck`, `pnpm lint` (0 warnings/errors), `pnpm test:unit` (17 passing), `git diff --check`, and live mock-auth Plans walkthrough/screenshot. The debugger registry still contains the previously documented transient `formatCostLevel` hot-reload error from an earlier edit; no matching runtime failure appeared in this walkthrough.
 - Corrected date-card cost presentation so numeric affordability tiers no longer look like literal prices such as `$1`; free dates now read `Free` and paid tiers use familiar dollar-sign bands.
 - Argent proof on Plans / iPhone 17 Pro / iOS 26.5 described the mock Coffee walk with a `$` cost tier in place of `$1`; the screen remained usable after the live refresh. One transient `formatCostLevel` hot-reload error was captured while the helper was being added in a separate edit, but the final rendered screen and connected debugger confirmed the completed bundle.
 - Verification on 2026-07-14: `pnpm format:fix`, `pnpm typecheck`, `pnpm lint` (0 warnings/errors), `pnpm test:unit` (17 passing), `git diff --check`, and live mock-auth Plans walkthrough/screenshot.
@@ -56,7 +59,7 @@ No hard blocker for local code/planning slices. Do not deploy, run production mi
 
 ## Next safe actions
 
-1. Audit the next bounded Phase 2 Plans/date UX mismatch against the accepted spec before changing production behavior.
+1. Audit whether lifecycle controls within Our Dates should progress by state (for example, rating only after completion) before changing production behavior.
 2. Add focused automated coverage for the stateful mock mutation reducer if the mock runtime expands further.
 3. Keep the optional `itemKey` backfill local/dry-run only until Austin explicitly approves any live migration.
 

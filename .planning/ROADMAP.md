@@ -48,7 +48,8 @@ Current implementation order:
 - [x] Make mock-auth date lifecycle actions stateful for reliable simulator walkthroughs.
 - [x] Show scheduled/completed timing and rated lifecycle state directly on date cards.
 - [x] Present affordability tiers as `Free`/`$`/`$$` instead of literal-looking dollar amounts.
-- [ ] Audit the next bounded accepted-spec Plans/date UX mismatch before changing production behavior.
+- [x] Audit and fix the next bounded accepted-spec Plans/date UX mismatch: keep scheduling, completion, and rating inside Our Dates rather than on Explore recommendations.
+- [ ] Audit lifecycle-action clarity within Our Dates before changing additional production behavior.
 
 ## Phase 3 — Agentic engineering foundation
 

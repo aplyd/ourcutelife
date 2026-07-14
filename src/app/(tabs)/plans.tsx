@@ -138,6 +138,7 @@ export default function PlansTab(): JSX.Element {
               <DateCard
                 key={date._id}
                 date={date}
+                showLifecycleActions
                 onLike={likeDate}
                 onSave={saveDate}
                 onSchedule={scheduleTonight}
@@ -306,6 +307,7 @@ function Section({
 
 function DateCard({
   date,
+  showLifecycleActions = false,
   onLike,
   onSave,
   onSchedule,
@@ -313,6 +315,7 @@ function DateCard({
   onRate,
 }: {
   date: any;
+  showLifecycleActions?: boolean;
   onLike: any;
   onSave: any;
   onSchedule: any;
@@ -370,9 +373,13 @@ function DateCard({
           label={date.isSaved ? "Saved" : "Save"}
           onPress={() => onSave({ datePlanId: date._id })}
         />
-        <Action label="Schedule" onPress={() => onSchedule(date._id)} />
-        <Action label="Complete" onPress={() => onComplete({ datePlanId: date._id })} />
-        <Action label="😍" onPress={() => onRate(date._id, 4)} />
+        {showLifecycleActions ? (
+          <>
+            <Action label="Schedule" onPress={() => onSchedule(date._id)} />
+            <Action label="Complete" onPress={() => onComplete({ datePlanId: date._id })} />
+            <Action label="😍" onPress={() => onRate(date._id, 4)} />
+          </>
+        ) : null}
       </View>
     </View>
   );

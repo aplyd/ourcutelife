@@ -176,6 +176,7 @@ export default defineSchema({
     .index("by_user_and_match", ["userId", "matchId"]),
   datePlans: defineTable({
     coupleId: v.id("couples"),
+    itemKey: v.optional(v.string()),
     title: v.string(),
     summary: v.string(),
     itemIds: v.array(v.id("planIdeas")),
@@ -191,6 +192,7 @@ export default defineSchema({
     createdAt: v.number(),
   })
     .index("by_couple_and_created_at", ["coupleId", "createdAt"])
+    .index("by_couple_and_item_key", ["coupleId", "itemKey"])
     .index("by_couple_and_popularity", ["coupleId", "popularityScore"])
     .index("by_couple_and_trending", ["coupleId", "trendingScore"]),
   datePlanLikes: defineTable({

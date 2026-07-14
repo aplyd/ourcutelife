@@ -3,6 +3,7 @@ import type { Id } from "./_generated/dataModel";
 import type { MutationCtx } from "./_generated/server";
 import { mutation } from "./_generated/server";
 import { getCurrentAppUser } from "./auth";
+import { createDatePlanItemKey } from "./datePlanDedupe";
 
 const PAIRING_CODE_TTL_MS = 1000 * 60 * 60 * 24 * 7;
 
@@ -330,11 +331,13 @@ export const pairWithTestPartner = mutation({
         .withIndex("by_couple_and_created_at", (q) => q.eq("coupleId", activeCoupleId))
         .collect();
       if (!existingDates.some((date) => date.title === "Gunther's → Dimple Records")) {
+        const itemIds = matchedIdeaIds.slice(0, 2);
         await ctx.db.insert("datePlans", {
           coupleId: activeCoupleId,
           title: "Gunther's → Dimple Records",
           summary: "Ice cream first, then browse records and pick something weird for each other.",
-          itemIds: matchedIdeaIds.slice(0, 2),
+          itemIds,
+          itemKey: createDatePlanItemKey(itemIds),
           freeformSteps: ["Get cones", "Browse one aisle each", "Trade one pick"],
           durationMinutes: 90,
           costLevel: 1,
@@ -348,11 +351,13 @@ export const pairWithTestPartner = mutation({
         });
       }
       if (!existingDates.some((date) => date.title === "Gunther's to-go → puzzle night")) {
+        const itemIds = [matchedIdeaIds[0], matchedIdeaIds[2]];
         await ctx.db.insert("datePlans", {
           coupleId: activeCoupleId,
           title: "Gunther's to-go → puzzle night",
           summary: "Grab ice cream, head home, and make the night intentionally cozy.",
-          itemIds: [matchedIdeaIds[0], matchedIdeaIds[2]],
+          itemIds,
+          itemKey: createDatePlanItemKey(itemIds),
           freeformSteps: ["Pick up ice cream", "Put phones away", "Finish one puzzle section"],
           durationMinutes: 120,
           costLevel: 1,

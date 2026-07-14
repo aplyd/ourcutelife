@@ -3,6 +3,14 @@ import type { Doc, Id } from "./_generated/dataModel";
 import type { MutationCtx, QueryCtx } from "./_generated/server";
 import { mutation, query } from "./_generated/server";
 import { getCurrentAppUser } from "./auth";
+import { createDatePlanItemKey, shouldCreateDatePlanForItems } from "./datePlanDedupe";
+import {
+  createScheduledDatePlanState,
+  shouldCountDateCompletionEngagement,
+  shouldCountDateLikeEngagement,
+  shouldCountDateSaveEngagement,
+  summarizeDatePlanRatings,
+} from "./datePlanState";
 import { canRevealDatePlanItem } from "./planPrivacy";
 
 const categoryValidator = v.union(
@@ -233,11 +241,13 @@ export const seedDemoPartnerData = mutation({
       .withIndex("by_couple_and_created_at", (q) => q.eq("coupleId", coupleId))
       .collect();
     if (!existingDates.some((date) => date.title === "Gunther's → Dimple Records")) {
+      const itemIds = ideaIds.slice(0, 2);
       await ctx.db.insert("datePlans", {
         coupleId,
         title: "Gunther's → Dimple Records",
         summary: "Ice cream first, then browse records and pick something weird for each other.",
-        itemIds: ideaIds.slice(0, 2),
+        itemIds,
+        itemKey: createDatePlanItemKey(itemIds),
         freeformSteps: ["Get cones", "Browse one aisle each", "Trade one pick"],
         durationMinutes: 90,
         costLevel: 1,
@@ -251,11 +261,13 @@ export const seedDemoPartnerData = mutation({
       });
     }
     if (!existingDates.some((date) => date.title === "Gunther's to-go → puzzle night")) {
+      const itemIds = [ideaIds[0], ideaIds[2]];
       await ctx.db.insert("datePlans", {
         coupleId,
         title: "Gunther's to-go → puzzle night",
         summary: "Grab ice cream, head home, and make the night intentionally cozy.",
-        itemIds: [ideaIds[0], ideaIds[2]],
+        itemIds,
+        itemKey: createDatePlanItemKey(itemIds),
         freeformSteps: ["Pick up ice cream", "Put phones away", "Finish one puzzle section"],
         durationMinutes: 120,
         costLevel: 1,
@@ -371,11 +383,20 @@ async function decorateDatePlan(
 }
 
 async function ensureDateForIdea(ctx: MutationCtx, idea: Doc<"planIdeas">) {
+  const itemIds = [idea._id];
+  const itemKey = createDatePlanItemKey(itemIds);
+  const existingByKey = await ctx.db
+    .query("datePlans")
+    .withIndex("by_couple_and_item_key", (q) =>
+      q.eq("coupleId", idea.coupleId).eq("itemKey", itemKey),
+    )
+    .first();
+  if (existingByKey) return;
   const existing = await ctx.db
     .query("datePlans")
     .withIndex("by_couple_and_created_at", (q) => q.eq("coupleId", idea.coupleId))
     .take(100);
-  if (existing.some((plan) => plan.itemIds.length === 1 && plan.itemIds[0] === idea._id)) return;
+  if (!shouldCreateDatePlanForItems(itemIds, existing)) return;
   const isPlace = inferKind(idea) === "place";
   await ctx.db.insert("datePlans", {
     coupleId: idea.coupleId,
@@ -383,7 +404,8 @@ async function ensureDateForIdea(ctx: MutationCtx, idea: Doc<"planIdeas">) {
     summary: isPlace
       ? `Start with ${idea.title}, then add one easy nearby or at-home follow-up.`
       : idea.description,
-    itemIds: [idea._id],
+    itemIds,
+    itemKey,
     freeformSteps: isPlace ? ["Add an easy second stop", "Leave room to bail or extend"] : [],
     durationMinutes: Math.max(idea.durationMinutes, 60),
     costLevel: idea.costLevel,
@@ -403,18 +425,19 @@ async function ensureDateForPair(
 ) {
   if (first._id === second._id || first.coupleId !== second.coupleId) return;
   const itemIds = [first._id, second._id].sort() as Array<Id<"planIdeas">>;
+  const itemKey = createDatePlanItemKey(itemIds);
+  const existingByKey = await ctx.db
+    .query("datePlans")
+    .withIndex("by_couple_and_item_key", (q) =>
+      q.eq("coupleId", first.coupleId).eq("itemKey", itemKey),
+    )
+    .first();
+  if (existingByKey) return;
   const existing = await ctx.db
     .query("datePlans")
     .withIndex("by_couple_and_created_at", (q) => q.eq("coupleId", first.coupleId))
     .take(100);
-  if (
-    existing.some(
-      (plan) =>
-        plan.itemIds.length === 2 &&
-        [...plan.itemIds].sort().every((itemId, index) => itemId === itemIds[index]),
-    )
-  )
-    return;
+  if (!shouldCreateDatePlanForItems(itemIds, existing)) return;
   const firstIsPlace = inferKind(first) === "place";
   const secondIsPlace = inferKind(second) === "place";
   const title =
@@ -426,6 +449,7 @@ async function ensureDateForPair(
     title,
     summary: `A lightweight date built from two mutual yeses: ${first.title} and ${second.title}.`,
     itemIds,
+    itemKey,
     freeformSteps: ["Keep it flexible", "Save the best part for last"],
     durationMinutes: Math.max(60, Math.min(first.durationMinutes + second.durationMinutes, 240)),
     costLevel: Math.max(first.costLevel, second.costLevel),
@@ -784,7 +808,8 @@ export const likeDate = mutation({
     ).length;
     if (likes.length >= memberCount)
       await saveDatePlan(ctx, membership.coupleId, args.datePlanId, user._id);
-    await ctx.db.patch(args.datePlanId, { trendingScore: plan.trendingScore + 1 });
+    if (shouldCountDateLikeEngagement(existing !== null))
+      await ctx.db.patch(args.datePlanId, { trendingScore: plan.trendingScore + 1 });
     return likes.length;
   },
 });
@@ -794,18 +819,27 @@ async function saveDatePlan(
   coupleId: Id<"couples">,
   datePlanId: Id<"datePlans">,
   userId: Id<"users">,
-) {
+): Promise<{
+  previousStatus: "saved" | "scheduled" | "completed" | "archived" | null;
+  savedDatePlanId: Id<"savedDatePlans">;
+  shouldCountEngagement: boolean;
+}> {
   const existing = await ctx.db
     .query("savedDatePlans")
     .withIndex("by_date_plan", (q) => q.eq("datePlanId", datePlanId))
     .first();
   const now = Date.now();
   if (existing) {
+    const shouldCountEngagement = shouldCountDateSaveEngagement(existing.status);
     if (existing.status === "archived")
       await ctx.db.patch(existing._id, { status: "saved", updatedAt: now });
-    return existing._id;
+    return {
+      previousStatus: existing.status,
+      savedDatePlanId: existing._id,
+      shouldCountEngagement,
+    };
   }
-  return await ctx.db.insert("savedDatePlans", {
+  const savedDatePlanId = await ctx.db.insert("savedDatePlans", {
     coupleId,
     datePlanId,
     savedByUserId: userId,
@@ -813,6 +847,7 @@ async function saveDatePlan(
     createdAt: now,
     updatedAt: now,
   });
+  return { previousStatus: null, savedDatePlanId, shouldCountEngagement: true };
 }
 
 export const saveDate = mutation({
@@ -821,11 +856,17 @@ export const saveDate = mutation({
     const { user, membership } = await requireSession(ctx);
     const plan = await ctx.db.get(args.datePlanId);
     if (!plan || plan.coupleId !== membership.coupleId) throw new Error("Date unavailable.");
-    await saveDatePlan(ctx, membership.coupleId, args.datePlanId, user._id);
-    await ctx.db.patch(args.datePlanId, {
-      popularityScore: plan.popularityScore + 1,
-      trendingScore: plan.trendingScore + 2,
-    });
+    const { shouldCountEngagement } = await saveDatePlan(
+      ctx,
+      membership.coupleId,
+      args.datePlanId,
+      user._id,
+    );
+    if (shouldCountEngagement)
+      await ctx.db.patch(args.datePlanId, {
+        popularityScore: plan.popularityScore + 1,
+        trendingScore: plan.trendingScore + 2,
+      });
     return true;
   },
 });
@@ -836,12 +877,16 @@ export const scheduleDate = mutation({
     const { user, membership } = await requireSession(ctx);
     const plan = await ctx.db.get(args.datePlanId);
     if (!plan || plan.coupleId !== membership.coupleId) throw new Error("Date unavailable.");
-    const savedId = await saveDatePlan(ctx, membership.coupleId, args.datePlanId, user._id);
-    await ctx.db.patch(savedId, {
-      status: "scheduled",
-      scheduledFor: args.scheduledFor,
-      updatedAt: Date.now(),
-    });
+    const { savedDatePlanId } = await saveDatePlan(
+      ctx,
+      membership.coupleId,
+      args.datePlanId,
+      user._id,
+    );
+    await ctx.db.patch(
+      savedDatePlanId,
+      createScheduledDatePlanState(args.scheduledFor, Date.now()),
+    );
     return true;
   },
 });
@@ -852,16 +897,22 @@ export const completeDate = mutation({
     const { user, membership } = await requireSession(ctx);
     const plan = await ctx.db.get(args.datePlanId);
     if (!plan || plan.coupleId !== membership.coupleId) throw new Error("Date unavailable.");
-    const savedId = await saveDatePlan(ctx, membership.coupleId, args.datePlanId, user._id);
-    await ctx.db.patch(savedId, {
+    const { previousStatus, savedDatePlanId } = await saveDatePlan(
+      ctx,
+      membership.coupleId,
+      args.datePlanId,
+      user._id,
+    );
+    await ctx.db.patch(savedDatePlanId, {
       status: "completed",
       completedAt: Date.now(),
       updatedAt: Date.now(),
     });
-    await ctx.db.patch(args.datePlanId, {
-      popularityScore: plan.popularityScore + 3,
-      trendingScore: plan.trendingScore + 3,
-    });
+    if (shouldCountDateCompletionEngagement(previousStatus))
+      await ctx.db.patch(args.datePlanId, {
+        popularityScore: plan.popularityScore + 3,
+        trendingScore: plan.trendingScore + 3,
+      });
     return true;
   },
 });
@@ -898,9 +949,7 @@ export const rateDate = mutation({
       .query("datePlanRatings")
       .withIndex("by_date_plan", (q) => q.eq("datePlanId", args.datePlanId))
       .take(20);
-    const average =
-      ratings.reduce((sum, rating) => sum + rating.rating, 0) / Math.max(ratings.length, 1);
-    await ctx.db.patch(args.datePlanId, { ratingAverage: average, ratingCount: ratings.length });
+    await ctx.db.patch(args.datePlanId, summarizeDatePlanRatings(ratings));
     return true;
   },
 });

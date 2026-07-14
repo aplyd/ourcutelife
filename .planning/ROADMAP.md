@@ -9,7 +9,7 @@ Source spec: `docs/product-spec-relationship-app-restructure.md`
 
 Audit: `phases/01-relationship-app-restructure/01-01-AUDIT.md`
 
-Implementation status: bottom tabs are aligned around Today, Chat, Plans, and Me. Code/static checks passed. Argent can now launch an installed `com.ourcutelife.app` on an iOS 26.5 simulator, but the remaining verification gap is rebuilding/reinstalling the latest source edits and repeating the full walkthrough against that fresh build.
+Implementation status: bottom tabs are aligned around Today, Chat, Plans, and Me. Code/static checks passed, and a rebuilt/reinstalled `com.ourcutelife.app` completed the Today → Chat → Plans → Me Argent walkthrough on an iOS 26.5 simulator. Repeat focused device verification when a later UI slice changes these routes.
 
 Potential task slices:
 
@@ -42,7 +42,9 @@ Current implementation order:
 - [x] Polish remaining visible copy for plan-item/date terminology in swipe/history routes.
 - [x] Rebuild/reinstall dev app on the iOS 26.5 simulator and run Argent Today → Chat → Plans → Me walkthrough evidence.
 - [x] Audit remaining Plans route copy for plan-item/date terminology mismatches.
-- [ ] Consider date-plan dedupe-key hardening after MVP semantics/verification are stable.
+- [x] Add date-plan dedupe-key hardening after MVP semantics/verification are stable.
+- [x] Draft the safe backfill plan for existing date plans that lack `itemKey`.
+- [x] Add/run a no-live-service validation path for the item-key backfill before any approved live migration.
 
 ## Phase 3 — Agentic engineering foundation
 

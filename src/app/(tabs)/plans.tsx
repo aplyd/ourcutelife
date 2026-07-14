@@ -350,7 +350,7 @@ function DateCard({
           {date.durationMinutes} min
         </Text>
         <Text className="rounded-full bg-app-bg px-3 py-1 text-xs font-semibold text-muted">
-          ${date.costLevel}
+          {formatCostLevel(date.costLevel)}
         </Text>
         <Text className="rounded-full bg-app-bg px-3 py-1 text-xs font-semibold text-muted">
           {date.matchedItemCount} matched
@@ -384,6 +384,11 @@ function Action({ label, onPress }: { label: string; onPress: () => void }) {
       <Text className="font-bold text-app-bg">{label}</Text>
     </Pressable>
   );
+}
+
+function formatCostLevel(costLevel: number) {
+  if (costLevel <= 0) return "Free";
+  return "$".repeat(Math.min(Math.round(costLevel), 3));
 }
 
 function formatCompletedDate(timestamp: number) {

@@ -1,10 +1,10 @@
 # State
 
-Updated: 2026-07-14T06:22:33-07:00
+Updated: 2026-07-14T09:52:14-07:00
 
 ## Current position
 
-Our Cute Life is on `main` with local commits ahead of origin. Current autonomous lane is Phase 2 date-plans restructure after Phase 1 relationship-app navigation/screens received simulator evidence. Scheduled dates now expose their actual day and time on the date card, and the mock-auth simulator can exercise date lifecycle changes visibly.
+Our Cute Life is on `main` with local commits ahead of origin. Current autonomous lane is Phase 2 date-plans restructure after Phase 1 relationship-app navigation/screens received simulator evidence. Date cards now expose the actual day for completed dates and the day/time for scheduled dates, and the mock-auth simulator can exercise date lifecycle changes visibly.
 
 ## What exists
 
@@ -17,11 +17,15 @@ Our Cute Life is on `main` with local commits ahead of origin. Current autonomou
 
 ## Latest work / verification
 
+- Added the completion day directly to completed date cards so `Our Dates` preserves when a finished date happened instead of showing only a `COMPLETED` badge.
+- Argent proof on iPhone 17 Pro / iOS 26.5 completed the mock Coffee walk and described both the `COMPLETED` status and `Completed Tue, Jul 14` card text; the post-walkthrough debugger log registry had 0 entries.
+- Verification on 2026-07-14: `pnpm format:fix`, `pnpm format:check`, `pnpm typecheck`, `pnpm lint` (0 warnings/errors), `pnpm test:unit` (17 passing), `git diff --check`, mock-auth Debug `xcodebuild` (`BUILD SUCCEEDED`), Argent reinstall, and live completion walkthrough.
+
+## Previous work / verification
+
 - Added the scheduled day and time directly to scheduled date cards so `Our Dates` communicates when a plan will happen rather than only showing a status badge.
 - Argent proof on iPhone 17 Pro / iOS 26.5 scheduled the mock Coffee walk and described both the `SCHEDULED` status and `Scheduled Tue, Jul 14 at 7:00 PM` card text.
 - Verification on 2026-07-14: `pnpm format:fix`, `pnpm typecheck`, `pnpm lint` (0 warnings/errors), `pnpm test:unit` (17 passing), `git diff --check`, mock-auth Debug `xcodebuild` (`BUILD SUCCEEDED`), Argent reinstall/restart, and live scheduling walkthrough.
-
-## Previous work / verification
 
 - Made the mock-auth Plans runtime stateful for date likes, saves, scheduling, completion, and rating so simulator actions visibly update the date card rather than silently no-op.
 - Added complete date-card fixture fields so the simulator shows meaningful duration, cost, matched count, and saved lifecycle state.

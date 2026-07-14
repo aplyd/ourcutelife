@@ -1,10 +1,10 @@
 # State
 
-Updated: 2026-07-14T00:31:56-07:00
+Updated: 2026-07-14T02:52:51-07:00
 
 ## Current position
 
-Our Cute Life is on `main` with local commits ahead of origin and an in-progress dirty Phase 2 date-plan hardening slice. Current autonomous lane is Phase 2 date-plans restructure after Phase 1 relationship-app navigation/screens received simulator evidence. The next safe work should stay small, reversible, and focused on Plans/date correctness, test harness coverage, or local simulator/dev-build verification if a concrete issue reappears.
+Our Cute Life is on `main` with local commits ahead of origin and one uncommitted Phase 2 mock-runtime verification improvement. Current autonomous lane is Phase 2 date-plans restructure after Phase 1 relationship-app navigation/screens received simulator evidence. The mock-auth simulator can now exercise date lifecycle changes visibly, removing the previous no-op limitation for Plans walkthroughs.
 
 ## What exists
 
@@ -17,14 +17,19 @@ Our Cute Life is on `main` with local commits ahead of origin and an in-progress
 
 ## Latest work / verification
 
+- Made the mock-auth Plans runtime stateful for date likes, saves, scheduling, completion, and rating so simulator actions visibly update the date card rather than silently no-op.
+- Added complete date-card fixture fields so the simulator shows meaningful duration, cost, matched count, and saved lifecycle state.
+- Argent proof on iPhone 17 Pro / iOS 26.5 exercised `Our Dates` through saved → completed → scheduled → completed; the status badge updated at each transition and scheduling cleared the prior completion in the mock runtime.
+- Verification on 2026-07-14: `pnpm format:fix`, `pnpm typecheck`, `pnpm lint` (0 warnings/errors), `pnpm test:unit` (17 passing), `git diff --check`, clean app restart, and post-walkthrough debugger log registry (0 entries).
+
+## Previous work / verification
+
 - Added a pure `shouldCreateDatePlanForItems` decision boundary and wired both single-item and pair date generation through it, so the legacy fallback dedupe behavior is directly testable without a live Convex environment.
 - Added three creation-path tests proving an existing single-item date is skipped, pair order does not create a duplicate, and a genuinely new item bundle is allowed.
 - Preserved the indexed `itemKey` fast path before the bounded legacy-row comparison; no migration or external service was run.
 - Fixed date lifecycle transitions so scheduling a previously completed date starts a fresh scheduled state instead of retaining a stale completion timestamp.
 - Kept completion engagement idempotent: repeatedly completing an already-completed date still does not inflate Popular or Trending rank, while a newly rescheduled date can count as a new completion after it happens.
 - Verification on 2026-07-14: `pnpm format:fix`, `pnpm test:unit` (17 passing), `pnpm typecheck`, `pnpm format:check`, `pnpm lint` (0 warnings/errors), `git diff --check`, and `tools/agent_review` passed.
-
-## Previous work / verification
 
 - Route/screen audit documented Phase 1 navigation alignment and remaining compatibility redirects in `.planning/phases/01-relationship-app-restructure/01-04-ROUTE-SCREEN-AUDIT.md`.
 - Argent/device proof previously covered Today, Chat, Plans, Me tabs; Today Add Moment; Answer prompt; and Moments history on iPhone 17 Pro / iOS 26.5 with mock auth.
@@ -37,8 +42,8 @@ No hard blocker for local code/planning slices. Do not deploy, run production mi
 
 ## Next safe actions
 
-1. Re-run an Argent Plans walkthrough with `EXPO_PUBLIC_MOCK_AUTH=1` when device/runtime verification is the highest-value next evidence.
-2. Exercise the completed → scheduled → completed date lifecycle against a local/mock runtime when the Plans walkthrough is next run.
+1. Add focused automated coverage for the stateful mock mutation reducer if the mock runtime expands further.
+2. Audit the next bounded Phase 2 Plans/date UX mismatch against the accepted spec before changing production behavior.
 3. Keep the optional `itemKey` backfill local/dry-run only until Austin explicitly approves any live migration.
 
 ## Blockers / questions

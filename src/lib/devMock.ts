@@ -1,5 +1,6 @@
 import { getFunctionName } from "convex/server";
 import { useMutation, useQuery } from "convex/react";
+import { useSyncExternalStore } from "react";
 
 const TRUE_VALUES = new Set(["1", "true", "yes", "on"]);
 
@@ -95,17 +96,45 @@ const mockMatch = {
   status: "matched" as const,
 };
 
-const mockDatePlan = {
+let mockDatePlan = {
   _id: "mock_date_plan" as never,
   _creationTime: now,
   coupleId: mockCouple._id,
   title: "Coffee walk",
   summary: "Grab coffee and take a long walk somewhere pretty.",
+  itemIds: [],
+  freeformSteps: [],
+  durationMinutes: 60,
+  costLevel: 1,
+  matchedItemCount: 0,
+  likedByViewer: false,
+  likeCount: 0,
+  ratingAverage: null as number | null,
+  isSaved: true,
+  savedStatus: "saved" as "saved" | "scheduled" | "completed",
   scheduledFor: now + 172_800_000,
-  status: "planned" as const,
+  completedAt: null as number | null,
   createdAt: now,
   updatedAt: now,
 };
+
+let mockVersion = 0;
+const mockListeners = new Set<() => void>();
+
+function updateMockDatePlan(patch: Partial<typeof mockDatePlan>) {
+  mockDatePlan = { ...mockDatePlan, ...patch, updatedAt: Date.now() };
+  mockVersion += 1;
+  for (const listener of mockListeners) listener();
+}
+
+function subscribeToMockData(listener: () => void) {
+  mockListeners.add(listener);
+  return () => mockListeners.delete(listener);
+}
+
+function getMockVersion() {
+  return mockVersion;
+}
 
 const mockPrompt = {
   prompt: "What small thing made you feel loved today?",
@@ -197,17 +226,54 @@ function mockQueryResult(query: unknown, args: unknown): unknown {
 }
 
 export const useAppQuery: typeof useQuery = ((query: any, args: any): any => {
-  if (isDevMockAuthEnabled) return mockQueryResult(query, args);
+  if (isDevMockAuthEnabled) {
+    useSyncExternalStore(subscribeToMockData, getMockVersion, getMockVersion);
+    return mockQueryResult(query, args);
+  }
   return useQuery(query, args);
 }) as typeof useQuery;
 
 export const useAppMutation: typeof useMutation = ((mutation: any): any => {
   if (isDevMockAuthEnabled) {
-    return async () => ({
-      code: "123-456",
-      expiresAt: now + 86_400_000,
-      id: "mock_mutation_result",
-    });
+    const mutationName = getFunctionName(mutation as never);
+    return async (args: Record<string, unknown> = {}) => {
+      switch (mutationName) {
+        case "plans:likeDate":
+          updateMockDatePlan({ likedByViewer: true, likeCount: 1 });
+          break;
+        case "plans:saveDate":
+          updateMockDatePlan({ isSaved: true, savedStatus: "saved" });
+          break;
+        case "plans:scheduleDate":
+          updateMockDatePlan({
+            isSaved: true,
+            savedStatus: "scheduled",
+            scheduledFor: args.scheduledFor as number,
+            completedAt: null,
+          });
+          break;
+        case "plans:completeDate":
+          updateMockDatePlan({
+            isSaved: true,
+            savedStatus: "completed",
+            completedAt: Date.now(),
+          });
+          break;
+        case "plans:rateDate":
+          updateMockDatePlan({
+            isSaved: true,
+            savedStatus: "completed",
+            completedAt: mockDatePlan.completedAt ?? Date.now(),
+            ratingAverage: args.rating as number,
+          });
+          break;
+      }
+      return {
+        code: "123-456",
+        expiresAt: now + 86_400_000,
+        id: "mock_mutation_result",
+      };
+    };
   }
   return useMutation(mutation);
 }) as typeof useMutation;

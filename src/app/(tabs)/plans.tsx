@@ -365,21 +365,36 @@ function DateCard({
         ) : null}
       </View>
       <View className="flex-row flex-wrap gap-2">
-        <Action
-          label={date.likedByViewer ? "Liked" : "Like"}
-          onPress={() => onLike({ datePlanId: date._id })}
-        />
-        <Action
-          label={date.isSaved ? "Saved" : "Save"}
-          onPress={() => onSave({ datePlanId: date._id })}
-        />
         {showLifecycleActions ? (
           <>
-            <Action label="Schedule" onPress={() => onSchedule(date._id)} />
-            <Action label="Complete" onPress={() => onComplete({ datePlanId: date._id })} />
-            <Action label="😍" onPress={() => onRate(date._id, 4)} />
+            <Action
+              label={
+                date.savedStatus === "scheduled"
+                  ? "Reschedule"
+                  : date.savedStatus === "completed"
+                    ? "Plan again"
+                    : "Schedule"
+              }
+              onPress={() => onSchedule(date._id)}
+            />
+            {date.savedStatus === "completed" ? (
+              <Action label="Rate 4★" onPress={() => onRate(date._id, 4)} />
+            ) : (
+              <Action label="Mark done" onPress={() => onComplete({ datePlanId: date._id })} />
+            )}
           </>
-        ) : null}
+        ) : (
+          <>
+            <Action
+              label={date.likedByViewer ? "Liked" : "Like"}
+              onPress={() => onLike({ datePlanId: date._id })}
+            />
+            <Action
+              label={date.isSaved ? "Saved" : "Save"}
+              onPress={() => onSave({ datePlanId: date._id })}
+            />
+          </>
+        )}
       </View>
     </View>
   );

@@ -1,6 +1,6 @@
 # State
 
-Updated: 2026-07-14T16:08:26-07:00
+Updated: 2026-07-14T19:14:55-07:00
 
 ## Current position
 
@@ -17,6 +17,9 @@ Our Cute Life is on `main` with local commits ahead of origin. Current autonomou
 
 ## Latest work / verification
 
+- Clarified the Our Dates action flow: accepted dates no longer repeat Like/Saved controls, scheduled dates offer Reschedule or Mark done, and completed dates offer Plan again or an explicit 4-star rating action. Rating is no longer presented before completion.
+- Argent proof on Plans / iPhone 17 Pro / iOS 26.5 exercised completed → scheduled → completed and described the expected Plan again/Rate 4★, Reschedule/Mark done, and restored completed controls; Explore Dates retained only Like/Saved. The post-walkthrough debugger log registry had 0 entries.
+- Verification on 2026-07-14: `pnpm format:fix`, `pnpm format:check`, `pnpm typecheck`, `pnpm lint` (0 warnings/errors), `pnpm test:unit` (17 passing), `git diff --check`, and live mock-auth lifecycle walkthrough.
 - Removed Schedule, Complete, and quick-rate controls from Explore Dates cards so a recommendation cannot visually skip the accepted Like/Save → Our Dates decision flow; lifecycle controls remain available on the same date in Our Dates.
 - Argent proof on Plans / iPhone 17 Pro / iOS 26.5 described the Explore Coffee walk card with only Like and Saved controls, while the Our Dates copy retained Schedule, Complete, and rating controls.
 - Verification on 2026-07-14: `pnpm format:fix`, `pnpm format:check`, `pnpm typecheck`, `pnpm lint` (0 warnings/errors), `pnpm test:unit` (17 passing), `git diff --check`, and live mock-auth Plans walkthrough/screenshot. The debugger registry still contains the previously documented transient `formatCostLevel` hot-reload error from an earlier edit; no matching runtime failure appeared in this walkthrough.
@@ -59,7 +62,7 @@ No hard blocker for local code/planning slices. Do not deploy, run production mi
 
 ## Next safe actions
 
-1. Audit whether lifecycle controls within Our Dates should progress by state (for example, rating only after completion) before changing production behavior.
+1. Audit the remaining Phase 2 Plans/date copy and action surfaces for the next bounded accepted-spec mismatch.
 2. Add focused automated coverage for the stateful mock mutation reducer if the mock runtime expands further.
 3. Keep the optional `itemKey` backfill local/dry-run only until Austin explicitly approves any live migration.
 

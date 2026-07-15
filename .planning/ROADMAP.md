@@ -49,7 +49,7 @@ Current implementation order:
 - [x] Show scheduled/completed timing and rated lifecycle state directly on date cards.
 - [x] Present affordability tiers as `Free`/`$`/`$$` instead of literal-looking dollar amounts.
 - [x] Audit and fix the next bounded accepted-spec Plans/date UX mismatch: keep scheduling, completion, and rating inside Our Dates rather than on Explore recommendations.
-- [ ] Audit lifecycle-action clarity within Our Dates before changing additional production behavior.
+- [x] Audit lifecycle-action clarity within Our Dates and make accepted-date controls progress by state.
 
 ## Phase 3 — Agentic engineering foundation
 

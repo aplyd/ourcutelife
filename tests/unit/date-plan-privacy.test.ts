@@ -10,6 +10,7 @@ import {
 } from "../../convex/datePlanDedupe";
 import {
   createScheduledDatePlanState,
+  isValidDatePlanRating,
   shouldCountDateCompletionEngagement,
   shouldCountDateLikeEngagement,
   shouldCountDateSaveEngagement,
@@ -90,6 +91,11 @@ void test("date plan rating summaries use the latest stored ratings", () => {
     ratingAverage: 3,
     ratingCount: 3,
   });
+});
+
+void test("date plan ratings accept each whole-star choice shown in the app", () => {
+  for (const rating of [1, 2, 3, 4, 5]) assert.equal(isValidDatePlanRating(rating), true);
+  for (const rating of [0, 1.5, 6]) assert.equal(isValidDatePlanRating(rating), false);
 });
 
 void test("date plan rating summaries stay safe with no ratings", () => {

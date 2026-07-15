@@ -16,6 +16,10 @@ export type ScheduledDatePlanState = {
   updatedAt: number;
 };
 
+export function isValidDatePlanRating(rating: number): boolean {
+  return Number.isInteger(rating) && rating >= 1 && rating <= 5;
+}
+
 export function summarizeDatePlanRatings(
   ratings: ReadonlyArray<DatePlanRatingInput>,
 ): DatePlanRatingSummary {

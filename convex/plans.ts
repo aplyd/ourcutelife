@@ -6,6 +6,7 @@ import { getCurrentAppUser } from "./auth";
 import { createDatePlanItemKey, shouldCreateDatePlanForItems } from "./datePlanDedupe";
 import {
   createScheduledDatePlanState,
+  isValidDatePlanRating,
   shouldCountDateCompletionEngagement,
   shouldCountDateLikeEngagement,
   shouldCountDateSaveEngagement,
@@ -921,7 +922,8 @@ export const rateDate = mutation({
   args: { datePlanId: v.id("datePlans"), rating: v.number(), tags: v.array(v.string()) },
   handler: async (ctx, args) => {
     const { user, membership } = await requireSession(ctx);
-    if (args.rating < 1 || args.rating > 4) throw new Error("Rating must be 1-4.");
+    if (!isValidDatePlanRating(args.rating))
+      throw new Error("Rating must be a whole number from 1-5.");
     const plan = await ctx.db.get(args.datePlanId);
     if (!plan || plan.coupleId !== membership.coupleId) throw new Error("Date unavailable.");
     const existing = await ctx.db

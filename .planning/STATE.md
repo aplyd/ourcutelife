@@ -1,6 +1,6 @@
 # State
 
-Updated: 2026-07-14T22:20:26-07:00
+Updated: 2026-07-15T01:32:33-07:00
 
 ## Current position
 
@@ -16,6 +16,10 @@ Our Cute Life is on `main` with local commits ahead of origin. Current autonomou
 - Current app spine: Expo Router iOS app with Today, Chat, Plans, Me tabs; Convex-backed couples/moments/prompts/plans/date-plan flows; mock-auth simulator path for local walkthroughs.
 
 ## Latest work / verification
+
+- Fixed the real Convex rating boundary to accept the same whole-star 1–5 scale shown in Our Dates; the previous backend rejected 5★ even though the simulator mock appeared to save it. Out-of-range and fractional ratings still fail closed.
+- Argent proof on Plans / iPhone 17 Pro / iOS 26.5 selected 5★ and showed the completed Coffee walk at `★ 5.0`; debugger output contained only normal startup/info entries and no warnings or errors.
+- Verification on 2026-07-15: `pnpm format:fix`, `pnpm format:check`, `pnpm typecheck`, `pnpm lint` (0 warnings/errors), `pnpm test:unit` (18 passing), `pnpm agent:validate`, `git diff --check`, and `tools/agent_review`.
 
 - Replaced the fixed `Rate 4★` shortcut with a full 1–5 star choice on completed dates, so either partner can record the rating they actually intend.
 - Argent proof on Plans / iPhone 17 Pro / iOS 26.5 completed the mock Coffee walk, exposed all five rating choices, selected 2★, and showed the card update to `RATED` with `★ 2.0`; the debugger registry had no warnings or errors.

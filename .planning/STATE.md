@@ -1,6 +1,6 @@
 # State
 
-Updated: 2026-07-14T19:14:55-07:00
+Updated: 2026-07-14T22:20:26-07:00
 
 ## Current position
 
@@ -16,6 +16,10 @@ Our Cute Life is on `main` with local commits ahead of origin. Current autonomou
 - Current app spine: Expo Router iOS app with Today, Chat, Plans, Me tabs; Convex-backed couples/moments/prompts/plans/date-plan flows; mock-auth simulator path for local walkthroughs.
 
 ## Latest work / verification
+
+- Replaced the fixed `Rate 4★` shortcut with a full 1–5 star choice on completed dates, so either partner can record the rating they actually intend.
+- Argent proof on Plans / iPhone 17 Pro / iOS 26.5 completed the mock Coffee walk, exposed all five rating choices, selected 2★, and showed the card update to `RATED` with `★ 2.0`; the debugger registry had no warnings or errors.
+- Verification on 2026-07-14: `pnpm format:fix`, `pnpm format:check`, `pnpm typecheck`, `pnpm lint` (0 warnings/errors), `pnpm test:unit` (17 passing), `git diff --check`, `tools/agent_review`, and live mock-auth completion/rating walkthrough.
 
 - Clarified the Our Dates action flow: accepted dates no longer repeat Like/Saved controls, scheduled dates offer Reschedule or Mark done, and completed dates offer Plan again or an explicit 4-star rating action. Rating is no longer presented before completion.
 - Argent proof on Plans / iPhone 17 Pro / iOS 26.5 exercised completed → scheduled → completed and described the expected Plan again/Rate 4★, Reschedule/Mark done, and restored completed controls; Explore Dates retained only Like/Saved. The post-walkthrough debugger log registry had 0 entries.

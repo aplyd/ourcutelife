@@ -114,8 +114,7 @@ export default function PlansTab(): JSX.Element {
     Alert.alert("Scheduled", "Added to Our Dates for the next 7pm slot.");
   }
 
-  async function quickRate(datePlanId: Id<"datePlans">, rating: number) {
-    await completeDate({ datePlanId });
+  async function rateCompletedDate(datePlanId: Id<"datePlans">, rating: number) {
     await rateDate({ datePlanId, rating, tags: rating >= 3 ? ["would-do-again"] : ["not-again"] });
   }
 
@@ -143,7 +142,7 @@ export default function PlansTab(): JSX.Element {
                 onSave={saveDate}
                 onSchedule={scheduleTonight}
                 onComplete={completeDate}
-                onRate={quickRate}
+                onRate={rateCompletedDate}
               />
             ))
           ) : (
@@ -182,7 +181,7 @@ export default function PlansTab(): JSX.Element {
                 onSave={saveDate}
                 onSchedule={scheduleTonight}
                 onComplete={completeDate}
-                onRate={quickRate}
+                onRate={rateCompletedDate}
               />
             ))
           ) : (
@@ -378,7 +377,18 @@ function DateCard({
               onPress={() => onSchedule(date._id)}
             />
             {date.savedStatus === "completed" ? (
-              <Action label="Rate 4★" onPress={() => onRate(date._id, 4)} />
+              <View className="w-full gap-2">
+                <Text className="text-sm font-semibold text-muted">Your rating</Text>
+                <View className="flex-row flex-wrap gap-2">
+                  {[1, 2, 3, 4, 5].map((rating) => (
+                    <Action
+                      key={rating}
+                      label={`${rating}★`}
+                      onPress={() => onRate(date._id, rating)}
+                    />
+                  ))}
+                </View>
+              </View>
             ) : (
               <Action label="Mark done" onPress={() => onComplete({ datePlanId: date._id })} />
             )}

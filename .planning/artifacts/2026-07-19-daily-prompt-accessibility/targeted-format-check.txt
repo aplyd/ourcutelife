@@ -1,0 +1,5 @@
+$ pnpm exec oxfmt --check source/test targets
+Checking formatting...
+
+All matched files use the correct format.
+Finished in 25ms on 3 files using 12 threads.

@@ -5,6 +5,8 @@ import { mutation, query } from "./_generated/server";
 import { getCurrentAppUser } from "./auth";
 import { createDatePlanItemKey, shouldCreateDatePlanForItems } from "./datePlanDedupe";
 import {
+  canManageDatePlanForCouple,
+  canRateDatePlanForCouple,
   createScheduledDatePlanState,
   isValidDatePlanRating,
   shouldCountDateCompletionEngagement,
@@ -875,17 +877,19 @@ export const saveDate = mutation({
 export const scheduleDate = mutation({
   args: { datePlanId: v.id("datePlans"), scheduledFor: v.number() },
   handler: async (ctx, args) => {
-    const { user, membership } = await requireSession(ctx);
+    const { membership } = await requireSession(ctx);
     const plan = await ctx.db.get(args.datePlanId);
     if (!plan || plan.coupleId !== membership.coupleId) throw new Error("Date unavailable.");
-    const { savedDatePlanId } = await saveDatePlan(
-      ctx,
-      membership.coupleId,
-      args.datePlanId,
-      user._id,
-    );
+    const savedDates = await ctx.db
+      .query("savedDatePlans")
+      .withIndex("by_couple_and_date_plan", (q) =>
+        q.eq("coupleId", membership.coupleId).eq("datePlanId", args.datePlanId),
+      )
+      .take(2);
+    if (!canManageDatePlanForCouple(membership.coupleId, savedDates))
+      throw new Error("Save this date to Our Dates before scheduling it.");
     await ctx.db.patch(
-      savedDatePlanId,
+      savedDates[0]._id,
       createScheduledDatePlanState(args.scheduledFor, Date.now()),
     );
     return true;
@@ -895,21 +899,24 @@ export const scheduleDate = mutation({
 export const completeDate = mutation({
   args: { datePlanId: v.id("datePlans") },
   handler: async (ctx, args) => {
-    const { user, membership } = await requireSession(ctx);
+    const { membership } = await requireSession(ctx);
     const plan = await ctx.db.get(args.datePlanId);
     if (!plan || plan.coupleId !== membership.coupleId) throw new Error("Date unavailable.");
-    const { previousStatus, savedDatePlanId } = await saveDatePlan(
-      ctx,
-      membership.coupleId,
-      args.datePlanId,
-      user._id,
-    );
-    await ctx.db.patch(savedDatePlanId, {
+    const savedDates = await ctx.db
+      .query("savedDatePlans")
+      .withIndex("by_couple_and_date_plan", (q) =>
+        q.eq("coupleId", membership.coupleId).eq("datePlanId", args.datePlanId),
+      )
+      .take(2);
+    if (!canManageDatePlanForCouple(membership.coupleId, savedDates))
+      throw new Error("Save this date to Our Dates before completing it.");
+    const [savedDate] = savedDates;
+    await ctx.db.patch(savedDate._id, {
       status: "completed",
       completedAt: Date.now(),
       updatedAt: Date.now(),
     });
-    if (shouldCountDateCompletionEngagement(previousStatus))
+    if (shouldCountDateCompletionEngagement(savedDate.status))
       await ctx.db.patch(args.datePlanId, {
         popularityScore: plan.popularityScore + 3,
         trendingScore: plan.trendingScore + 3,
@@ -926,6 +933,14 @@ export const rateDate = mutation({
       throw new Error("Rating must be a whole number from 1-5.");
     const plan = await ctx.db.get(args.datePlanId);
     if (!plan || plan.coupleId !== membership.coupleId) throw new Error("Date unavailable.");
+    const savedDates = await ctx.db
+      .query("savedDatePlans")
+      .withIndex("by_couple_and_date_plan", (q) =>
+        q.eq("coupleId", membership.coupleId).eq("datePlanId", args.datePlanId),
+      )
+      .take(2);
+    if (!canRateDatePlanForCouple(membership.coupleId, savedDates))
+      throw new Error("Complete this date before rating it.");
     const existing = await ctx.db
       .query("datePlanRatings")
       .withIndex("by_user_and_date_plan", (q) =>

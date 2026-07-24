@@ -36,6 +36,8 @@ export default function PlanHistoryScreen(): JSX.Element {
     <ScrollView className="flex-1 bg-[#fff8f1]" contentContainerClassName="px-3 pt-16 pb-10 gap-4">
       <View className="flex-row items-center justify-between">
         <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Back to Plans"
           className="h-11 px-4 rounded-full bg-white border border-[#e6d2c2] items-center justify-center"
           onPress={() => router.back()}
         >
@@ -48,6 +50,9 @@ export default function PlanHistoryScreen(): JSX.Element {
         {categories.map((item) => (
           <Pressable
             key={item.label}
+            accessibilityRole="button"
+            accessibilityLabel={`Filter matched plan items by ${item.label}`}
+            accessibilityState={{ selected: category === item.value }}
             className={`rounded-full px-4 py-2 ${category === item.value ? "bg-[#2f211c]" : "bg-white/80 border border-[#e6d2c2]"}`}
             onPress={() => setCategory(item.value)}
           >

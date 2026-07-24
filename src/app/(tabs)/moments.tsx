@@ -11,6 +11,12 @@ const toneStyles = {
   bad: "bg-rose-100 text-rose-900",
 } as const;
 
+const toneLabels = {
+  good: "GOOD",
+  mixed: "MIXED",
+  bad: "HARD",
+} as const;
+
 function formatDate(timestamp: number): string {
   return new Intl.DateTimeFormat("en", {
     month: "short",
@@ -36,6 +42,8 @@ export default function MomentsTab(): JSX.Element {
       </View>
 
       <Pressable
+        accessibilityLabel="Log a moment"
+        accessibilityRole="button"
         className="h-14 rounded-full bg-[#7c3aed] items-center justify-center"
         onPress={() => router.push("/moments/new")}
       >
@@ -58,6 +66,8 @@ export default function MomentsTab(): JSX.Element {
           {moments.map((moment) => (
             <Pressable
               key={moment._id}
+              accessibilityLabel={`Open moment: ${moment.summary}`}
+              accessibilityRole="button"
               className="rounded-3xl bg-white/85 p-4 border border-[#f1dfd2] gap-3"
               onPress={() => router.push(`/moments/${moment._id}`)}
             >
@@ -68,7 +78,7 @@ export default function MomentsTab(): JSX.Element {
                 <Text
                   className={`overflow-hidden rounded-full px-3 py-1 text-xs font-bold ${toneStyles[moment.tone]}`}
                 >
-                  {moment.tone.toUpperCase()}
+                  {toneLabels[moment.tone]}
                 </Text>
               </View>
               <Text className="text-xl font-bold leading-7 text-[#2f211c]" numberOfLines={2}>

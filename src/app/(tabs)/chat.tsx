@@ -25,6 +25,15 @@ function formatTime(timestamp: number): string {
   );
 }
 
+const composerModes = [
+  ["normal", "Normal message"],
+  ["coach", "Ask coach"],
+  ["rephrase", "Rephrase before sending"],
+  ["talk", "Help us talk about this"],
+] as const;
+
+type ComposerMode = (typeof composerModes)[number][0];
+
 export default function ChatTab(): JSX.Element {
   const betterAuthSession = useSession();
   const viewer = useAppQuery(api.auth.viewer, {});
@@ -32,7 +41,7 @@ export default function ChatTab(): JSX.Element {
   const send = useAppMutation(api.chat.send);
   const [text, setText] = useState("");
   const [isSending, setIsSending] = useState(false);
-  const [mode, setMode] = useState<"normal" | "coach" | "rephrase">("normal");
+  const [mode, setMode] = useState<ComposerMode>("normal");
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const scrollRef = useRef<ScrollView | null>(null);
   const insets = useSafeAreaInsets();
@@ -131,16 +140,12 @@ export default function ChatTab(): JSX.Element {
         className="absolute left-0 right-0 px-3 gap-2"
         style={{ bottom: keyboardVisible ? 8 : Math.max(insets.bottom + 70, 82) }}
       >
-        <View className="flex-row gap-2">
-          {(
-            [
-              ["normal", "Normal"],
-              ["coach", "Ask coach"],
-              ["rephrase", "Rephrase"],
-            ] as const
-          ).map(([value, label]) => (
+        <View className="flex-row flex-wrap gap-2">
+          {composerModes.map(([value, label]) => (
             <Pressable
               key={value}
+              accessibilityRole="button"
+              accessibilityState={{ selected: mode === value }}
               className={`rounded-full px-3 py-2 shadow-sm ${mode === value ? "bg-accent" : "bg-card border border-soft"}`}
               onPress={() => setMode(value)}
             >
@@ -155,6 +160,7 @@ export default function ChatTab(): JSX.Element {
         <View className="flex-row gap-2 items-end">
           <TextInput
             multiline
+            accessibilityLabel="Chat message"
             className="max-h-32 flex-1 rounded-3xl border border-soft bg-card px-4 py-3 text-base text-ink shadow-sm"
             placeholder="Write the honest version…"
             placeholderTextColor="#8c766b"
@@ -162,6 +168,9 @@ export default function ChatTab(): JSX.Element {
             onChangeText={setText}
           />
           <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Send message"
+            accessibilityState={{ disabled: !text.trim() || isSending, busy: isSending }}
             className="h-12 rounded-full bg-accent px-5 items-center justify-center shadow-sm"
             disabled={!text.trim() || isSending}
             onPress={handleSend}

@@ -1,7 +1,7 @@
 import { useAppMutation, useAppQuery } from "@/lib/devMock";
 import { Redirect, router } from "expo-router";
 import type { JSX } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 
 import { api } from "../../../../convex/_generated/api";
@@ -11,10 +11,12 @@ export default function TodayPromptSheet(): JSX.Element {
   const betterAuthSession = useSession();
   const viewer = useAppQuery(api.auth.viewer, {});
   const todayPrompt = useAppQuery(api.prompts.today, {});
+  const startAnswering = useAppMutation(api.prompts.startAnswering);
   const saveAnswer = useAppMutation(api.prompts.answer);
   const [answer, setAnswer] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const answerStartPromiseRef = useRef<Promise<number> | null>(null);
 
   useEffect(() => {
     if (todayPrompt?.response) setAnswer(todayPrompt.response);
@@ -32,11 +34,35 @@ export default function TodayPromptSheet(): JSX.Element {
 
   const promptData = todayPrompt;
 
+  function ensureAnswerStarted(): Promise<number> {
+    if (answerStartPromiseRef.current) return answerStartPromiseRef.current;
+    const promise = startAnswering({}).catch((err) => {
+      if (answerStartPromiseRef.current === promise) answerStartPromiseRef.current = null;
+      throw err;
+    });
+    answerStartPromiseRef.current = promise;
+    return promise;
+  }
+
+  function handleAnswerChange(nextAnswer: string) {
+    const shouldStartAnswering = Boolean(
+      nextAnswer.trim() && (!answer.trim() || answerStartPromiseRef.current === null),
+    );
+    setAnswer(nextAnswer);
+    if (!shouldStartAnswering) return;
+
+    setError(null);
+    void ensureAnswerStarted().catch((err) => {
+      setError(err instanceof Error ? err.message : "Could not start today's answer.");
+    });
+  }
+
   async function handleSave() {
     if (!answer.trim()) return;
     setError(null);
     setIsSaving(true);
     try {
+      if (!promptData.response?.trim()) await ensureAnswerStarted();
       await saveAnswer({
         promptDate: promptData.promptDate,
         prompt: promptData.prompt,
@@ -65,15 +91,19 @@ export default function TodayPromptSheet(): JSX.Element {
         </Text>
       </View>
       <TextInput
+        accessibilityLabel="Daily prompt answer"
         multiline
         className="min-h-36 rounded-3xl border border-[#e6d2c2] bg-white/90 px-4 py-4 text-base leading-6 text-[#2f211c]"
         placeholder="Write your answer…"
         textAlignVertical="top"
         value={answer}
-        onChangeText={setAnswer}
+        onChangeText={handleAnswerChange}
       />
       {error ? <Text className="text-center text-sm text-red-700">{error}</Text> : null}
       <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Submit daily prompt answer"
+        accessibilityState={{ disabled: !answer.trim() || isSaving, busy: isSaving }}
         className={`h-14 rounded-full items-center justify-center ${answer.trim() && !isSaving ? "bg-[#2f211c]" : "bg-[#d8c2b4]"}`}
         disabled={!answer.trim() || isSaving}
         onPress={handleSave}

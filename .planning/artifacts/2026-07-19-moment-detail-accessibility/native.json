@@ -1,0 +1,302 @@
+{
+  "status": "ok",
+  "screenFrame": {
+    "x": 0,
+    "y": 0,
+    "width": 402,
+    "height": 874
+  },
+  "elements": [
+    {
+      "frame": {
+        "x": 12,
+        "y": 64,
+        "width": 378,
+        "height": 20
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 74
+      },
+      "normalizedFrame": {
+        "x": 0.029850746268656716,
+        "y": 0.07322654462242563,
+        "width": 0.9402985074626866,
+        "height": 0.02288329519450801
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.08466819221967964
+      },
+      "traits": ["staticText"],
+      "label": "PRIVATE MOMENT"
+    },
+    {
+      "frame": {
+        "x": 12,
+        "y": 92,
+        "width": 378,
+        "height": 40
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 112
+      },
+      "normalizedFrame": {
+        "x": 0.029850746268656716,
+        "y": 0.10526315789473684,
+        "width": 0.9402985074626866,
+        "height": 0.04576659038901602
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.12814645308924486
+      },
+      "traits": ["staticText"],
+      "label": "Good moment"
+    },
+    {
+      "frame": {
+        "x": 12,
+        "y": 140,
+        "width": 378,
+        "height": 24
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 152
+      },
+      "normalizedFrame": {
+        "x": 0.029850746268656716,
+        "y": 0.16018306636155608,
+        "width": 0.9402985074626866,
+        "height": 0.02745995423340961
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.17391304347826086
+      },
+      "traits": ["staticText"],
+      "label": "Saturday, July 18, 2026"
+    },
+    {
+      "frame": {
+        "x": 12,
+        "y": 180,
+        "width": 184,
+        "height": 44
+      },
+      "tapPoint": {
+        "x": 104,
+        "y": 202
+      },
+      "normalizedFrame": {
+        "x": 0.029850746268656716,
+        "y": 0.20594965675057209,
+        "width": 0.4577114427860697,
+        "height": 0.05034324942791762
+      },
+      "normalizedTapPoint": {
+        "x": 0.25870646766169153,
+        "y": 0.2311212814645309
+      },
+      "traits": ["button"],
+      "label": "Edit moment",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 204,
+        "y": 180,
+        "width": 186,
+        "height": 44
+      },
+      "tapPoint": {
+        "x": 297,
+        "y": 202
+      },
+      "normalizedFrame": {
+        "x": 0.5074626865671642,
+        "y": 0.20594965675057209,
+        "width": 0.4626865671641791,
+        "height": 0.05034324942791762
+      },
+      "normalizedTapPoint": {
+        "x": 0.7388059701492538,
+        "y": 0.2311212814645309
+      },
+      "traits": ["button"],
+      "label": "Delete moment",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 29,
+        "y": 257,
+        "width": 344,
+        "height": 20
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 267
+      },
+      "normalizedFrame": {
+        "x": 0.07213930348258707,
+        "y": 0.2940503432494279,
+        "width": 0.8557213930348259,
+        "height": 0.02288329519450801
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.30549199084668194
+      },
+      "traits": ["staticText"],
+      "label": "WHAT HAPPENED"
+    },
+    {
+      "frame": {
+        "x": 29,
+        "y": 289,
+        "width": 344,
+        "height": 64
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 321
+      },
+      "normalizedFrame": {
+        "x": 0.07213930348258707,
+        "y": 0.3306636155606407,
+        "width": 0.8557213930348259,
+        "height": 0.07322654462242563
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.36727688787185353
+      },
+      "traits": ["staticText"],
+      "label": "Mocked a sweet product moment so agents can verify the timeline."
+    },
+    {
+      "frame": {
+        "x": 29,
+        "y": 403,
+        "width": 344,
+        "height": 20
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 413
+      },
+      "normalizedFrame": {
+        "x": 0.07213930348258707,
+        "y": 0.4610983981693364,
+        "width": 0.8557213930348259,
+        "height": 0.02288329519450801
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.47254004576659037
+      },
+      "traits": ["staticText"],
+      "label": "HOW IT FELT"
+    },
+    {
+      "frame": {
+        "x": 29,
+        "y": 435,
+        "width": 344,
+        "height": 32
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 451
+      },
+      "normalizedFrame": {
+        "x": 0.07213930348258707,
+        "y": 0.4977116704805492,
+        "width": 0.8557213930348259,
+        "height": 0.036613272311212815
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.5160183066361556
+      },
+      "traits": ["staticText"],
+      "label": "Proud and cozy"
+    },
+    {
+      "frame": {
+        "x": 12,
+        "y": 500,
+        "width": 62.666664123535156,
+        "height": 36
+      },
+      "tapPoint": {
+        "x": 43.33333206176758,
+        "y": 518
+      },
+      "normalizedFrame": {
+        "x": 0.029850746268656716,
+        "y": 0.5720823798627003,
+        "width": 0.1558872241878984,
+        "height": 0.041189931350114416
+      },
+      "normalizedTapPoint": {
+        "x": 0.10779435836260591,
+        "y": 0.5926773455377574
+      },
+      "traits": ["staticText"],
+      "label": "agent"
+    },
+    {
+      "frame": {
+        "x": 82.66666412353516,
+        "y": 500,
+        "width": 62.00000762939453,
+        "height": 36
+      },
+      "tapPoint": {
+        "x": 113.66666793823242,
+        "y": 518
+      },
+      "normalizedFrame": {
+        "x": 0.20563846796899293,
+        "y": 0.5720823798627003,
+        "width": 0.1542288746999864,
+        "height": 0.041189931350114416
+      },
+      "normalizedTapPoint": {
+        "x": 0.2827529053189861,
+        "y": 0.5926773455377574
+      },
+      "traits": ["staticText"],
+      "label": "demo"
+    },
+    {
+      "frame": {
+        "x": 10,
+        "y": -22.33333333333333,
+        "width": 382,
+        "height": 14.333333333333329
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": -15.166666666666664
+      },
+      "normalizedFrame": {
+        "x": 0.024875621890547265,
+        "y": -0.025553012967200604,
+        "width": 0.9502487562189055,
+        "height": 0.016399694889397402
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": -0.017353165522501903
+      },
+      "traits": ["staticText"],
+      "label": "Refreshing...",
+      "viewClassName": "UILabel"
+    }
+  ]
+}

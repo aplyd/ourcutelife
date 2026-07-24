@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
+import type { MutationCtx } from "./_generated/server";
 import { internalAction, internalMutation, internalQuery, mutation } from "./_generated/server";
 import { getCurrentAppUser } from "./auth";
 
@@ -36,6 +37,27 @@ function isExpoPushToken(token: string): boolean {
   return /^ExponentPushToken\[[^\]]+\]$/.test(token) || /^ExpoPushToken\[[^\]]+\]$/.test(token);
 }
 
+async function getAuthenticatedUser(ctx: MutationCtx): Promise<Doc<"users"> | null> {
+  let appUser: Doc<"users"> | null = null;
+  try {
+    appUser = await getCurrentAppUser(ctx);
+  } catch (error) {
+    if (!(error instanceof Error) || !error.message.includes('Component "betterAuth"')) {
+      throw error;
+    }
+  }
+  if (appUser) return appUser;
+
+  const identity = await ctx.auth.getUserIdentity();
+  const authUserId = identity?.tokenIdentifier;
+  if (!authUserId) return null;
+
+  return await ctx.db
+    .query("users")
+    .withIndex("by_auth_user_id", (q) => q.eq("authUserId", authUserId))
+    .first();
+}
+
 export const registerToken = mutation({
   args: {
     token: v.string(),
@@ -44,7 +66,7 @@ export const registerToken = mutation({
     timezone: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const user = await getCurrentAppUser(ctx);
+    const user = await getAuthenticatedUser(ctx);
     if (!user) throw new Error("Not signed in.");
     if (!isExpoPushToken(args.token)) throw new Error("Invalid Expo push token.");
 
@@ -55,6 +77,9 @@ export const registerToken = mutation({
       .first();
 
     if (existing) {
+      if (existing.userId !== user._id) {
+        throw new Error("Push token already belongs to another user.");
+      }
       await ctx.db.patch(existing._id, {
         userId: user._id,
         platform: args.platform,

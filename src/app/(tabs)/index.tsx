@@ -159,6 +159,8 @@ export default function TodayTab(): JSX.Element {
             </View>
           ) : null}
           <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Answer today's daily prompt"
             className="h-11 rounded-full bg-app-bg items-center justify-center"
             onPress={() => router.push("/prompts/today")}
           >
@@ -170,6 +172,8 @@ export default function TodayTab(): JSX.Element {
 
         <View className="flex-row gap-3">
           <Pressable
+            accessibilityLabel="Open weekly game"
+            accessibilityRole="button"
             className="flex-1 aspect-square rounded-[28px] bg-card/90 border border-soft p-4 justify-between"
             onPress={() => router.push("/games/weekly")}
           >
@@ -182,6 +186,8 @@ export default function TodayTab(): JSX.Element {
             </View>
           </Pressable>
           <Pressable
+            accessibilityLabel="Open today's tiny quiz"
+            accessibilityRole="button"
             className="flex-1 aspect-square rounded-[28px] bg-card/90 border border-soft p-4 justify-between"
             onPress={() => router.push("/quizzes/today")}
           >
@@ -198,7 +204,11 @@ export default function TodayTab(): JSX.Element {
         <View className="rounded-3xl bg-card/90 p-4 border border-soft gap-4">
           <View className="flex-row items-center justify-between">
             <Text className="text-2xl font-bold text-ink">Recent moments</Text>
-            <Pressable onPress={() => router.push("/moments")}>
+            <Pressable
+              accessibilityLabel="See all moments"
+              accessibilityRole="button"
+              onPress={() => router.push("/moments")}
+            >
               <Text className="font-semibold text-[#7c3aed]">See all</Text>
             </Pressable>
           </View>
@@ -207,6 +217,8 @@ export default function TodayTab(): JSX.Element {
               {recentMoments.map((moment) => (
                 <Pressable
                   key={moment._id}
+                  accessibilityLabel={`Open moment: ${moment.summary}`}
+                  accessibilityRole="button"
                   className="flex-row items-center gap-3 py-2"
                   onPress={() => router.push(`/moments/${moment._id}`)}
                 >
@@ -231,6 +243,8 @@ export default function TodayTab(): JSX.Element {
       </ScrollView>
 
       <Pressable
+        accessibilityLabel="Add a moment"
+        accessibilityRole="button"
         className="absolute bottom-28 right-3 h-16 w-16 rounded-full bg-accent items-center justify-center shadow-lg"
         onPress={() => router.push("/moments/new")}
       >

@@ -20,6 +20,32 @@ export function isValidDatePlanRating(rating: number): boolean {
   return Number.isInteger(rating) && rating >= 1 && rating <= 5;
 }
 
+export function canRateDatePlan(status: SavedDatePlanStatus | null): boolean {
+  return status === "completed";
+}
+
+export function canRateDatePlanForCouple(
+  coupleId: string,
+  lifecycleRows: ReadonlyArray<{ coupleId: string; status: SavedDatePlanStatus }>,
+): boolean {
+  return (
+    lifecycleRows.length === 1 &&
+    lifecycleRows[0].coupleId === coupleId &&
+    canRateDatePlan(lifecycleRows[0].status)
+  );
+}
+
+export function canManageDatePlanForCouple(
+  coupleId: string,
+  lifecycleRows: ReadonlyArray<{ coupleId: string; status: SavedDatePlanStatus }>,
+): boolean {
+  return (
+    lifecycleRows.length === 1 &&
+    lifecycleRows[0].coupleId === coupleId &&
+    lifecycleRows[0].status !== "archived"
+  );
+}
+
 export function summarizeDatePlanRatings(
   ratings: ReadonlyArray<DatePlanRatingInput>,
 ): DatePlanRatingSummary {

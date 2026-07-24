@@ -56,6 +56,8 @@ export default function MeTab(): JSX.Element {
       <View className="rounded-3xl bg-card/90 p-4 border border-soft gap-4">
         <View className="items-center gap-3">
           <Pressable
+            accessibilityLabel="Edit profile photo"
+            accessibilityRole="button"
             className="h-24 w-24 overflow-hidden rounded-full bg-accent items-center justify-center"
             onPress={() => router.push("/me/profile")}
           >
@@ -70,7 +72,11 @@ export default function MeTab(): JSX.Element {
           <Text className="text-sm text-muted">Tap avatar to update your profile</Text>
         </View>
         <View className="gap-2">
-          <Pressable onPress={() => router.push("/me/profile")}>
+          <Pressable
+            accessibilityLabel="Edit name"
+            accessibilityRole="button"
+            onPress={() => router.push("/me/profile")}
+          >
             <Text className="text-sm font-semibold text-muted">Name ✎</Text>
             <TextInput
               editable={false}
@@ -87,7 +93,12 @@ export default function MeTab(): JSX.Element {
           <Text className="text-sm font-semibold text-muted">Partner</Text>
           <Text className="text-lg font-bold text-ink">{partnerName}</Text>
         </View>
-        <Pressable className="gap-1" onPress={() => router.push("/me/anniversary")}>
+        <Pressable
+          accessibilityLabel="Edit anniversary"
+          accessibilityRole="button"
+          className="gap-1"
+          onPress={() => router.push("/me/anniversary")}
+        >
           <Text className="text-sm font-semibold text-muted">Anniversary ✎</Text>
           <Text className="text-lg font-bold text-ink">{anniversary}</Text>
         </Pressable>
@@ -99,6 +110,9 @@ export default function MeTab(): JSX.Element {
           {(["light", "dark", "system"] as const).map((item) => (
             <Pressable
               key={item}
+              accessibilityLabel={`Use ${item} theme`}
+              accessibilityRole="button"
+              accessibilityState={{ selected: theme === item }}
               className={`flex-1 rounded-full py-3 items-center ${theme === item ? "bg-accent" : "bg-app-bg border border-soft"}`}
               onPress={() => setTheme(item)}
             >
@@ -115,12 +129,16 @@ export default function MeTab(): JSX.Element {
       <View className="rounded-3xl bg-card/90 p-4 border border-soft gap-3">
         <Text className="text-2xl font-bold text-ink">Account</Text>
         <Pressable
+          accessibilityLabel="Sign out"
+          accessibilityRole="button"
           className="h-12 rounded-full bg-accent items-center justify-center"
           onPress={() => void authClient.signOut()}
         >
           <Text className="font-bold text-white">Sign out</Text>
         </Pressable>
         <Pressable
+          accessibilityLabel="Leave couple"
+          accessibilityRole="button"
           className="h-12 rounded-full border border-[#fecdd3] bg-[#fff1f2] items-center justify-center"
           onPress={confirmLeaveCouple}
         >

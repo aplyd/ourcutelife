@@ -1,0 +1,76 @@
+executionPrerequisite: "A booted iPhone 17 Pro simulator has com.ourcutelife.app
+  installed from the current source with EXPO_PUBLIC_MOCK_AUTH=1. The app can
+  launch without a system dialog, is in portrait orientation, and its
+  Today/Chat/Plans/Me tab bar is visible. The flow is a non-destructive visual
+  baseline only: it does not submit forms or invoke backend mutations."
+steps:
+  - echo: Capture deterministic mock-auth baselines for the four primary tabs
+      without changing user data.
+  - tool: rotate
+    args:
+      udid: F736E64F-ED8F-475C-BD05-7C156B568F74
+      orientation: Portrait
+  - tool: launch-app
+    args:
+      udid: F736E64F-ED8F-475C-BD05-7C156B568F74
+      bundleId: com.ourcutelife.app
+  - tool: gesture-tap
+    args:
+      udid: F736E64F-ED8F-475C-BD05-7C156B568F74
+      x: 0.184
+      y: 0.941
+  - tool: await-ui-element
+    args:
+      udid: F736E64F-ED8F-475C-BD05-7C156B568F74
+      condition: visible
+      selector:
+        text: TODAY
+      timeoutMs: 5000
+  - tool: screenshot
+    args:
+      udid: F736E64F-ED8F-475C-BD05-7C156B568F74
+  - tool: gesture-tap
+    args:
+      udid: F736E64F-ED8F-475C-BD05-7C156B568F74
+      x: 0.395
+      y: 0.941
+  - tool: await-ui-element
+    args:
+      udid: F736E64F-ED8F-475C-BD05-7C156B568F74
+      condition: visible
+      selector:
+        text: COACH
+      timeoutMs: 5000
+  - tool: screenshot
+    args:
+      udid: F736E64F-ED8F-475C-BD05-7C156B568F74
+  - tool: gesture-tap
+    args:
+      udid: F736E64F-ED8F-475C-BD05-7C156B568F74
+      x: 0.605
+      y: 0.941
+  - tool: await-ui-element
+    args:
+      udid: F736E64F-ED8F-475C-BD05-7C156B568F74
+      condition: visible
+      selector:
+        text: PLANS
+      timeoutMs: 5000
+  - tool: screenshot
+    args:
+      udid: F736E64F-ED8F-475C-BD05-7C156B568F74
+  - tool: gesture-tap
+    args:
+      udid: F736E64F-ED8F-475C-BD05-7C156B568F74
+      x: 0.816
+      y: 0.941
+  - tool: await-ui-element
+    args:
+      udid: F736E64F-ED8F-475C-BD05-7C156B568F74
+      condition: visible
+      selector:
+        text: ME
+      timeoutMs: 5000
+  - tool: screenshot
+    args:
+      udid: F736E64F-ED8F-475C-BD05-7C156B568F74

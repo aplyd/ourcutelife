@@ -2,6 +2,8 @@ import { getFunctionName } from "convex/server";
 import { useMutation, useQuery } from "convex/react";
 import { useSyncExternalStore } from "react";
 
+import { applyMockDatePlanMutation, type MockDatePlanMutationName } from "@/lib/mockDatePlanState";
+
 const TRUE_VALUES = new Set(["1", "true", "yes", "on"]);
 
 export const isDevMockAuthEnabled =
@@ -78,6 +80,7 @@ const mockPlanIdea = {
   coupleId: mockCouple._id,
   title: "Sunset picnic QA date",
   description: "A mock plan idea used for local simulator verification.",
+  kind: "activity" as const,
   category: "date" as const,
   costLevel: 2,
   durationMinutes: 90,
@@ -112,7 +115,7 @@ let mockDatePlan = {
   ratingAverage: null as number | null,
   isSaved: true,
   savedStatus: "saved" as "saved" | "scheduled" | "completed",
-  scheduledFor: now + 172_800_000,
+  scheduledFor: (now + 172_800_000) as number | null,
   completedAt: null as number | null,
   createdAt: now,
   updatedAt: now,
@@ -121,8 +124,10 @@ let mockDatePlan = {
 let mockVersion = 0;
 const mockListeners = new Set<() => void>();
 
-function updateMockDatePlan(patch: Partial<typeof mockDatePlan>) {
-  mockDatePlan = { ...mockDatePlan, ...patch, updatedAt: Date.now() };
+function updateMockDatePlan(mutationName: MockDatePlanMutationName, args: Record<string, unknown>) {
+  const nextDatePlan = applyMockDatePlanMutation(mockDatePlan, mutationName, args, Date.now());
+  if (nextDatePlan === mockDatePlan) return;
+  mockDatePlan = nextDatePlan;
   mockVersion += 1;
   for (const listener of mockListeners) listener();
 }
@@ -137,6 +142,7 @@ function getMockVersion() {
 }
 
 const mockPrompt = {
+  promptDate: new Date(now).toISOString().slice(0, 10),
   prompt: "What small thing made you feel loved today?",
   response: null,
   partnerResponse: null,
@@ -239,33 +245,11 @@ export const useAppMutation: typeof useMutation = ((mutation: any): any => {
     return async (args: Record<string, unknown> = {}) => {
       switch (mutationName) {
         case "plans:likeDate":
-          updateMockDatePlan({ likedByViewer: true, likeCount: 1 });
-          break;
         case "plans:saveDate":
-          updateMockDatePlan({ isSaved: true, savedStatus: "saved" });
-          break;
         case "plans:scheduleDate":
-          updateMockDatePlan({
-            isSaved: true,
-            savedStatus: "scheduled",
-            scheduledFor: args.scheduledFor as number,
-            completedAt: null,
-          });
-          break;
         case "plans:completeDate":
-          updateMockDatePlan({
-            isSaved: true,
-            savedStatus: "completed",
-            completedAt: Date.now(),
-          });
-          break;
         case "plans:rateDate":
-          updateMockDatePlan({
-            isSaved: true,
-            savedStatus: "completed",
-            completedAt: mockDatePlan.completedAt ?? Date.now(),
-            ratingAverage: args.rating as number,
-          });
+          updateMockDatePlan(mutationName, args);
           break;
       }
       return {

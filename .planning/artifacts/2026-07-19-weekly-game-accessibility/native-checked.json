@@ -1,0 +1,410 @@
+{
+  "status": "ok",
+  "screenFrame": {
+    "x": 0,
+    "y": 0,
+    "width": 402,
+    "height": 874
+  },
+  "elements": [
+    {
+      "frame": {
+        "x": 12,
+        "y": 64,
+        "width": 378,
+        "height": 17
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 72.5
+      },
+      "normalizedFrame": {
+        "x": 0.029850746268656716,
+        "y": 0.07322654462242563,
+        "width": 0.9402985074626866,
+        "height": 0.019450800915331808
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.08295194508009153
+      },
+      "traits": ["button"],
+      "label": "Back to Today",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 32,
+        "y": 117,
+        "width": 338,
+        "height": 20
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 127
+      },
+      "normalizedFrame": {
+        "x": 0.07960199004975124,
+        "y": 0.13386727688787187,
+        "width": 0.8407960199004975,
+        "height": 0.02288329519450801
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.14530892448512586
+      },
+      "traits": ["staticText"],
+      "label": "WEEKLY GAME"
+    },
+    {
+      "frame": {
+        "x": 32,
+        "y": 153,
+        "width": 338,
+        "height": 88
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 197
+      },
+      "normalizedFrame": {
+        "x": 0.07960199004975124,
+        "y": 0.17505720823798626,
+        "width": 0.8407960199004975,
+        "height": 0.10068649885583524
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.22540045766590389
+      },
+      "traits": ["staticText"],
+      "label": "Two-minute memory game"
+    },
+    {
+      "frame": {
+        "x": 32,
+        "y": 257,
+        "width": 338,
+        "height": 24
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 269
+      },
+      "normalizedFrame": {
+        "x": 0.07960199004975124,
+        "y": 0.2940503432494279,
+        "width": 0.8407960199004975,
+        "height": 0.02745995423340961
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.30778032036613273
+      },
+      "traits": ["staticText"]
+    },
+    {
+      "frame": {
+        "x": 29,
+        "y": 362,
+        "width": 344,
+        "height": 20
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 372
+      },
+      "normalizedFrame": {
+        "x": 0.07213930348258707,
+        "y": 0.41418764302059496,
+        "width": 0.8557213930348259,
+        "height": 0.02288329519450801
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.425629290617849
+      },
+      "traits": ["staticText"],
+      "label": "TURN CARD"
+    },
+    {
+      "frame": {
+        "x": 29,
+        "y": 394,
+        "width": 344,
+        "height": 160
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 474
+      },
+      "normalizedFrame": {
+        "x": 0.07213930348258707,
+        "y": 0.45080091533180777,
+        "width": 0.8557213930348259,
+        "height": 0.18306636155606407
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.5423340961098398
+      },
+      "traits": ["staticText"],
+      "label": "Pick one tiny shared memory and compare what each of you remembers."
+    },
+    {
+      "frame": {
+        "x": 29,
+        "y": 566,
+        "width": 169,
+        "height": 43
+      },
+      "tapPoint": {
+        "x": 113.5,
+        "y": 587.5
+      },
+      "normalizedFrame": {
+        "x": 0.07213930348258707,
+        "y": 0.6475972540045767,
+        "width": 0.42039800995024873,
+        "height": 0.04919908466819222
+      },
+      "normalizedTapPoint": {
+        "x": 0.28233830845771146,
+        "y": 0.6721967963386728
+      },
+      "traits": ["button"],
+      "label": "Previous weekly game prompt",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 206,
+        "y": 566,
+        "width": 167,
+        "height": 43
+      },
+      "tapPoint": {
+        "x": 289.5,
+        "y": 587.5
+      },
+      "normalizedFrame": {
+        "x": 0.5124378109452736,
+        "y": 0.6475972540045767,
+        "width": 0.4154228855721393,
+        "height": 0.04919908466819222
+      },
+      "normalizedTapPoint": {
+        "x": 0.7201492537313433,
+        "y": 0.6721967963386728
+      },
+      "traits": ["button"],
+      "label": "Next weekly game prompt",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 12,
+        "y": 642,
+        "width": 378,
+        "height": 32
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 658
+      },
+      "normalizedFrame": {
+        "x": 0.029850746268656716,
+        "y": 0.7345537757437071,
+        "width": 0.9402985074626866,
+        "height": 0.036613272311212815
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.7528604118993135
+      },
+      "traits": ["staticText"],
+      "label": "Scoreboard"
+    },
+    {
+      "frame": {
+        "x": 12,
+        "y": 682,
+        "width": 378,
+        "height": 82
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 723
+      },
+      "normalizedFrame": {
+        "x": 0.029850746268656716,
+        "y": 0.7803203661327232,
+        "width": 0.9402985074626866,
+        "height": 0.09382151029748284
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.8272311212814645
+      },
+      "traits": [],
+      "label": "Mark weekly game prompt complete: Pick one tiny shared memory and compare what each of you remembers.",
+      "value": "checkbox, checked",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 12,
+        "y": 772,
+        "width": 378,
+        "height": 58
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 801
+      },
+      "normalizedFrame": {
+        "x": 0.029850746268656716,
+        "y": 0.8832951945080092,
+        "width": 0.9402985074626866,
+        "height": 0.06636155606407322
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.9164759725400458
+      },
+      "traits": [],
+      "label": "Mark weekly game prompt complete: Make a tiny bid for attention.",
+      "value": "checkbox, unchecked",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 12,
+        "y": 838,
+        "width": 378,
+        "height": 58
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 867
+      },
+      "normalizedFrame": {
+        "x": 0.029850746268656716,
+        "y": 0.9588100686498856,
+        "width": 0.9402985074626866,
+        "height": 0.06636155606407322
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.9919908466819222
+      },
+      "traits": [],
+      "label": "Mark weekly game prompt complete: Name one specific appreciation.",
+      "value": "checkbox, unchecked",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 12,
+        "y": 904,
+        "width": 378,
+        "height": 58
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 933
+      },
+      "normalizedFrame": {
+        "x": 0.029850746268656716,
+        "y": 1.034324942791762,
+        "width": 0.9402985074626866,
+        "height": 0.06636155606407322
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 1.0675057208237986
+      },
+      "traits": [],
+      "label": "Mark weekly game prompt complete: Ask one curious follow-up.",
+      "value": "checkbox, unchecked",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 12,
+        "y": 970,
+        "width": 378,
+        "height": 82
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 1011
+      },
+      "normalizedFrame": {
+        "x": 0.029850746268656716,
+        "y": 1.1098398169336385,
+        "width": 0.9402985074626866,
+        "height": 0.09382151029748284
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 1.1567505720823799
+      },
+      "traits": [],
+      "label": "Mark weekly game prompt complete: Offer one repair phrase you’d actually use.",
+      "value": "checkbox, unchecked",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 12,
+        "y": 1060,
+        "width": 378,
+        "height": 58
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 1089
+      },
+      "normalizedFrame": {
+        "x": 0.029850746268656716,
+        "y": 1.2128146453089246,
+        "width": 0.9402985074626866,
+        "height": 0.06636155606407322
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 1.2459954233409611
+      },
+      "traits": [],
+      "label": "Mark weekly game prompt complete: Pick a tiny ritual to protect this week.",
+      "value": "checkbox, unchecked",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 10,
+        "y": -22.33333333333333,
+        "width": 382,
+        "height": 14.333333333333329
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": -15.166666666666664
+      },
+      "normalizedFrame": {
+        "x": 0.024875621890547265,
+        "y": -0.025553012967200604,
+        "width": 0.9502487562189055,
+        "height": 0.016399694889397402
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": -0.017353165522501903
+      },
+      "traits": ["staticText"],
+      "label": "Refreshing...",
+      "viewClassName": "UILabel"
+    }
+  ]
+}

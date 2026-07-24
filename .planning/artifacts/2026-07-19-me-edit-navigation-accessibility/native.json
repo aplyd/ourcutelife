@@ -1,0 +1,628 @@
+{
+  "status": "ok",
+  "screenFrame": {
+    "x": 0,
+    "y": 0,
+    "width": 402,
+    "height": 874
+  },
+  "elements": [
+    {
+      "frame": {
+        "x": 12,
+        "y": 126,
+        "width": 378,
+        "height": 20
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 136
+      },
+      "normalizedFrame": {
+        "x": 0.029850746268656716,
+        "y": 0.14416475972540047,
+        "width": 0.9402985074626866,
+        "height": 0.02288329519450801
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.15560640732265446
+      },
+      "traits": ["staticText"],
+      "label": "ME"
+    },
+    {
+      "frame": {
+        "x": 12,
+        "y": 154,
+        "width": 378,
+        "height": 80
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 194
+      },
+      "normalizedFrame": {
+        "x": 0.029850746268656716,
+        "y": 0.17620137299771166,
+        "width": 0.9402985074626866,
+        "height": 0.09153318077803203
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.2219679633867277
+      },
+      "traits": ["staticText"],
+      "label": "Profile and couple settings"
+    },
+    {
+      "frame": {
+        "x": 153,
+        "y": 263,
+        "width": 96,
+        "height": 96
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 311
+      },
+      "normalizedFrame": {
+        "x": 0.3805970149253731,
+        "y": 0.3009153318077803,
+        "width": 0.23880597014925373,
+        "height": 0.10983981693363844
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.35583524027459956
+      },
+      "traits": ["button"],
+      "label": "Edit profile photo",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 96,
+        "y": 371,
+        "width": 209.66665649414062,
+        "height": 20
+      },
+      "tapPoint": {
+        "x": 200.8333282470703,
+        "y": 381
+      },
+      "normalizedFrame": {
+        "x": 0.23880597014925373,
+        "y": 0.4244851258581236,
+        "width": 0.5215588470003498,
+        "height": 0.02288329519450801
+      },
+      "normalizedTapPoint": {
+        "x": 0.4995853936494286,
+        "y": 0.43592677345537756
+      },
+      "traits": ["staticText"],
+      "label": "Tap avatar to update your profile"
+    },
+    {
+      "frame": {
+        "x": 29,
+        "y": 407,
+        "width": 344,
+        "height": 68
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 441
+      },
+      "normalizedFrame": {
+        "x": 0.07213930348258707,
+        "y": 0.465675057208238,
+        "width": 0.8557213930348259,
+        "height": 0.07780320366132723
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.5045766590389016
+      },
+      "traits": ["button"],
+      "label": "Edit name",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 29,
+        "y": 521,
+        "width": 344,
+        "height": 32
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 537
+      },
+      "normalizedFrame": {
+        "x": 0.07213930348258707,
+        "y": 0.5961098398169337,
+        "width": 0.8557213930348259,
+        "height": 0.036613272311212815
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.61441647597254
+      },
+      "traits": ["staticText"],
+      "label": "Relationship"
+    },
+    {
+      "frame": {
+        "x": 29,
+        "y": 569,
+        "width": 344,
+        "height": 20
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 579
+      },
+      "normalizedFrame": {
+        "x": 0.07213930348258707,
+        "y": 0.6510297482837528,
+        "width": 0.8557213930348259,
+        "height": 0.02288329519450801
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.6624713958810069
+      },
+      "traits": ["staticText"],
+      "label": "Partner"
+    },
+    {
+      "frame": {
+        "x": 29,
+        "y": 593,
+        "width": 344,
+        "height": 28
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 607
+      },
+      "normalizedFrame": {
+        "x": 0.07213930348258707,
+        "y": 0.6784897025171625,
+        "width": 0.8557213930348259,
+        "height": 0.032036613272311214
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.6945080091533181
+      },
+      "traits": ["staticText"],
+      "label": "Test Partner"
+    },
+    {
+      "frame": {
+        "x": 29,
+        "y": 637,
+        "width": 344,
+        "height": 52
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 663
+      },
+      "normalizedFrame": {
+        "x": 0.07213930348258707,
+        "y": 0.7288329519450801,
+        "width": 0.8557213930348259,
+        "height": 0.059496567505720827
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.7585812356979404
+      },
+      "traits": ["button"],
+      "label": "Edit anniversary",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 29,
+        "y": 735,
+        "width": 344,
+        "height": 32
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 751
+      },
+      "normalizedFrame": {
+        "x": 0.07213930348258707,
+        "y": 0.8409610983981693,
+        "width": 0.8557213930348259,
+        "height": 0.036613272311212815
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.8592677345537757
+      },
+      "traits": ["staticText"],
+      "label": "Settings"
+    },
+    {
+      "frame": {
+        "x": 29,
+        "y": 783,
+        "width": 110,
+        "height": 43
+      },
+      "tapPoint": {
+        "x": 84,
+        "y": 804.5
+      },
+      "normalizedFrame": {
+        "x": 0.07213930348258707,
+        "y": 0.8958810068649885,
+        "width": 0.2736318407960199,
+        "height": 0.04919908466819222
+      },
+      "normalizedTapPoint": {
+        "x": 0.208955223880597,
+        "y": 0.9204805491990846
+      },
+      "traits": ["button"],
+      "label": "Use light theme",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 147,
+        "y": 783,
+        "width": 110,
+        "height": 43
+      },
+      "tapPoint": {
+        "x": 202,
+        "y": 804.5
+      },
+      "normalizedFrame": {
+        "x": 0.3656716417910448,
+        "y": 0.8958810068649885,
+        "width": 0.2736318407960199,
+        "height": 0.04919908466819222
+      },
+      "normalizedTapPoint": {
+        "x": 0.5024875621890548,
+        "y": 0.9204805491990846
+      },
+      "traits": ["button"],
+      "label": "Use dark theme",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 265,
+        "y": 783,
+        "width": 108,
+        "height": 43
+      },
+      "tapPoint": {
+        "x": 319,
+        "y": 804.5
+      },
+      "normalizedFrame": {
+        "x": 0.6592039800995025,
+        "y": 0.8958810068649885,
+        "width": 0.26865671641791045,
+        "height": 0.04919908466819222
+      },
+      "normalizedTapPoint": {
+        "x": 0.7935323383084577,
+        "y": 0.9204805491990846
+      },
+      "traits": ["button", "selected"],
+      "label": "Use system theme",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 29,
+        "y": 872,
+        "width": 344,
+        "height": 32
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 888
+      },
+      "normalizedFrame": {
+        "x": 0.07213930348258707,
+        "y": 0.9977116704805492,
+        "width": 0.8557213930348259,
+        "height": 0.036613272311212815
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 1.0160183066361557
+      },
+      "traits": ["staticText"],
+      "label": "Account"
+    },
+    {
+      "frame": {
+        "x": 29,
+        "y": 916,
+        "width": 344,
+        "height": 48
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 940
+      },
+      "normalizedFrame": {
+        "x": 0.07213930348258707,
+        "y": 1.0480549199084668,
+        "width": 0.8557213930348259,
+        "height": 0.05491990846681922
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 1.0755148741418765
+      },
+      "traits": ["button"],
+      "label": "Sign out",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 29,
+        "y": 976,
+        "width": 344,
+        "height": 48
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 1000
+      },
+      "normalizedFrame": {
+        "x": 0.07213930348258707,
+        "y": 1.1167048054919908,
+        "width": 0.8557213930348259,
+        "height": 0.05491990846681922
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 1.1441647597254005
+      },
+      "traits": ["button"],
+      "label": "Leave couple",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 25,
+        "y": 795,
+        "width": 98,
+        "height": 54
+      },
+      "tapPoint": {
+        "x": 74,
+        "y": 822
+      },
+      "normalizedFrame": {
+        "x": 0.06218905472636816,
+        "y": 0.9096109839816934,
+        "width": 0.24378109452736318,
+        "height": 0.06178489702517163
+      },
+      "normalizedTapPoint": {
+        "x": 0.18407960199004975,
+        "y": 0.9405034324942791
+      },
+      "traits": ["button"],
+      "label": "Today",
+      "viewClassName": "_UITabButton"
+    },
+    {
+      "frame": {
+        "x": 109.66666666666669,
+        "y": 795,
+        "width": 98,
+        "height": 54
+      },
+      "tapPoint": {
+        "x": 158.66666666666669,
+        "y": 822
+      },
+      "normalizedFrame": {
+        "x": 0.27280265339966836,
+        "y": 0.9096109839816934,
+        "width": 0.24378109452736318,
+        "height": 0.06178489702517163
+      },
+      "normalizedTapPoint": {
+        "x": 0.39469320066334995,
+        "y": 0.9405034324942791
+      },
+      "traits": ["button"],
+      "label": "Chat",
+      "viewClassName": "_UITabButton"
+    },
+    {
+      "frame": {
+        "x": 194.33333333333334,
+        "y": 795,
+        "width": 98.00000000000003,
+        "height": 54
+      },
+      "tapPoint": {
+        "x": 243.33333333333337,
+        "y": 822
+      },
+      "normalizedFrame": {
+        "x": 0.4834162520729685,
+        "y": 0.9096109839816934,
+        "width": 0.24378109452736327,
+        "height": 0.06178489702517163
+      },
+      "normalizedTapPoint": {
+        "x": 0.6053067993366502,
+        "y": 0.9405034324942791
+      },
+      "traits": ["button"],
+      "label": "Plans",
+      "viewClassName": "_UITabButton"
+    },
+    {
+      "frame": {
+        "x": 279,
+        "y": 795,
+        "width": 98,
+        "height": 54
+      },
+      "tapPoint": {
+        "x": 328,
+        "y": 822
+      },
+      "normalizedFrame": {
+        "x": 0.6940298507462687,
+        "y": 0.9096109839816934,
+        "width": 0.24378109452736318,
+        "height": 0.06178489702517163
+      },
+      "normalizedTapPoint": {
+        "x": 0.8159203980099502,
+        "y": 0.9405034324942791
+      },
+      "traits": ["button", "selected"],
+      "label": "Me",
+      "viewClassName": "_UITabButton"
+    },
+    {
+      "frame": {
+        "x": 25,
+        "y": 795,
+        "width": 98,
+        "height": 54
+      },
+      "tapPoint": {
+        "x": 74,
+        "y": 822
+      },
+      "normalizedFrame": {
+        "x": 0.06218905472636816,
+        "y": 0.9096109839816934,
+        "width": 0.24378109452736318,
+        "height": 0.06178489702517163
+      },
+      "normalizedTapPoint": {
+        "x": 0.18407960199004975,
+        "y": 0.9405034324942791
+      },
+      "traits": ["button"],
+      "label": "Today",
+      "viewClassName": "_UITabButton"
+    },
+    {
+      "frame": {
+        "x": 109.66666666666669,
+        "y": 795,
+        "width": 98,
+        "height": 54
+      },
+      "tapPoint": {
+        "x": 158.66666666666669,
+        "y": 822
+      },
+      "normalizedFrame": {
+        "x": 0.27280265339966836,
+        "y": 0.9096109839816934,
+        "width": 0.24378109452736318,
+        "height": 0.06178489702517163
+      },
+      "normalizedTapPoint": {
+        "x": 0.39469320066334995,
+        "y": 0.9405034324942791
+      },
+      "traits": ["button"],
+      "label": "Chat",
+      "viewClassName": "_UITabButton"
+    },
+    {
+      "frame": {
+        "x": 194.33333333333334,
+        "y": 795,
+        "width": 98.00000000000003,
+        "height": 54
+      },
+      "tapPoint": {
+        "x": 243.33333333333337,
+        "y": 822
+      },
+      "normalizedFrame": {
+        "x": 0.4834162520729685,
+        "y": 0.9096109839816934,
+        "width": 0.24378109452736327,
+        "height": 0.06178489702517163
+      },
+      "normalizedTapPoint": {
+        "x": 0.6053067993366502,
+        "y": 0.9405034324942791
+      },
+      "traits": ["button"],
+      "label": "Plans",
+      "viewClassName": "_UITabButton"
+    },
+    {
+      "frame": {
+        "x": 279,
+        "y": 795,
+        "width": 98,
+        "height": 54
+      },
+      "tapPoint": {
+        "x": 328,
+        "y": 822
+      },
+      "normalizedFrame": {
+        "x": 0.6940298507462687,
+        "y": 0.9096109839816934,
+        "width": 0.24378109452736318,
+        "height": 0.06178489702517163
+      },
+      "normalizedTapPoint": {
+        "x": 0.8159203980099502,
+        "y": 0.9405034324942791
+      },
+      "traits": ["button", "selected"],
+      "label": "Me",
+      "viewClassName": "_UITabButton"
+    },
+    {
+      "frame": {
+        "x": 10,
+        "y": -22.33333333333333,
+        "width": 382,
+        "height": 14.333333333333329
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": -15.166666666666664
+      },
+      "normalizedFrame": {
+        "x": 0.024875621890547265,
+        "y": -0.025553012967200604,
+        "width": 0.9502487562189055,
+        "height": 0.016399694889397402
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": -0.017353165522501903
+      },
+      "traits": ["staticText"],
+      "label": "Refreshing...",
+      "viewClassName": "UILabel"
+    }
+  ]
+}

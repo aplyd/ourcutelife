@@ -1,0 +1,10 @@
+$ oxfmt --check .
+Checking formatting...
+
+src/app/(tabs)/plans.tsx (1ms)
+
+Format issues found in above 1 files. Run without `--check` to fix.
+Finished in 1124ms on 186 files using 12 threads.
+[ELIFECYCLE] Command failed with exit code 1.
+
+exit_code=1

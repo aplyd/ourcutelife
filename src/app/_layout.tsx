@@ -1,27 +1,59 @@
 import { useAppMutation } from "@/lib/devMock";
 import type { JSX } from "react";
 import { useEffect } from "react";
+import type { FunctionReference } from "convex/server";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
 import { HeroUINativeProvider } from "heroui-native";
+import { AppState } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { api } from "../../convex/_generated/api";
 import { authClient, useSession } from "@/lib/betterAuth";
 import { convex } from "@/lib/convex";
 import { ThemeProvider, useAppTheme } from "@/lib/theme";
-import { getServerPushRegistration } from "@/lib/notifications";
+import { reconcileServerPushRegistration } from "@/lib/notifications";
 import { UpdateProvider } from "@/providers/update-provider";
 import "../global.css";
 
 void SplashScreen.preventAutoHideAsync();
 
+type ReportPermissionObservationArgs = {
+  deviceId: string;
+  platform: "ios" | "android" | "web" | "unknown";
+  permissionStatus: "undetermined" | "denied" | "granted";
+  timezone: string;
+};
+
+type RegisterGrantedDeviceArgs = {
+  deviceId: string;
+  platform: "ios" | "android" | "web" | "unknown";
+  pushToken: string;
+  timezone: string;
+};
+
+const notificationDevicesApi = api as typeof api & {
+  notificationDevices: {
+    reportPermissionObservation: FunctionReference<
+      "mutation",
+      "public",
+      ReportPermissionObservationArgs
+    >;
+    registerGrantedDevice: FunctionReference<"mutation", "public", RegisterGrantedDeviceArgs>;
+  };
+};
+
 function RootStack(): JSX.Element {
   const { resolvedTheme } = useAppTheme();
   const betterAuthSession = useSession();
-  const registerPushToken = useAppMutation(api.push.registerToken);
+  const reportPermissionObservation = useAppMutation(
+    notificationDevicesApi.notificationDevices.reportPermissionObservation,
+  );
+  const registerGrantedDevice = useAppMutation(
+    notificationDevicesApi.notificationDevices.registerGrantedDevice,
+  );
 
   useEffect(() => {
     if (!betterAuthSession.isPending) void SplashScreen.hideAsync();
@@ -31,19 +63,31 @@ function RootStack(): JSX.Element {
     if (!betterAuthSession.data?.session) return;
 
     let cancelled = false;
-    void getServerPushRegistration()
-      .then((registration) => {
-        if (!registration || cancelled) return;
-        void registerPushToken(registration);
-      })
-      .catch(() => {
-        // Push registration is opportunistic; don't block app launch if permission/network fails.
-      });
+    const reconcile = () => {
+      void reconcileServerPushRegistration()
+        .then(async (result) => {
+          if (cancelled) return;
+          await reportPermissionObservation(result.observation);
+          if (result.registration) {
+            if (cancelled) return;
+            await registerGrantedDevice(result.registration);
+          }
+        })
+        .catch(() => {
+          // Push permission observation is opportunistic; don't block app launch.
+        });
+    };
+
+    reconcile();
+    const subscription = AppState.addEventListener("change", (state) => {
+      if (state === "active") reconcile();
+    });
 
     return () => {
       cancelled = true;
+      subscription.remove();
     };
-  }, [betterAuthSession.data?.session, registerPushToken]);
+  }, [betterAuthSession.data?.session, registerGrantedDevice, reportPermissionObservation]);
 
   return (
     <>

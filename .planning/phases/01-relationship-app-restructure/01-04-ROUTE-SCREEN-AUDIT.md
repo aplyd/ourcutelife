@@ -52,3 +52,30 @@ Phase 1 navigation is visually verified enough to move forward. Next safe work i
 - Device verification: Argent described Today, Chat, Plans, and Me tab screens and the Today Add Moment sheet.
 - Device verification: Argent launched `com.ourcutelife.app`, scrolled Today so `Answer prompt` was clear of the tab bar, tapped it, and described the daily prompt sheet with `Write your answer…` and `Submit answer` visible.
 - Device verification: Argent dismissed the prompt sheet, tapped `Recent moments` → `See all`, and described the `/moments` screen with `MOMENTS`, `Your private relationship journal`, `Log a moment`, and the mock `GOOD` timeline item visible.
+
+## 2026-07-18 bounded follow-up audit — remaining Phase 1 surfaces
+
+### Scope and evidence
+
+No runtime code was changed. This pass re-read the remaining accepted-spec surfaces outside the recently audited Plans work:
+
+- `src/app/(tabs)/index.tsx` and the Today-linked prompt, weekly game, quiz, moment history/detail/new/edit routes
+- `src/app/(tabs)/chat.tsx` and `convex/chat.ts` / `convex/chatActions.ts`
+- `src/app/(tabs)/me.tsx` and the profile/anniversary sheets
+- `docs/product-spec-relationship-app-restructure.md`
+
+Today and Me still expose the accepted sections and routes. Chat still preserves invoked-only AI: normal messages do not set `asCoachPrompt`, while an explicitly selected coach mode does. The accepted Chat MVP, however, names three explicit coach affordances: `Ask coach`, `Rephrase before sending`, and `Help us talk about this` (spec lines 110–117). The composer currently renders only `Normal`, `Ask coach`, and `Rephrase` (`src/app/(tabs)/chat.tsx` lines 134–153); there is no `Help us talk about this` control or equivalent user-facing state. Existing backend handling already accepts a generic explicit coach prompt (`convex/chat.ts` lines 31–57 and `convex/chatActions.ts` lines 16–29), so the missing affordance can remain a small bounded UI/action-intent slice rather than an AI architecture change.
+
+### Exactly one recommendation for the next worker
+
+Add the missing explicit `Help us talk about this` Chat composer mode, keep it user-invoked, and make all composer modes expose their selected state. Do not add proactive coach behavior or refactor the chat backend.
+
+Argent verification contract for that later UI slice:
+
+1. Launch the mock-auth app and select the `Chat` tab (`/chat`).
+2. Accessibility inspection must expose buttons named `Normal message`, `Ask coach`, `Rephrase before sending`, and `Help us talk about this`; exactly one must carry the native `selected` state, initially `Normal message`.
+3. Tap `Help us talk about this`; it alone must become selected. Enter a short message and verify the enabled send action remains explicitly user-triggered (no coach message before Send is tapped).
+4. Screenshot target: the Chat composer with `Help us talk about this` visibly selected and the drafted message still unsent.
+5. After the interaction, check the connected debugger log registry and require no new warnings or errors.
+
+This is the highest-value remaining Phase 1 mismatch found in the bounded pass because it is an explicitly accepted, user-facing invoked-AI path that is absent, while the other inspected Phase 1 jobs remain represented and routable.

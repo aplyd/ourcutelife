@@ -72,12 +72,16 @@ export default function MomentDetailScreen(): JSX.Element {
         <Text className="text-base text-[#6f5a50]">{formatDate(moment.happenedAt)}</Text>
         <View className="flex-row gap-2 pt-2">
           <Pressable
+            accessibilityLabel="Edit moment"
+            accessibilityRole="button"
             className="flex-1 h-11 rounded-full bg-[#2f211c] items-center justify-center"
             onPress={() => router.push(`/moments/edit/${moment._id}`)}
           >
             <Text className="font-bold text-white">Edit</Text>
           </Pressable>
           <Pressable
+            accessibilityLabel="Delete moment"
+            accessibilityRole="button"
             className="flex-1 h-11 rounded-full bg-[#fff1f2] border border-[#fecdd3] items-center justify-center"
             onPress={() =>
               Alert.alert("Delete moment?", "This hides the moment from your history.", [

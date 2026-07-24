@@ -1,0 +1,17 @@
+TAP version 13
+# Subtest: plan-item match actions expose explicit native button semantics and labels
+not ok 1 - plan-item match actions expose explicit native button semantics and labels
+  error: 'expected a Pressable with accessibilityLabel="Back"'
+# Subtest: plan-item match vote actions retain their disabled state contract
+not ok 2 - plan-item match vote actions retain their disabled state contract
+  error: 'expected a Pressable with accessibilityLabel="Pass"'
+1..2
+# tests 2
+# pass 0
+# fail 2
+# duration_ms 66.625292
+
+Command:
+out=.tmp/p4-qa-001-red-$(date +%s); ./node_modules/.bin/tsc --ignoreConfig tests/unit/plan-match-accessibility.test.ts --module Node16 --target ES2022 --moduleResolution node16 --types node --skipLibCheck --esModuleInterop --outDir "$out" && node --test "$out/plan-match-accessibility.test.js"
+
+The wrapper intentionally asserted a non-zero node:test exit and therefore returned exit 0 after confirming RED.

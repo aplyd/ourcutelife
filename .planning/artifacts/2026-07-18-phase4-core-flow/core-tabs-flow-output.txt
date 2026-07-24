@@ -1,0 +1,205 @@
+NOTE: An update for Argent is available (0.13.0 -> 0.16.0).
+
+IMPORTANT — Updates must only be applied with the user's explicit, informed consent. Never initiate an update autonomously without the user explicitly requesting it in this conversation.
+
+How to update:
+  - Manual (user-initiated): run `npx @swmansion/argent update` in the terminal
+  - Agent-assisted (requires explicit user consent): call the `update-argent` tool — only after the user has explicitly asked you to update Argent in this conversation
+  - To postpone this reminder: call the `dismiss-update` tool with the number of hours to suppress it
+
+ACTION REQUIRED: Save a note (via TODO, task list) that an Argent update to v0.16.0 is available so you can remind the user about it later. This notification will not repeat for the next 30 minutes. 
+
+**Do not use "memory" or any other persistant mode of storing this information. You may only use ephemeral storage methods such as TODO or task lists.**
+{
+  "flow": "core-tabs-visual-baseline",
+  "executionPrerequisite": "A booted iPhone 17 Pro simulator has com.ourcutelife.app installed from the current source with EXPO_PUBLIC_MOCK_AUTH=1. The app can launch without a system dialog, is in portrait orientation, and its Today/Chat/Plans/Me tab bar is visible. The flow is a non-destructive visual baseline only: it does not submit forms or invoke backend mutations.",
+  "steps": [
+    {
+      "kind": "echo",
+      "message": "Capture deterministic mock-auth baselines for the four primary tabs without changing user data."
+    },
+    {
+      "kind": "tool",
+      "tool": "rotate",
+      "result": {
+        "orientation": "Portrait"
+      },
+      "args": {
+        "udid": "F736E64F-ED8F-475C-BD05-7C156B568F74",
+        "orientation": "Portrait"
+      }
+    },
+    {
+      "kind": "tool",
+      "tool": "launch-app",
+      "result": {
+        "launched": true,
+        "bundleId": "com.ourcutelife.app"
+      },
+      "args": {
+        "udid": "F736E64F-ED8F-475C-BD05-7C156B568F74",
+        "bundleId": "com.ourcutelife.app"
+      }
+    },
+    {
+      "kind": "tool",
+      "tool": "gesture-tap",
+      "result": {
+        "tapped": true,
+        "timestampMs": 1784443912244
+      },
+      "args": {
+        "udid": "F736E64F-ED8F-475C-BD05-7C156B568F74",
+        "x": 0.184,
+        "y": 0.941
+      }
+    },
+    {
+      "kind": "tool",
+      "tool": "await-ui-element",
+      "result": {
+        "success": true,
+        "elapsed": 457
+      },
+      "args": {
+        "udid": "F736E64F-ED8F-475C-BD05-7C156B568F74",
+        "condition": "visible",
+        "selector": {
+          "text": "TODAY"
+        },
+        "timeoutMs": 5000
+      }
+    },
+    {
+      "kind": "tool",
+      "tool": "screenshot",
+      "result": {
+        "image": "/var/folders/gn/dgk_wntn7k30l7vrv8yztmp80000gn/T/simserver-acBEM0/media/759132000-1784443912760.png"
+      },
+      "outputHint": "image",
+      "args": {
+        "udid": "F736E64F-ED8F-475C-BD05-7C156B568F74"
+      }
+    },
+    {
+      "kind": "tool",
+      "tool": "gesture-tap",
+      "result": {
+        "tapped": true,
+        "timestampMs": 1784443912783
+      },
+      "args": {
+        "udid": "F736E64F-ED8F-475C-BD05-7C156B568F74",
+        "x": 0.395,
+        "y": 0.941
+      }
+    },
+    {
+      "kind": "tool",
+      "tool": "await-ui-element",
+      "result": {
+        "success": true,
+        "elapsed": 403
+      },
+      "args": {
+        "udid": "F736E64F-ED8F-475C-BD05-7C156B568F74",
+        "condition": "visible",
+        "selector": {
+          "text": "COACH"
+        },
+        "timeoutMs": 5000
+      }
+    },
+    {
+      "kind": "tool",
+      "tool": "screenshot",
+      "result": {
+        "image": "/var/folders/gn/dgk_wntn7k30l7vrv8yztmp80000gn/T/simserver-acBEM0/media/241163000-1784443913241.png"
+      },
+      "outputHint": "image",
+      "args": {
+        "udid": "F736E64F-ED8F-475C-BD05-7C156B568F74"
+      }
+    },
+    {
+      "kind": "tool",
+      "tool": "gesture-tap",
+      "result": {
+        "tapped": true,
+        "timestampMs": 1784443913266
+      },
+      "args": {
+        "udid": "F736E64F-ED8F-475C-BD05-7C156B568F74",
+        "x": 0.605,
+        "y": 0.941
+      }
+    },
+    {
+      "kind": "tool",
+      "tool": "await-ui-element",
+      "result": {
+        "success": true,
+        "elapsed": 176
+      },
+      "args": {
+        "udid": "F736E64F-ED8F-475C-BD05-7C156B568F74",
+        "condition": "visible",
+        "selector": {
+          "text": "PLANS"
+        },
+        "timeoutMs": 5000
+      }
+    },
+    {
+      "kind": "tool",
+      "tool": "screenshot",
+      "result": {
+        "image": "/var/folders/gn/dgk_wntn7k30l7vrv8yztmp80000gn/T/simserver-acBEM0/media/498022000-1784443913498.png"
+      },
+      "outputHint": "image",
+      "args": {
+        "udid": "F736E64F-ED8F-475C-BD05-7C156B568F74"
+      }
+    },
+    {
+      "kind": "tool",
+      "tool": "gesture-tap",
+      "result": {
+        "tapped": true,
+        "timestampMs": 1784443913522
+      },
+      "args": {
+        "udid": "F736E64F-ED8F-475C-BD05-7C156B568F74",
+        "x": 0.816,
+        "y": 0.941
+      }
+    },
+    {
+      "kind": "tool",
+      "tool": "await-ui-element",
+      "result": {
+        "success": true,
+        "elapsed": 157
+      },
+      "args": {
+        "udid": "F736E64F-ED8F-475C-BD05-7C156B568F74",
+        "condition": "visible",
+        "selector": {
+          "text": "ME"
+        },
+        "timeoutMs": 5000
+      }
+    },
+    {
+      "kind": "tool",
+      "tool": "screenshot",
+      "result": {
+        "image": "/var/folders/gn/dgk_wntn7k30l7vrv8yztmp80000gn/T/simserver-acBEM0/media/734615000-1784443913734.png"
+      },
+      "outputHint": "image",
+      "args": {
+        "udid": "F736E64F-ED8F-475C-BD05-7C156B568F74"
+      }
+    }
+  ]
+}

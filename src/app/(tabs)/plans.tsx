@@ -129,7 +129,47 @@ export default function PlansTab(): JSX.Element {
             Swipe on activities and places. Dates are combinations you can like, save, schedule,
             complete, and rate.
           </Text>
+          <View className="flex-row flex-wrap gap-2">
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Open surprise plan item picker"
+              className="rounded-full bg-accent px-4 py-2"
+              onPress={() => router.push("/plans/random")}
+            >
+              <Text className="font-semibold text-app-bg">Surprise us</Text>
+            </Pressable>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Open matched plan item history"
+              className="rounded-full border border-soft bg-card px-4 py-2"
+              onPress={() => router.push("/plans/history")}
+            >
+              <Text className="font-semibold text-ink">Match history</Text>
+            </Pressable>
+          </View>
         </View>
+
+        <Section
+          title="Swipe plan items"
+          subtitle="Choose a category and privately find your next match."
+        >
+          <View className="flex-row flex-wrap justify-between gap-y-3">
+            {categories.map((item) => (
+              <Pressable
+                key={item.value}
+                accessibilityRole="button"
+                accessibilityLabel={`Browse ${item.label} plan items`}
+                className="w-[48%] aspect-square rounded-3xl bg-card border border-soft p-4 justify-between"
+                onPress={() => router.push(`/plans/match/${item.value}`)}
+              >
+                <Text className="text-sm font-bold uppercase tracking-widest text-muted">
+                  Plan items
+                </Text>
+                <Text className="text-2xl font-bold text-ink">{item.label}</Text>
+              </Pressable>
+            ))}
+          </View>
+        </Section>
 
         <Section title="Our Dates" subtitle="The decision list for date night.">
           {ourDates.length ? (
@@ -160,6 +200,9 @@ export default function PlansTab(): JSX.Element {
               return (
                 <Pressable
                   key={item.value}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Sort Explore Dates by ${item.label}`}
+                  accessibilityState={{ selected: active }}
                   className={`rounded-full px-4 py-2 ${active ? "bg-accent" : "bg-card border border-soft"}`}
                   onPress={() => setDateSort(item.value)}
                 >
@@ -197,6 +240,8 @@ export default function PlansTab(): JSX.Element {
             <View className="flex-row items-center justify-between">
               <Text className="text-lg font-bold text-ink">Filter</Text>
               <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Pick random matched plan items"
                 className="h-10 w-10 rounded-full bg-accent items-center justify-center"
                 onPress={showDicePicks}
               >
@@ -209,6 +254,9 @@ export default function PlansTab(): JSX.Element {
                 return (
                   <Pressable
                     key={item.value}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Filter matched plan items by ${item.label}`}
+                    accessibilityState={{ selected: active }}
                     className={`rounded-full px-4 py-2 ${active ? "bg-accent" : "bg-app-bg border border-soft"}`}
                     onPress={() => toggleCategory(item.value)}
                   >
@@ -275,6 +323,8 @@ export default function PlansTab(): JSX.Element {
       </ScrollView>
 
       <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Add a private plan item"
         className="absolute bottom-28 right-3 h-16 w-16 rounded-full bg-accent items-center justify-center shadow-lg"
         onPress={() => router.push("/plans/new")}
       >
@@ -412,7 +462,12 @@ function DateCard({
 
 function Action({ label, onPress }: { label: string; onPress: () => void }) {
   return (
-    <Pressable className="rounded-full bg-accent px-4 py-2" onPress={onPress}>
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      className="rounded-full bg-accent px-4 py-2"
+      onPress={onPress}
+    >
       <Text className="font-bold text-app-bg">{label}</Text>
     </Pressable>
   );

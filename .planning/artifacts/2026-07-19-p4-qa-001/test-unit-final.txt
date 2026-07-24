@@ -1,0 +1,185 @@
+$ rm -rf .tmp/unit-tests && tsc --ignoreConfig tests/unit/*.test.ts convex/planPrivacy.ts --module Node16 --target ES2022 --moduleResolution node16 --types node --skipLibCheck --esModuleInterop --outDir .tmp/unit-tests && node --test .tmp/unit-tests/tests/unit/*.test.js
+TAP version 13
+# Subtest: date plan item keys are stable regardless of item order
+ok 1 - date plan item keys are stable regardless of item order
+  ---
+  duration_ms: 1.387625
+  type: 'test'
+  ...
+# Subtest: date plan item keys ignore duplicate item ids
+ok 2 - date plan item keys ignore duplicate item ids
+  ---
+  duration_ms: 0.152125
+  type: 'test'
+  ...
+# Subtest: date plan creation skips an existing single-item date
+ok 3 - date plan creation skips an existing single-item date
+  ---
+  duration_ms: 0.094791
+  type: 'test'
+  ...
+# Subtest: date plan creation skips an existing pair regardless of item order
+ok 4 - date plan creation skips an existing pair regardless of item order
+  ---
+  duration_ms: 0.078125
+  type: 'test'
+  ...
+# Subtest: date plan creation proceeds when the item bundle is new
+ok 5 - date plan creation proceeds when the item bundle is new
+  ---
+  duration_ms: 0.147042
+  type: 'test'
+  ...
+# Subtest: date plan item-key backfill preview only targets missing keys
+ok 6 - date plan item-key backfill preview only targets missing keys
+  ---
+  duration_ms: 0.6725
+  type: 'test'
+  ...
+# Subtest: date plan item-key backfill preview is no-op when all rows are keyed
+ok 7 - date plan item-key backfill preview is no-op when all rows are keyed
+  ---
+  duration_ms: 0.086833
+  type: 'test'
+  ...
+# Subtest: date plan rating summaries use the latest stored ratings
+ok 8 - date plan rating summaries use the latest stored ratings
+  ---
+  duration_ms: 0.097041
+  type: 'test'
+  ...
+# Subtest: date plan ratings accept each whole-star choice shown in the app
+ok 9 - date plan ratings accept each whole-star choice shown in the app
+  ---
+  duration_ms: 0.463375
+  type: 'test'
+  ...
+# Subtest: date plan ratings are available only after completion
+ok 10 - date plan ratings are available only after completion
+  ---
+  duration_ms: 0.491833
+  type: 'test'
+  ...
+# Subtest: rating authorization rejects a completed lifecycle owned by another couple
+ok 11 - rating authorization rejects a completed lifecycle owned by another couple
+  ---
+  duration_ms: 0.145834
+  type: 'test'
+  ...
+# Subtest: rating authorization rejects ambiguous duplicate lifecycle rows
+ok 12 - rating authorization rejects ambiguous duplicate lifecycle rows
+  ---
+  duration_ms: 0.057375
+  type: 'test'
+  ...
+# Subtest: rating authorization allows exactly one completed lifecycle for the same couple
+ok 13 - rating authorization allows exactly one completed lifecycle for the same couple
+  ---
+  duration_ms: 0.041375
+  type: 'test'
+  ...
+# Subtest: date lifecycle actions require exactly one active Our Dates row for the couple
+ok 14 - date lifecycle actions require exactly one active Our Dates row for the couple
+  ---
+  duration_ms: 0.220875
+  type: 'test'
+  ...
+# Subtest: date plan rating summaries stay safe with no ratings
+ok 15 - date plan rating summaries stay safe with no ratings
+  ---
+  duration_ms: 0.072625
+  type: 'test'
+  ...
+# Subtest: date plan save engagement is counted only for new or restored saves
+ok 16 - date plan save engagement is counted only for new or restored saves
+  ---
+  duration_ms: 0.061625
+  type: 'test'
+  ...
+# Subtest: date plan like engagement is counted only once per member
+ok 17 - date plan like engagement is counted only once per member
+  ---
+  duration_ms: 0.047625
+  type: 'test'
+  ...
+# Subtest: date plan completion engagement is counted only on the first completion
+ok 18 - date plan completion engagement is counted only on the first completion
+  ---
+  duration_ms: 0.048625
+  type: 'test'
+  ...
+# Subtest: scheduling a completed date starts a fresh scheduled lifecycle
+ok 19 - scheduling a completed date starts a fresh scheduled lifecycle
+  ---
+  duration_ms: 0.054542
+  type: 'test'
+  ...
+# Subtest: mock date lifecycle follows saved to scheduled to completed to rated
+ok 20 - mock date lifecycle follows saved to scheduled to completed to rated
+  ---
+  duration_ms: 0.670666
+  type: 'test'
+  ...
+# Subtest: mock scheduling a completed date clears its prior completion
+ok 21 - mock scheduling a completed date clears its prior completion
+  ---
+  duration_ms: 0.05525
+  type: 'test'
+  ...
+# Subtest: mock rating fails closed before completion and outside the one-to-five scale
+ok 22 - mock rating fails closed before completion and outside the one-to-five scale
+  ---
+  duration_ms: 0.315125
+  type: 'test'
+  ...
+# Subtest: mock like and save mutations are idempotent
+ok 23 - mock like and save mutations are idempotent
+  ---
+  duration_ms: 0.048167
+  type: 'test'
+  ...
+# Subtest: date plan items without a creator are safe to reveal
+ok 24 - date plan items without a creator are safe to reveal
+  ---
+  duration_ms: 0.054667
+  type: 'test'
+  ...
+# Subtest: date plan items created by the viewer are safe to reveal before a match
+ok 25 - date plan items created by the viewer are safe to reveal before a match
+  ---
+  duration_ms: 0.03875
+  type: 'test'
+  ...
+# Subtest: partner-created date plan items stay hidden until mutual match
+ok 26 - partner-created date plan items stay hidden until mutual match
+  ---
+  duration_ms: 0.038125
+  type: 'test'
+  ...
+# Subtest: partner-created date plan items are revealed after mutual match
+ok 27 - partner-created date plan items are revealed after mutual match
+  ---
+  duration_ms: 0.039167
+  type: 'test'
+  ...
+# Subtest: plan-item match actions expose explicit native button semantics and labels
+ok 28 - plan-item match actions expose explicit native button semantics and labels
+  ---
+  duration_ms: 1.359625
+  type: 'test'
+  ...
+# Subtest: plan-item match vote actions retain their disabled state contract
+ok 29 - plan-item match vote actions retain their disabled state contract
+  ---
+  duration_ms: 0.219084
+  type: 'test'
+  ...
+1..29
+# tests 29
+# suites 0
+# pass 29
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 72.328

@@ -1,0 +1,54 @@
+TAP version 13
+# Subtest: plan-item match actions expose explicit native button semantics and labels
+not ok 1 - plan-item match actions expose explicit native button semantics and labels
+  ---
+  duration_ms: 2.142542
+  type: 'test'
+  location: '/Users/austinftacnik/dev/ourcutelife/.tmp/p4-qa-001-red-1784444349/plan-match-accessibility.test.js:18:30'
+  failureType: 'testCodeFailure'
+  error: 'expected a Pressable with accessibilityLabel="Back"'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: ~
+  operator: '=='
+  stack: |-
+    pressableForLabel (/Users/austinftacnik/dev/ourcutelife/.tmp/p4-qa-001-red-1784444349/plan-match-accessibility.test.js:15:22)
+    TestContext.<anonymous> (/Users/austinftacnik/dev/ourcutelife/.tmp/p4-qa-001-red-1784444349/plan-match-accessibility.test.js:20:32)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: plan-item match vote actions retain their disabled state contract
+not ok 2 - plan-item match vote actions retain their disabled state contract
+  ---
+  duration_ms: 0.360666
+  type: 'test'
+  location: '/Users/austinftacnik/dev/ourcutelife/.tmp/p4-qa-001-red-1784444349/plan-match-accessibility.test.js:23:30'
+  failureType: 'testCodeFailure'
+  error: 'expected a Pressable with accessibilityLabel="Pass"'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: ~
+  operator: '=='
+  stack: |-
+    pressableForLabel (/Users/austinftacnik/dev/ourcutelife/.tmp/p4-qa-001-red-1784444349/plan-match-accessibility.test.js:15:22)
+    TestContext.<anonymous> (/Users/austinftacnik/dev/ourcutelife/.tmp/p4-qa-001-red-1784444349/plan-match-accessibility.test.js:25:32)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 0
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 66.625292

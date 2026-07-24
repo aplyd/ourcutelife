@@ -22,6 +22,7 @@ export default function EditMomentScreen(): JSX.Element {
   const [dateText, setDateText] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const canSave = Boolean(summary.trim() && feeling.trim() && !isSaving);
 
   useEffect(() => {
     if (!moment) return;
@@ -102,6 +103,9 @@ export default function EditMomentScreen(): JSX.Element {
         {(["good", "mixed", "bad"] as const).map((item) => (
           <Pressable
             key={item}
+            accessibilityRole="button"
+            accessibilityLabel={`Set moment tone to ${item === "bad" ? "Hard" : item === "good" ? "Good" : "Mixed"}`}
+            accessibilityState={{ selected: tone === item }}
             className={`flex-1 rounded-full py-3 items-center ${tone === item ? "bg-[#2f211c]" : "bg-white border border-[#e6d2c2]"}`}
             onPress={() => setTone(item)}
           >
@@ -113,8 +117,11 @@ export default function EditMomentScreen(): JSX.Element {
       </View>
       {error ? <Text className="text-center text-sm text-red-700">{error}</Text> : null}
       <Pressable
-        className="h-14 rounded-full bg-[#2f211c] items-center justify-center"
-        disabled={isSaving}
+        accessibilityRole="button"
+        accessibilityLabel="Save moment changes"
+        accessibilityState={{ disabled: !canSave, busy: isSaving }}
+        className={`h-14 rounded-full items-center justify-center ${canSave ? "bg-[#2f211c]" : "bg-[#d8c2b4]"}`}
+        disabled={!canSave}
         onPress={handleSave}
       >
         <Text className="font-bold text-white">{isSaving ? "Saving…" : "Save changes"}</Text>

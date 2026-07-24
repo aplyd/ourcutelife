@@ -1,0 +1,16 @@
+{
+  "source": "Argent mcp_argent_describe",
+  "route": "/moments",
+  "elements": [
+    {
+      "role": "AXButton",
+      "label": "Log a moment",
+      "frame": [0.03, 0.307, 0.94, 0.064]
+    },
+    {
+      "role": "AXButton",
+      "label": "Open moment: Mocked a sweet product moment so agents can verify the timeline.",
+      "frame": [0.03, 0.389, 0.94, 0.227]
+    }
+  ]
+}

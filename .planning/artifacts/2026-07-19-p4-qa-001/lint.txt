@@ -1,0 +1,3 @@
+$ oxlint --type-aware --type-check --react-plugin --jsx-a11y-plugin .
+Found 0 warnings and 0 errors.
+Finished in 867ms on 69 files with 141 rules using 12 threads.

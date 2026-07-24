@@ -104,6 +104,7 @@ export default function NewMomentScreen(): JSX.Element {
       <View className="gap-2">
         <Text className="text-sm font-semibold text-[#6f5a50]">Date</Text>
         <TextInput
+          accessibilityLabel="Moment date"
           className="h-12 rounded-2xl border border-[#e6d2c2] bg-white/80 px-4 text-base text-[#2f211c]"
           placeholder="YYYY-MM-DD"
           value={happenedAtText}
@@ -114,6 +115,7 @@ export default function NewMomentScreen(): JSX.Element {
       <View className="gap-2">
         <Text className="text-sm font-semibold text-[#6f5a50]">What happened?</Text>
         <TextInput
+          accessibilityLabel="What happened"
           multiline
           className="min-h-28 rounded-2xl border border-[#e6d2c2] bg-white/80 px-4 py-3 text-base leading-6 text-[#2f211c]"
           placeholder="Jot down the moment in your own words."
@@ -126,6 +128,7 @@ export default function NewMomentScreen(): JSX.Element {
       <View className="gap-2">
         <Text className="text-sm font-semibold text-[#6f5a50]">How did it make you feel?</Text>
         <TextInput
+          accessibilityLabel="How the moment felt"
           multiline
           className="min-h-24 rounded-2xl border border-[#e6d2c2] bg-white/80 px-4 py-3 text-base leading-6 text-[#2f211c]"
           placeholder="Name the feeling without polishing it for anyone else."
@@ -143,6 +146,9 @@ export default function NewMomentScreen(): JSX.Element {
             return (
               <Pressable
                 key={option.value}
+                accessibilityRole="button"
+                accessibilityLabel={`Set moment tone to ${option.label}`}
+                accessibilityState={{ selected }}
                 className={`rounded-2xl border p-4 ${selected ? "border-[#7c3aed] bg-[#f4ecff]" : "border-[#e6d2c2] bg-white/80"}`}
                 onPress={() => setTone(option.value)}
               >
@@ -209,6 +215,9 @@ export default function NewMomentScreen(): JSX.Element {
       {error ? <Text className="text-center text-sm text-red-700">{error}</Text> : null}
 
       <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Save private moment"
+        accessibilityState={{ disabled: !canSave, busy: isSaving }}
         className={`h-14 rounded-full items-center justify-center ${canSave ? "bg-[#2f211c]" : "bg-[#d8c2b4]"}`}
         disabled={!canSave}
         onPress={handleSave}

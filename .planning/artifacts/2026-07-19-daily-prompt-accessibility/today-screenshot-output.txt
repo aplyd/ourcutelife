@@ -1,0 +1,2 @@
+Saved screenshot: /var/folders/gn/dgk_wntn7k30l7vrv8yztmp80000gn/T/simserver-RsTWTm/media/355367000-1784474240356.png
+Wrote: .planning/artifacts/2026-07-19-daily-prompt-accessibility/today.png

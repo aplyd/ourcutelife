@@ -130,6 +130,9 @@ export default function EditProfileSheet(): JSX.Element {
 
       <View className="items-center gap-3 rounded-3xl border border-soft bg-card/90 p-4">
         <Pressable
+          accessibilityLabel="Change profile photo"
+          accessibilityRole="button"
+          accessibilityState={{ disabled: isUploadingPhoto, busy: isUploadingPhoto }}
           className="h-28 w-28 overflow-hidden rounded-full bg-accent items-center justify-center"
           disabled={isUploadingPhoto}
           onPress={handlePickPhoto}
@@ -143,6 +146,9 @@ export default function EditProfileSheet(): JSX.Element {
           )}
         </Pressable>
         <Pressable
+          accessibilityLabel={avatarUrl ? "Change profile photo" : "Upload profile photo"}
+          accessibilityRole="button"
+          accessibilityState={{ disabled: isUploadingPhoto, busy: isUploadingPhoto }}
           className="rounded-full bg-accent px-4 py-2"
           disabled={isUploadingPhoto}
           onPress={handlePickPhoto}
@@ -156,6 +162,7 @@ export default function EditProfileSheet(): JSX.Element {
       <View className="gap-2">
         <Text className="text-sm font-semibold text-muted">Name</Text>
         <TextInput
+          accessibilityLabel="Profile name"
           className="h-12 rounded-2xl border border-soft bg-card/90 px-4 text-base text-ink"
           value={fullName}
           onChangeText={setFullName}
@@ -165,6 +172,9 @@ export default function EditProfileSheet(): JSX.Element {
       </View>
       {error ? <Text className="text-center text-sm text-red-700">{error}</Text> : null}
       <Pressable
+        accessibilityLabel="Save profile"
+        accessibilityRole="button"
+        accessibilityState={{ disabled: !fullName.trim() || isSaving, busy: isSaving }}
         className={`h-14 rounded-full items-center justify-center ${fullName.trim() && !isSaving ? "bg-accent" : "bg-soft"}`}
         disabled={!fullName.trim() || isSaving}
         onPress={handleSave}

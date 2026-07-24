@@ -16,6 +16,8 @@ export default defineSchema({
     name: v.string(),
     anniversaryDate: v.optional(v.number()),
     createdByUserId: v.id("users"),
+    promptTimezone: v.optional(v.string()),
+    promptTimezoneUpdatedAt: v.optional(v.number()),
     createdAt: v.number(),
     updatedAt: v.number(),
   }),
@@ -108,6 +110,113 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_token", ["token"])
     .index("by_enabled", ["enabled"]),
+  notificationDevices: defineTable({
+    coupleId: v.id("couples"),
+    userId: v.id("users"),
+    deviceId: v.string(),
+    pushToken: v.optional(v.string()),
+    platform: v.union(
+      v.literal("ios"),
+      v.literal("android"),
+      v.literal("web"),
+      v.literal("unknown"),
+    ),
+    permissionStatus: v.union(
+      v.literal("undetermined"),
+      v.literal("denied"),
+      v.literal("granted"),
+      v.literal("revoked"),
+    ),
+    timezone: v.optional(v.string()),
+    enabled: v.boolean(),
+    lastObservedAt: v.optional(v.number()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user_id_and_device_id", ["userId", "deviceId"])
+    .index("by_couple_id_and_user_id", ["coupleId", "userId"])
+    .index("by_couple_id_and_user_id_and_enabled_and_permission_status_and_updated_at", [
+      "coupleId",
+      "userId",
+      "enabled",
+      "permissionStatus",
+      "updatedAt",
+    ])
+    .index("by_ready_lookup", ["coupleId", "userId", "enabled", "permissionStatus", "pushToken"])
+    .index("by_push_token", ["pushToken"])
+    .index("by_enabled_and_updated_at", ["enabled", "updatedAt"]),
+  dailyPromptLifecycles: defineTable({
+    coupleId: v.id("couples"),
+    promptDate: v.string(),
+    timezone: v.string(),
+    firstUserId: v.id("users"),
+    secondUserId: v.id("users"),
+    randomizedFirstLocalMinute: v.number(),
+    firstScheduledAt: v.number(),
+    firstStatus: v.union(
+      v.literal("pending"),
+      v.literal("scheduled"),
+      v.literal("sending"),
+      v.literal("sent"),
+      v.literal("skipped"),
+    ),
+    secondStatus: v.union(
+      v.literal("pending"),
+      v.literal("scheduled"),
+      v.literal("sending"),
+      v.literal("sent"),
+      v.literal("skipped"),
+    ),
+    firstStartedAt: v.optional(v.number()),
+    secondScheduledAt: v.optional(v.number()),
+    secondDeliveryKey: v.optional(v.string()),
+    secondSchedulerJobId: v.optional(v.string()),
+    firstSentAt: v.optional(v.number()),
+    secondSentAt: v.optional(v.number()),
+    skippedAt: v.optional(v.number()),
+    skippedReason: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_couple_id_and_prompt_date", ["coupleId", "promptDate"])
+    .index("by_first_scheduled_at_and_first_status", ["firstScheduledAt", "firstStatus"])
+    .index("by_second_scheduled_at_and_second_status", ["secondScheduledAt", "secondStatus"]),
+  dailyPromptDeliveryAttempts: defineTable({
+    lifecycleId: v.id("dailyPromptLifecycles"),
+    coupleId: v.id("couples"),
+    promptDate: v.string(),
+    step: v.union(v.literal("first"), v.literal("second")),
+    recipientUserId: v.id("users"),
+    idempotencyKey: v.string(),
+    deviceId: v.string(),
+    tokenRef: v.optional(v.string()),
+    tokenHash: v.optional(v.string()),
+    status: v.union(
+      v.literal("reserved"),
+      v.literal("provider_accepted"),
+      v.literal("provider_rejected"),
+      v.literal("sending_unknown"),
+    ),
+    expoTicketId: v.optional(v.string()),
+    expoErrorCode: v.optional(v.string()),
+    dispatchStartedAt: v.optional(v.number()),
+    outcomePersistedAt: v.optional(v.number()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_idempotency_key", ["idempotencyKey"])
+    .index("by_lifecycle_id_and_step", ["lifecycleId", "step"])
+    .index("by_status_and_created_at", ["status", "createdAt"]),
+  dailyPromptAnswerStarts: defineTable({
+    coupleId: v.id("couples"),
+    promptDate: v.string(),
+    userId: v.id("users"),
+    startedAt: v.number(),
+    source: v.literal("first_non_empty_input"),
+    createdAt: v.number(),
+  })
+    .index("by_couple_id_and_prompt_date", ["coupleId", "promptDate"])
+    .index("by_user_id_and_prompt_date", ["userId", "promptDate"]),
   planIdeas: defineTable({
     coupleId: v.id("couples"),
     createdByUserId: v.optional(v.id("users")),
@@ -220,6 +329,7 @@ export default defineSchema({
   })
     .index("by_couple_and_status", ["coupleId", "status"])
     .index("by_couple_and_created_at", ["coupleId", "createdAt"])
+    .index("by_couple_and_date_plan", ["coupleId", "datePlanId"])
     .index("by_date_plan", ["datePlanId"]),
   datePlanRatings: defineTable({
     coupleId: v.id("couples"),

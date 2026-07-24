@@ -21,13 +21,13 @@ Start the repo-local agentic engineering foundation phase so ourcutelife agents 
 - `package.json` scripts: `agent:validate`, `agent:review`, `agent:sweep`.
 - `docs/agent/TESTING.md` — behavioral test harness plan for pure unit tests, route/component smoke tests, Convex/server tests, and Argent device smoke evidence.
 - `pnpm test:unit` plus `tests/unit/date-plan-privacy.test.ts` — no-new-dependency unit starter covering private-until-mutual date-plan item reveal rules.
+- `.planning/worksheets/TEMPLATE.md` and `docs/agent/WORKSHEETS.md` — compact execution evidence template plus an immutable, optional `verified/YYYY-MM-DD/<slug>` local tag convention that does not imply release or deployment approval.
+- `.argent/flows/core-tabs-visual-baseline.yaml` — opt-in, non-destructive mock-auth capture flow for Today, Chat, Plans, and Me with stable-screen waits before every screenshot.
 
 ## Remaining foundation gaps
 
 - Behavioral test harness is only a no-dependency unit starter; no route/component, Convex/server, or browser/device automated harness yet.
-- No scripted visual regression baseline yet.
 - `tools/agent_review` is a local helper, not a full cross-model review dispatcher.
-- No worksheet template/git-tag flow yet.
 - No scheduled/cron enforcement for recent-commit sweeps yet.
 
 ## Verification plan

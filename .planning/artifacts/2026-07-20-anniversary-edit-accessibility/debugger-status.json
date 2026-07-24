@@ -1,0 +1,12 @@
+{
+  "port": 8081,
+  "projectRoot": "/Users/austinftacnik/dev/ourcutelife",
+  "deviceName": "iPhone 17 Pro",
+  "appName": "com.ourcutelife.app (iPhone 17 Pro)",
+  "logicalDeviceId": "02f7600982458f6cde43975bcfe5da7e2dafbae1",
+  "isNewDebugger": true,
+  "connected": true,
+  "loadedScripts": 15,
+  "enabledDomains": ["ReactNativeApplication", "Runtime", "Debugger"],
+  "sourceMapReady": true
+}

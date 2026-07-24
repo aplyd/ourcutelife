@@ -58,6 +58,7 @@ export default function EditAnniversarySheet(): JSX.Element {
         <Text className="text-sm font-semibold text-[#6f5a50]">Date</Text>
         <TextInput
           className="h-12 rounded-2xl border border-[#e6d2c2] bg-white/90 px-4 text-base text-[#2f211c]"
+          accessibilityLabel="Anniversary date"
           value={dateText}
           onChangeText={setDateText}
           placeholder="YYYY-MM-DD"
@@ -66,6 +67,9 @@ export default function EditAnniversarySheet(): JSX.Element {
       {error ? <Text className="text-center text-sm text-red-700">{error}</Text> : null}
       <Pressable
         className={`h-14 rounded-full items-center justify-center ${dateText.trim() && !isSaving ? "bg-[#2f211c]" : "bg-[#d8c2b4]"}`}
+        accessibilityRole="button"
+        accessibilityLabel="Save anniversary"
+        accessibilityState={{ disabled: !dateText.trim() || isSaving, busy: isSaving }}
         disabled={!dateText.trim() || isSaving}
         onPress={handleSave}
       >

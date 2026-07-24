@@ -29,7 +29,11 @@ export default function TodayQuizScreen(): JSX.Element {
 
   return (
     <ScrollView className="flex-1 bg-app-bg" contentContainerClassName="px-3 pt-16 pb-10 gap-4">
-      <Pressable onPress={() => router.back()}>
+      <Pressable
+        accessibilityLabel="Back to Today"
+        accessibilityRole="button"
+        onPress={() => router.back()}
+      >
         <Text className="font-semibold text-accent">← Back</Text>
       </Pressable>
 
@@ -52,6 +56,9 @@ export default function TodayQuizScreen(): JSX.Element {
             return (
               <Pressable
                 key={choice}
+                accessibilityLabel={`Guess ${choice}`}
+                accessibilityRole="button"
+                accessibilityState={{ selected: active }}
                 className={`rounded-full px-4 py-3 ${active ? "bg-accent" : "bg-white/15"}`}
                 onPress={() => setGuess(choice)}
               >
@@ -69,11 +76,16 @@ export default function TodayQuizScreen(): JSX.Element {
           what they need right now.
         </Text>
         <Pressable
-          className="h-12 rounded-full bg-accent items-center justify-center"
+          accessibilityLabel="Compare quiz answer"
+          accessibilityRole="button"
+          accessibilityState={{ disabled: !guess }}
+          className={`h-12 rounded-full items-center justify-center ${guess ? "bg-accent" : "bg-soft"}`}
           disabled={!guess}
           onPress={() => setRevealed(true)}
         >
-          <Text className="font-bold text-white">I asked them</Text>
+          <Text className={`font-bold ${guess ? "text-white" : "text-muted"}`}>
+            {guess ? "I asked them" : "Choose your guess first"}
+          </Text>
         </Pressable>
         {revealed ? (
           <View className="rounded-3xl bg-app-bg p-4 border border-soft gap-2">

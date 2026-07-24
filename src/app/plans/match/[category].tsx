@@ -56,6 +56,8 @@ export default function PlanMatchScreen(): JSX.Element {
     <View className="flex-1 bg-[#fff8f1] px-3 pt-14 pb-10 gap-3">
       <View className="flex-row items-center justify-between">
         <Pressable
+          accessibilityLabel="Back"
+          accessibilityRole="button"
           className="h-11 px-4 rounded-full bg-white border border-[#e6d2c2] items-center justify-center"
           onPress={() => router.back()}
         >
@@ -63,6 +65,8 @@ export default function PlanMatchScreen(): JSX.Element {
         </Pressable>
         <Text className="text-lg font-bold text-[#2f211c]">{planItemLabel}</Text>
         <Pressable
+          accessibilityLabel="History"
+          accessibilityRole="button"
           className="h-11 px-4 rounded-full bg-white border border-[#e6d2c2] items-center justify-center"
           onPress={() => router.push("/plans/history")}
         >
@@ -73,9 +77,14 @@ export default function PlanMatchScreen(): JSX.Element {
       {currentIdea ? (
         <View className="flex-1 rounded-[40px] bg-white/95 p-4 border border-[#f1dfd2] justify-between">
           <View className="gap-4">
-            <Text className="self-start rounded-full bg-[#f4ecff] px-4 py-2 text-sm font-bold uppercase tracking-widest text-[#5b21b6]">
-              {planItemLabel}
-            </Text>
+            <View className="flex-row flex-wrap gap-2">
+              <Text className="rounded-full bg-[#f4ecff] px-4 py-2 text-sm font-bold uppercase tracking-widest text-[#5b21b6]">
+                {planItemLabel}
+              </Text>
+              <Text className="rounded-full bg-[#ecfeff] px-4 py-2 text-sm font-bold uppercase tracking-widest text-[#0e7490]">
+                {currentIdea.kind === "place" ? "Place" : "Activity"}
+              </Text>
+            </View>
             <Text className="text-4xl font-bold leading-[46px] text-[#2f211c]">
               {currentIdea.title}
             </Text>
@@ -93,6 +102,8 @@ export default function PlanMatchScreen(): JSX.Element {
           </View>
           <View className="flex-row gap-3">
             <Pressable
+              accessibilityLabel="Pass"
+              accessibilityRole="button"
               className="flex-1 h-16 rounded-full bg-[#f1dfd2] items-center justify-center"
               disabled={isWorking}
               onPress={() => handleVote(currentIdea._id, "pass")}
@@ -100,6 +111,8 @@ export default function PlanMatchScreen(): JSX.Element {
               <Text className="text-lg font-bold text-[#6f5a50]">Pass</Text>
             </Pressable>
             <Pressable
+              accessibilityLabel="Like"
+              accessibilityRole="button"
               className="flex-1 h-16 rounded-full bg-[#7c3aed] items-center justify-center"
               disabled={isWorking}
               onPress={() => handleVote(currentIdea._id, "like")}
@@ -117,6 +130,8 @@ export default function PlanMatchScreen(): JSX.Element {
             Add your own private suggestion or check another category.
           </Text>
           <Pressable
+            accessibilityLabel="Add a private plan item"
+            accessibilityRole="button"
             className="h-12 rounded-full bg-[#7c3aed] px-5 items-center justify-center"
             onPress={() => router.push("/plans/new")}
           >

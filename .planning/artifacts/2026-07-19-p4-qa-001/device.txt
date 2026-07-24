@@ -1,0 +1,159 @@
+{
+  "devices": [
+    {
+      "platform": "ios",
+      "udid": "F736E64F-ED8F-475C-BD05-7C156B568F74",
+      "name": "iPhone 17 Pro",
+      "state": "Booted",
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-5"
+    },
+    {
+      "platform": "ios",
+      "udid": "824CD99D-5266-4C34-BA9F-9083334BF218",
+      "name": "iPhone 17 Pro",
+      "state": "Booted",
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-4"
+    },
+    {
+      "platform": "ios",
+      "udid": "390DA97B-C03E-448E-9A6A-4CCF4546B362",
+      "name": "iPhone 17 Pro Max",
+      "state": "Shutdown",
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-5"
+    },
+    {
+      "platform": "ios",
+      "udid": "766E2533-1E64-4DB9-85D0-FCBFDC275B34",
+      "name": "iPhone 17e",
+      "state": "Shutdown",
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-5"
+    },
+    {
+      "platform": "ios",
+      "udid": "05D7C5F5-98FA-4490-B9DC-EC8FEDD612F8",
+      "name": "iPhone Air",
+      "state": "Shutdown",
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-5"
+    },
+    {
+      "platform": "ios",
+      "udid": "D3004C3D-2CBB-49F3-A1F8-2C7C1713EA62",
+      "name": "iPhone 17",
+      "state": "Shutdown",
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-5"
+    },
+    {
+      "platform": "ios",
+      "udid": "24E5E473-435E-47FE-A297-C389BE0CE466",
+      "name": "iPhone 17 Pro Max",
+      "state": "Shutdown",
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-4"
+    },
+    {
+      "platform": "ios",
+      "udid": "AF12A5C3-0436-460E-89D0-7FDDB5AF017C",
+      "name": "iPhone 17e",
+      "state": "Shutdown",
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-4"
+    },
+    {
+      "platform": "ios",
+      "udid": "50DA9B8B-0F1A-47AB-B5B9-904FF99EC646",
+      "name": "iPhone Air",
+      "state": "Shutdown",
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-4"
+    },
+    {
+      "platform": "ios",
+      "udid": "4AC647D2-93B7-4400-B74A-4A83489FB9F7",
+      "name": "iPhone 17",
+      "state": "Shutdown",
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-4"
+    },
+    {
+      "platform": "ios",
+      "udid": "D42D579F-C182-4CAA-9BE4-D7EE3FACDA50",
+      "name": "iPad Pro 13-inch (M5)",
+      "state": "Shutdown",
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-5"
+    },
+    {
+      "platform": "ios",
+      "udid": "F4B4B2B3-C837-4470-BE81-1508C4EB21DD",
+      "name": "iPad Pro 11-inch (M5)",
+      "state": "Shutdown",
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-5"
+    },
+    {
+      "platform": "ios",
+      "udid": "960CEDE2-6E96-4CCD-B0D1-91358DA5C4F1",
+      "name": "iPad mini (A17 Pro)",
+      "state": "Shutdown",
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-5"
+    },
+    {
+      "platform": "ios",
+      "udid": "7EFBAEA5-1917-4F1F-9937-4DC7894A8813",
+      "name": "iPad Air 13-inch (M4)",
+      "state": "Shutdown",
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-5"
+    },
+    {
+      "platform": "ios",
+      "udid": "AF1B5F26-7F2D-45A7-AC5C-DFA891238617",
+      "name": "iPad Air 11-inch (M4)",
+      "state": "Shutdown",
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-5"
+    },
+    {
+      "platform": "ios",
+      "udid": "8A74676A-5AE8-4733-AD30-05C713EEF3C4",
+      "name": "iPad (A16)",
+      "state": "Shutdown",
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-5"
+    },
+    {
+      "platform": "ios",
+      "udid": "E5F4A38A-D352-47F8-84B0-22C832FBB3DE",
+      "name": "iPad Pro 13-inch (M5)",
+      "state": "Shutdown",
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-4"
+    },
+    {
+      "platform": "ios",
+      "udid": "D126A939-8010-4BB1-95C0-90EC528093E5",
+      "name": "iPad Pro 11-inch (M5)",
+      "state": "Shutdown",
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-4"
+    },
+    {
+      "platform": "ios",
+      "udid": "AD295C9C-BE19-4F35-83A5-D94522336608",
+      "name": "iPad mini (A17 Pro)",
+      "state": "Shutdown",
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-4"
+    },
+    {
+      "platform": "ios",
+      "udid": "6DE66A97-35AA-48B9-8656-D928DD279669",
+      "name": "iPad Air 13-inch (M4)",
+      "state": "Shutdown",
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-4"
+    },
+    {
+      "platform": "ios",
+      "udid": "1224E061-A749-4A5F-8723-A52E979108A0",
+      "name": "iPad Air 11-inch (M4)",
+      "state": "Shutdown",
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-4"
+    },
+    {
+      "platform": "ios",
+      "udid": "CC08866D-7C86-47A2-BE9F-C186DE9B11E0",
+      "name": "iPad (A16)",
+      "state": "Shutdown",
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-4"
+    }
+  ],
+  "avds": []
+}

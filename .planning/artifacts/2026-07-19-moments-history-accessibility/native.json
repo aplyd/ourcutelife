@@ -1,0 +1,20 @@
+{
+  "source": "Argent mcp_argent_native_describe_screen",
+  "status": "ok",
+  "route": "/moments",
+  "screenFrame": { "x": 0, "y": 0, "width": 402, "height": 874 },
+  "elements": [
+    {
+      "label": "Log a moment",
+      "traits": ["button"],
+      "viewClassName": "RCTViewComponentView",
+      "frame": { "x": 12, "y": 268, "width": 378, "height": 56 }
+    },
+    {
+      "label": "Open moment: Mocked a sweet product moment so agents can verify the timeline.",
+      "traits": ["button"],
+      "viewClassName": "RCTViewComponentView",
+      "frame": { "x": 12, "y": 340, "width": 378, "height": 198 }
+    }
+  ]
+}

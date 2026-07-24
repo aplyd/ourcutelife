@@ -6,7 +6,7 @@ Summary:
 2. Read AGENTS.md first, then this file, then .planning/STATE.md, ROADMAP.md, and DECISIONS.md.
 3. Keep .planning/ as canonical state; Notes/Reminders are intake only.
 4. Every code session should inspect git status, preserve user work, run the app when relevant, verify with real commands, and update state.
-5. Prefer small commits with evidence over large unverified changes.
+5. Prefer small commits with evidence over large unverified changes; use the worksheet flow in `docs/agent/WORKSHEETS.md` for meaningful bounded slices.
 6. Use independent review for meaningful code changes before or immediately after commit.
 7. Improve these docs/tools when a repeated failure or workflow gap appears.
 
@@ -20,7 +20,7 @@ Summary:
 6. Verify with `tools/agent_validate`, targeted checks, and `git diff --check`.
 7. Review meaningful code changes with `tools/agent_review` plus an independent reviewer when possible.
 8. Sweep recent committed work with `tools/agent_commit_sweep` before trusting a milestone or handing off a local branch.
-9. Commit coherent changes and update `.planning/STATE.md` with evidence, blockers, and next actions.
+9. Commit coherent changes and update `.planning/STATE.md` with evidence, blockers, and next actions. Create a verification tag only under the convention in `docs/agent/WORKSHEETS.md` and only when authorized to tag/push.
 
 ## Definition of done
 

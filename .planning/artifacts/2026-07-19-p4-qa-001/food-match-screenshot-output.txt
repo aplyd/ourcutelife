@@ -1,0 +1,2 @@
+Saved screenshot: /var/folders/gn/dgk_wntn7k30l7vrv8yztmp80000gn/T/simserver-acBEM0/media/858172000-1784444436859.png
+Wrote: .planning/artifacts/2026-07-19-p4-qa-001/food-match.png

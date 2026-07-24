@@ -1,17 +1,39 @@
 import { v } from "convex/values";
+import type { GenericId } from "convex/values";
+import { internal } from "./_generated/api";
+import type { Doc, Id } from "./_generated/dataModel";
 import type { MutationCtx, QueryCtx } from "./_generated/server";
-import { mutation, query } from "./_generated/server";
-import { getCurrentAppUser } from "./auth";
+import { internalMutation, mutation, query } from "./_generated/server";
+import {
+  createDailyPromptDeliveryKey,
+  getPromptDateInTimezone,
+  validateDailyPromptDeliveryStepTransition,
+} from "./dailyPromptLifecycle";
+import { getAuthoritativePromptDate, getLatestLifecycle } from "./dailyPromptDateResolver";
+
+async function getAuthenticatedUser(ctx: QueryCtx | MutationCtx): Promise<Doc<"users"> | null> {
+  const identity = await ctx.auth.getUserIdentity();
+  const authUserId = identity?.tokenIdentifier;
+  if (!authUserId) return null;
+
+  const users = await ctx.db
+    .query("users")
+    .withIndex("by_auth_user_id", (q) => q.eq("authUserId", authUserId))
+    .take(2);
+  if (users.length > 1) throw new Error("Ambiguous authenticated user.");
+  return users[0] ?? null;
+}
 
 async function requireSession(ctx: QueryCtx | MutationCtx) {
-  const user = await getCurrentAppUser(ctx);
+  const user = await getAuthenticatedUser(ctx);
   if (!user) throw new Error("Not signed in.");
-  const membership = await ctx.db
+  const memberships = await ctx.db
     .query("coupleMembers")
     .withIndex("by_user", (q) => q.eq("userId", user._id))
-    .first();
-  if (!membership) throw new Error("Pair with your partner first.");
-  return { user, membership };
+    .take(2);
+  if (memberships.length === 0) throw new Error("Pair with your partner first.");
+  if (memberships.length > 1) throw new Error("Ambiguous couple membership.");
+  return { user, membership: memberships[0] };
 }
 
 function todayKey(): string {
@@ -23,6 +45,296 @@ function stableIndex(seed: string, length: number): number {
   for (let index = 0; index < seed.length; index += 1)
     hash = (hash * 31 + seed.charCodeAt(index)) >>> 0;
   return hash % length;
+}
+
+async function getExactCoupleMembers(ctx: QueryCtx | MutationCtx, coupleId: Id<"couples">) {
+  const members = await ctx.db
+    .query("coupleMembers")
+    .withIndex("by_couple", (q) => q.eq("coupleId", coupleId))
+    .take(3);
+  const distinctUserIds = new Set(members.map((member) => member.userId));
+  if (members.length !== 2 || distinctUserIds.size !== 2) {
+    throw new Error("Invalid daily prompt membership.");
+  }
+  return members;
+}
+
+async function getCurrentLifecycle(
+  ctx: QueryCtx | MutationCtx,
+  coupleId: Id<"couples">,
+  promptDate: string,
+) {
+  const couple = await ctx.db.get(coupleId);
+  if (!couple?.promptTimezone) throw new Error("Daily prompt timezone is not configured.");
+
+  const authoritative = await getAuthoritativePromptDate(
+    ctx,
+    coupleId,
+    Date.now(),
+    couple.promptTimezone,
+  );
+  if (promptDate !== authoritative.promptDate) {
+    const latest = await getLatestLifecycle(ctx, coupleId);
+    if (!latest) throw new Error("Daily prompt is not scheduled.");
+    throw new Error("Daily prompt date is not current.");
+  }
+
+  const rows = await ctx.db
+    .query("dailyPromptLifecycles")
+    .withIndex("by_couple_id_and_prompt_date", (q) =>
+      q.eq("coupleId", coupleId).eq("promptDate", promptDate),
+    )
+    .take(2);
+  if (rows.length === 0) throw new Error("Daily prompt is not scheduled.");
+  if (rows.length > 1) throw new Error("Duplicate daily prompt lifecycle.");
+  const lifecycle = rows[0];
+  if (lifecycle.coupleId !== coupleId) throw new Error("Daily prompt lifecycle mismatch.");
+
+  return lifecycle;
+}
+
+async function validateLifecycleRecipients(
+  ctx: QueryCtx | MutationCtx,
+  lifecycle: Doc<"dailyPromptLifecycles">,
+  viewerUserId: Id<"users">,
+) {
+  if (lifecycle.firstUserId === lifecycle.secondUserId) {
+    throw new Error("Malformed daily prompt lifecycle recipients.");
+  }
+  const members = await getExactCoupleMembers(ctx, lifecycle.coupleId);
+  const memberUserIds = new Set(members.map((member) => member.userId));
+  if (
+    !memberUserIds.has(viewerUserId) ||
+    !memberUserIds.has(lifecycle.firstUserId) ||
+    !memberUserIds.has(lifecycle.secondUserId)
+  ) {
+    throw new Error("Malformed daily prompt lifecycle recipients.");
+  }
+}
+
+async function getExistingStart(
+  ctx: QueryCtx | MutationCtx,
+  userId: Id<"users">,
+  coupleId: Id<"couples">,
+  promptDate: string,
+) {
+  const rows = await ctx.db
+    .query("dailyPromptAnswerStarts")
+    .withIndex("by_user_id_and_prompt_date", (q) =>
+      q.eq("userId", userId).eq("promptDate", promptDate),
+    )
+    .take(2);
+  if (rows.length > 1) throw new Error("Duplicate daily prompt answer start.");
+  const start = rows[0] ?? null;
+  if (start && start.coupleId !== coupleId) {
+    throw new Error("Daily prompt answer start mismatch.");
+  }
+  return start;
+}
+
+function validateFirstAnswerCanStart(lifecycle: Doc<"dailyPromptLifecycles">) {
+  if (!["scheduled", "sending", "sent"].includes(lifecycle.firstStatus)) {
+    throw new Error("Illegal first daily prompt status for answer start.");
+  }
+}
+
+function validatePendingSecondState(lifecycle: Doc<"dailyPromptLifecycles">) {
+  if (
+    lifecycle.secondScheduledAt !== undefined ||
+    lifecycle.secondDeliveryKey !== undefined ||
+    lifecycle.secondSchedulerJobId !== undefined
+  ) {
+    throw new Error("Malformed pending second daily prompt state.");
+  }
+}
+
+async function validateScheduledSecondState(
+  ctx: MutationCtx,
+  lifecycle: Doc<"dailyPromptLifecycles">,
+  startedAt: number,
+  expectedJobStates: ReadonlyArray<"pending" | "inProgress" | "success"> = ["pending"],
+) {
+  const expectedScheduledAt = startedAt + 300_000;
+  const expectedDeliveryKey = createDailyPromptDeliveryKey(lifecycle._id, "second");
+  if (
+    lifecycle.secondScheduledAt !== expectedScheduledAt ||
+    lifecycle.secondDeliveryKey !== expectedDeliveryKey ||
+    !lifecycle.secondSchedulerJobId
+  ) {
+    throw new Error("Malformed scheduled second daily prompt state.");
+  }
+  let scheduled;
+  try {
+    scheduled = await ctx.db.system.get(
+      "_scheduled_functions",
+      lifecycle.secondSchedulerJobId as GenericId<"_scheduled_functions">,
+    );
+  } catch {
+    throw new Error("Malformed scheduled second daily prompt state.");
+  }
+  if (
+    !scheduled ||
+    scheduled.name !== "prompts:secondAnswerBoundary" ||
+    scheduled.scheduledTime !== expectedScheduledAt ||
+    !expectedJobStates.some((state) => state === scheduled.state.kind) ||
+    JSON.stringify(scheduled.args) !== JSON.stringify([{ lifecycleId: lifecycle._id }])
+  ) {
+    throw new Error("Malformed scheduled second daily prompt state.");
+  }
+  return scheduled;
+}
+
+async function validateExistingSecondState(
+  ctx: MutationCtx,
+  lifecycle: Doc<"dailyPromptLifecycles">,
+  startedAt: number,
+) {
+  if (lifecycle.firstStartedAt !== undefined && lifecycle.firstStartedAt !== startedAt) {
+    throw new Error("Malformed first daily prompt start state.");
+  }
+  if (lifecycle.secondStatus === "pending") {
+    validatePendingSecondState(lifecycle);
+    return;
+  }
+  if (lifecycle.secondStatus === "scheduled") {
+    await validateScheduledSecondState(ctx, lifecycle, startedAt, [
+      "pending",
+      "inProgress",
+      "success",
+    ]);
+    return;
+  }
+  if (lifecycle.secondStatus === "sending" || lifecycle.secondStatus === "sent") {
+    if (
+      lifecycle.secondScheduledAt !== startedAt + 300_000 ||
+      lifecycle.secondDeliveryKey !== createDailyPromptDeliveryKey(lifecycle._id, "second")
+    ) {
+      throw new Error("Malformed delivered second daily prompt state.");
+    }
+    return;
+  }
+  if (lifecycle.secondStatus === "skipped") {
+    if (lifecycle.skippedAt === undefined || !lifecycle.skippedReason) {
+      throw new Error("Malformed skipped second daily prompt state.");
+    }
+  }
+}
+
+async function recordAnswerStartFromSave({
+  ctx,
+  lifecycle,
+  userId,
+  now,
+}: {
+  ctx: MutationCtx;
+  lifecycle: Doc<"dailyPromptLifecycles">;
+  userId: Id<"users">;
+  now: number;
+}) {
+  const existingStart = await getExistingStart(
+    ctx,
+    userId,
+    lifecycle.coupleId,
+    lifecycle.promptDate,
+  );
+  const start =
+    existingStart ??
+    (await ctx.db.get(
+      await ctx.db.insert("dailyPromptAnswerStarts", {
+        coupleId: lifecycle.coupleId,
+        promptDate: lifecycle.promptDate,
+        userId,
+        startedAt: now,
+        source: "first_non_empty_input",
+        createdAt: now,
+      }),
+    ));
+  if (!start) throw new Error("Daily prompt answer start was not saved.");
+  const startedAt = start.startedAt;
+
+  if (userId === lifecycle.firstUserId) {
+    validateFirstAnswerCanStart(lifecycle);
+    await validateExistingSecondState(ctx, lifecycle, startedAt);
+    if (lifecycle.secondStatus === "pending") {
+      const [partnerStart, partnerResponses] = await Promise.all([
+        getExistingStart(ctx, lifecycle.secondUserId, lifecycle.coupleId, lifecycle.promptDate),
+        ctx.db
+          .query("promptResponses")
+          .withIndex("by_user_and_date", (q) =>
+            q.eq("userId", lifecycle.secondUserId).eq("promptDate", lifecycle.promptDate),
+          )
+          .take(2),
+      ]);
+      if (partnerResponses.length > 1) throw new Error("Duplicate daily prompt response.");
+      const partnerResponse = partnerResponses[0] ?? null;
+      if (partnerResponse && partnerResponse.coupleId !== lifecycle.coupleId) {
+        throw new Error("Daily prompt response mismatch.");
+      }
+      if (partnerStart || partnerResponse?.response.trim()) {
+        validateDailyPromptDeliveryStepTransition(lifecycle.secondStatus, "skipped");
+        await ctx.db.patch(lifecycle._id, {
+          firstStartedAt: lifecycle.firstStartedAt ?? startedAt,
+          secondStatus: "skipped",
+          skippedAt: now,
+          skippedReason: "skipped_already_started",
+          updatedAt: now,
+        });
+        return start;
+      }
+      validateDailyPromptDeliveryStepTransition(lifecycle.secondStatus, "scheduled");
+      const secondScheduledAt = startedAt + 300_000;
+      const secondDeliveryKey = createDailyPromptDeliveryKey(lifecycle._id, "second");
+      const secondSchedulerJobId = await ctx.scheduler.runAt(
+        secondScheduledAt,
+        internal.prompts.secondAnswerBoundary,
+        {
+          lifecycleId: lifecycle._id,
+        },
+      );
+      await ctx.db.patch(lifecycle._id, {
+        firstStartedAt: lifecycle.firstStartedAt ?? startedAt,
+        secondScheduledAt,
+        secondDeliveryKey,
+        secondSchedulerJobId: String(secondSchedulerJobId),
+        secondStatus: "scheduled",
+        updatedAt: now,
+      });
+    } else if (lifecycle.firstStartedAt === undefined) {
+      await ctx.db.patch(lifecycle._id, { firstStartedAt: startedAt, updatedAt: now });
+    }
+  } else if (
+    userId === lifecycle.secondUserId &&
+    (lifecycle.secondStatus === "pending" || lifecycle.secondStatus === "scheduled")
+  ) {
+    validateFirstAnswerCanStart(lifecycle);
+    if (lifecycle.secondStatus === "pending") {
+      validatePendingSecondState(lifecycle);
+    } else {
+      if (lifecycle.firstStartedAt === undefined) {
+        throw new Error("Malformed scheduled second daily prompt state.");
+      }
+      const scheduled = await validateScheduledSecondState(
+        ctx,
+        lifecycle,
+        lifecycle.firstStartedAt,
+        ["pending", "inProgress", "success"],
+      );
+      if (scheduled.state.kind === "pending") {
+        await ctx.scheduler.cancel(
+          lifecycle.secondSchedulerJobId as GenericId<"_scheduled_functions">,
+        );
+      }
+    }
+    validateDailyPromptDeliveryStepTransition(lifecycle.secondStatus, "skipped");
+    await ctx.db.patch(lifecycle._id, {
+      secondStatus: "skipped",
+      skippedAt: startedAt,
+      skippedReason: "skipped_already_started",
+      updatedAt: now,
+    });
+  }
+
+  return start;
 }
 
 const promptBank = [
@@ -110,7 +422,7 @@ const quizzes = [
   },
 ];
 
-function chooseGeneratedContent(promptDate: string, tags: string[]) {
+export function chooseGeneratedContent(promptDate: string, tags: string[]) {
   const seed = `${promptDate}:${tags.join(",")}`;
   const tagText = tags[0] ? ` Recent theme: ${tags[0]}.` : "";
   const prompt = promptBank[stableIndex(seed, promptBank.length)];
@@ -121,6 +433,14 @@ function chooseGeneratedContent(promptDate: string, tags: string[]) {
     promptPrinciple: prompt.principle,
     weeklyGame,
     quiz,
+  };
+}
+
+export function getDailyPromptQuestions(promptDate: string) {
+  const content = chooseGeneratedContent(promptDate, []);
+  return {
+    question: content.prompt,
+    quizQuestion: content.quiz.question,
   };
 }
 
@@ -137,7 +457,17 @@ export const today = query({
       .take(10)
       .then((items) => items.filter((item) => !item.deletedAt));
     const tags = Array.from(new Set(recent.flatMap((moment) => moment.tags)));
-    const promptDate = todayKey();
+    const couple = await ctx.db.get(membership.coupleId);
+    const promptDate = couple?.promptTimezone
+      ? (
+          await getAuthoritativePromptDate(
+            ctx,
+            membership.coupleId,
+            Date.now(),
+            couple.promptTimezone,
+          )
+        ).promptDate
+      : todayKey();
     const generated = chooseGeneratedContent(promptDate, tags);
     const responses = await ctx.db
       .query("promptResponses")
@@ -176,6 +506,48 @@ export const today = query({
   },
 });
 
+export const startAnswering = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const { user, membership } = await requireSession(ctx);
+    const latest = await getLatestLifecycle(ctx, membership.coupleId);
+    if (!latest) throw new Error("Daily prompt is not scheduled.");
+    const lifecycle = await getCurrentLifecycle(ctx, membership.coupleId, latest.promptDate);
+    await validateLifecycleRecipients(ctx, lifecycle, user._id);
+
+    const responses = await ctx.db
+      .query("promptResponses")
+      .withIndex("by_user_and_date", (q) =>
+        q.eq("userId", user._id).eq("promptDate", lifecycle.promptDate),
+      )
+      .take(2);
+    if (responses.length > 1) throw new Error("Duplicate daily prompt response.");
+    const response = responses[0] ?? null;
+    if (response && response.coupleId !== membership.coupleId) {
+      throw new Error("Daily prompt response mismatch.");
+    }
+
+    const existingStart = await getExistingStart(
+      ctx,
+      user._id,
+      lifecycle.coupleId,
+      lifecycle.promptDate,
+    );
+    if (response?.response.trim()) {
+      if (!existingStart) throw new Error("Daily prompt answer start is missing.");
+      return existingStart.startedAt;
+    }
+
+    const start = await recordAnswerStartFromSave({
+      ctx,
+      lifecycle,
+      userId: user._id,
+      now: Date.now(),
+    });
+    return start.startedAt;
+  },
+});
+
 export const answer = mutation({
   args: {
     promptDate: v.string(),
@@ -187,25 +559,114 @@ export const answer = mutation({
     const response = args.response.trim();
     if (!response) throw new Error("Write an answer before saving.");
     if (response.length > 2000) throw new Error("Keep today's answer under 2,000 characters.");
+    const lifecycle = await getCurrentLifecycle(ctx, membership.coupleId, args.promptDate);
+    await validateLifecycleRecipients(ctx, lifecycle, user._id);
     const existing = await ctx.db
       .query("promptResponses")
       .withIndex("by_user_and_date", (q) =>
         q.eq("userId", user._id).eq("promptDate", args.promptDate),
       )
-      .first();
+      .take(2);
+    if (existing.length > 1) throw new Error("Duplicate daily prompt response.");
+    const existingResponse = existing[0] ?? null;
+    if (existingResponse && existingResponse.coupleId !== membership.coupleId) {
+      throw new Error("Daily prompt response mismatch.");
+    }
     const now = Date.now();
+    const shouldRecordStart = !existingResponse?.response.trim();
     const payload = {
       coupleId: membership.coupleId,
       userId: user._id,
       promptDate: args.promptDate,
       prompt: args.prompt,
       response,
-      createdAt: now,
     };
-    if (existing) {
-      await ctx.db.patch(existing._id, payload);
-      return existing._id;
+    if (shouldRecordStart) {
+      await recordAnswerStartFromSave({ ctx, lifecycle, userId: user._id, now });
     }
-    return await ctx.db.insert("promptResponses", payload);
+    if (existingResponse) {
+      await ctx.db.patch(existingResponse._id, payload);
+      return existingResponse._id;
+    }
+    return await ctx.db.insert("promptResponses", { ...payload, createdAt: now });
+  },
+});
+
+export const secondAnswerBoundary = internalMutation({
+  args: {
+    lifecycleId: v.id("dailyPromptLifecycles"),
+  },
+  handler: async (ctx, args) => {
+    const lifecycle = await ctx.db.get(args.lifecycleId);
+    if (!lifecycle || lifecycle.secondStatus !== "scheduled") return null;
+    if (
+      lifecycle.firstStartedAt === undefined ||
+      lifecycle.secondScheduledAt !== lifecycle.firstStartedAt + 300_000 ||
+      lifecycle.secondDeliveryKey !== createDailyPromptDeliveryKey(lifecycle._id, "second") ||
+      !lifecycle.secondSchedulerJobId
+    ) {
+      throw new Error("Malformed scheduled second daily prompt state.");
+    }
+    await validateScheduledSecondState(ctx, lifecycle, lifecycle.firstStartedAt, ["inProgress"]);
+
+    const members = await ctx.db
+      .query("coupleMembers")
+      .withIndex("by_couple", (q) => q.eq("coupleId", lifecycle.coupleId))
+      .take(3);
+    const memberUserIds = new Set(members.map((member) => member.userId));
+    const validMembership =
+      members.length === 2 &&
+      memberUserIds.size === 2 &&
+      memberUserIds.has(lifecycle.firstUserId) &&
+      memberUserIds.has(lifecycle.secondUserId);
+    const [partnerStart, partnerResponses, readyDevice] = await Promise.all([
+      getExistingStart(ctx, lifecycle.secondUserId, lifecycle.coupleId, lifecycle.promptDate),
+      ctx.db
+        .query("promptResponses")
+        .withIndex("by_user_and_date", (q) =>
+          q.eq("userId", lifecycle.secondUserId).eq("promptDate", lifecycle.promptDate),
+        )
+        .take(2),
+      ctx.db
+        .query("notificationDevices")
+        .withIndex("by_ready_lookup", (q) =>
+          q
+            .eq("coupleId", lifecycle.coupleId)
+            .eq("userId", lifecycle.secondUserId)
+            .eq("enabled", true)
+            .eq("permissionStatus", "granted")
+            .gt("pushToken", ""),
+        )
+        .first(),
+    ]);
+    if (partnerResponses.length > 1) throw new Error("Duplicate daily prompt response.");
+    const partnerResponse = partnerResponses[0] ?? null;
+    if (partnerResponse && partnerResponse.coupleId !== lifecycle.coupleId) {
+      throw new Error("Daily prompt response mismatch.");
+    }
+    const stale = getPromptDateInTimezone(Date.now(), lifecycle.timezone) !== lifecycle.promptDate;
+    const hasReadyDevice = readyDevice !== null;
+    const skippedReason = stale
+      ? "skipped_stale"
+      : !validMembership
+        ? "skipped_membership_changed"
+        : partnerStart || partnerResponse?.response.trim()
+          ? "skipped_already_started"
+          : !hasReadyDevice
+            ? "skipped_permission_unavailable"
+            : null;
+    if (!skippedReason) {
+      // Provider reservation/dispatch is intentionally outside Slice 05-05.
+      return { status: "eligible" as const };
+    }
+    validateDailyPromptDeliveryStepTransition(lifecycle.secondStatus, "skipped");
+    const now = Date.now();
+    await ctx.db.patch(lifecycle._id, {
+      secondStatus: "skipped",
+      skippedAt: now,
+      skippedReason,
+      updatedAt: now,
+    });
+    return { status: "skipped" as const, reason: skippedReason };
   },
 });

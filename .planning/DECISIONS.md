@@ -6,6 +6,10 @@
 - D-004: Before changing Convex code, agents must read `convex/_generated/ai/guidelines.md`.
 - D-005: Before committing or pushing code changes, run `pnpm format:fix` so CI does not fail on formatting drift.
 - D-006: Private-until-mutual and invoked-AI principles are product constraints, not optional polish.
+- D-007: Replace the forward-looking Plans/Dates/Matches product model with a couple-initiated `Quality Time` workflow; preserve current implementation until bounded replacement phases are planned and verified.
+- D-008: Daily prompt notification leadership alternates between partners, with the first notification randomized between 7–9 PM and the second triggered five minutes after the first partner begins answering.
+- D-009: Daily prompts use a privacy-safe reusable library ranked by successful couple completions, with Vercel AI SDK generation supplying fresh prompts under Gottman-inspired but non-affiliated guidance.
+- D-010: Apple Notes is an intake and concise mirror only. `.planning/` remains canonical, and each project should have one current Apple Note rather than separate project and roadmap notes.
 
 ## Autonomy policy
 

@@ -43,7 +43,11 @@ export default function WeeklyGameScreen(): JSX.Element {
 
   return (
     <ScrollView className="flex-1 bg-app-bg" contentContainerClassName="px-3 pt-16 pb-10 gap-4">
-      <Pressable onPress={() => router.back()}>
+      <Pressable
+        accessibilityLabel="Back to Today"
+        accessibilityRole="button"
+        onPress={() => router.back()}
+      >
         <Text className="font-semibold text-accent">← Back</Text>
       </Pressable>
 
@@ -54,7 +58,7 @@ export default function WeeklyGameScreen(): JSX.Element {
         <Text className="text-4xl font-bold leading-[44px] text-white">{game.title}</Text>
         <Text className="text-base leading-6 text-white/75">{game.principle}</Text>
         <View className="h-3 overflow-hidden rounded-full bg-white/15">
-          <View className="h-3 rounded-full bg-accent" style={{ width: `${progress}%` }} />
+          <View className="h-3 rounded-full bg-white" style={{ width: `${progress}%` }} />
         </View>
       </View>
 
@@ -63,12 +67,16 @@ export default function WeeklyGameScreen(): JSX.Element {
         <Text className="text-3xl font-bold leading-10 text-ink">{cards[turn].text}</Text>
         <View className="flex-row gap-2">
           <Pressable
+            accessibilityLabel="Previous weekly game prompt"
+            accessibilityRole="button"
             className="flex-1 rounded-full bg-app-bg border border-soft py-3 items-center"
             onPress={() => setTurn((value) => (value + cards.length - 1) % cards.length)}
           >
             <Text className="font-bold text-ink">Previous</Text>
           </Pressable>
           <Pressable
+            accessibilityLabel="Next weekly game prompt"
+            accessibilityRole="button"
             className="flex-1 rounded-full bg-accent py-3 items-center"
             onPress={() => setTurn((value) => (value + 1) % cards.length)}
           >
@@ -84,6 +92,9 @@ export default function WeeklyGameScreen(): JSX.Element {
           return (
             <Pressable
               key={card.index}
+              accessibilityLabel={`Mark weekly game prompt complete: ${card.text}`}
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: done }}
               className={`rounded-3xl border p-4 ${done ? "border-accent bg-accent/10" : "border-soft bg-card"}`}
               onPress={() => toggle(card.index)}
             >

@@ -1,0 +1,131 @@
+$ pnpm exec tsc --ignoreConfig tests/unit/daily-prompt-accessibility.test.ts --module Node16 --target ES2022 --moduleResolution node16 --types node --skipLibCheck --esModuleInterop --outDir .tmp/daily-prompt-accessibility-red
+$ node --test .tmp/daily-prompt-accessibility-red/daily-prompt-accessibility.test.js
+TAP version 13
+# Subtest: Today daily-prompt entry is an explicitly named button
+not ok 1 - Today daily-prompt entry is an explicitly named button
+  ---
+  duration_ms: 1.433375
+  type: 'test'
+  location: '/Users/austinftacnik/dev/ourcutelife/.tmp/daily-prompt-accessibility-red/daily-prompt-accessibility.test.js:13:30'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /accessibilityRole="button"/. Input:
+    
+    '<Pressable\n' +
+      '            className="h-11 rounded-full bg-app-bg items-center justify-center"\n' +
+      '            onPress={() => router.push("/prompts/today")}\n' +
+      '          >\n' +
+      '            <Text className="font-semibold text-ink">\n' +
+      '              {hasAnswered ? "Edit answer" : "Answer prompt"}\n' +
+      '            </Text>\n' +
+      '          </Pressable>'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    <Pressable
+                className="h-11 rounded-full bg-app-bg items-center justify-center"
+                onPress={() => router.push("/prompts/today")}
+              >
+                <Text className="font-semibold text-ink">
+                  {hasAnswered ? "Edit answer" : "Answer prompt"}
+                </Text>
+              </Pressable>
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (/Users/austinftacnik/dev/ourcutelife/.tmp/daily-prompt-accessibility-red/daily-prompt-accessibility.test.js:16:22)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: Daily Prompt answer input has an explicit accessible name
+not ok 2 - Daily Prompt answer input has an explicit accessible name
+  ---
+  duration_ms: 0.307209
+  type: 'test'
+  location: '/Users/austinftacnik/dev/ourcutelife/.tmp/daily-prompt-accessibility-red/daily-prompt-accessibility.test.js:19:30'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /accessibilityLabel="Daily prompt answer"/. Input:
+    
+    '<TextInput\n' +
+      '        multiline\n' +
+      '        className="min-h-36 rounded-3xl border border-[#e6d2c2] bg-white/90 px-4 py-4 text-base leading-6 text-[#2f211c]"\n' +
+      '        placeholder="Write your answer…"\n' +
+      '        textAlignVertical="top"\n' +
+      '        value={answer}\n' +
+      '        onChangeText={setAnswer}\n' +
+      '      />'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    <TextInput
+            multiline
+            className="min-h-36 rounded-3xl border border-[#e6d2c2] bg-white/90 px-4 py-4 text-base leading-6 text-[#2f211c]"
+            placeholder="Write your answer…"
+            textAlignVertical="top"
+            value={answer}
+            onChangeText={setAnswer}
+          />
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (/Users/austinftacnik/dev/ourcutelife/.tmp/daily-prompt-accessibility-red/daily-prompt-accessibility.test.js:22:22)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: Submit is a named button whose accessibility state mirrors its disabled and saving state
+not ok 3 - Submit is a named button whose accessibility state mirrors its disabled and saving state
+  ---
+  duration_ms: 0.2015
+  type: 'test'
+  location: '/Users/austinftacnik/dev/ourcutelife/.tmp/daily-prompt-accessibility-red/daily-prompt-accessibility.test.js:24:30'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /accessibilityRole="button"/. Input:
+    
+    '<Pressable\n' +
+      '        className={`h-14 rounded-full items-center justify-center ${answer.trim() && !isSaving ? "bg-[#2f211c]" : "bg-[#d8c2b4]"}`}\n' +
+      '        disabled={!answer.trim() || isSaving}\n' +
+      '        onPress={handleSave}\n' +
+      '      >\n' +
+      '        <Text className="font-bold text-white">{isSaving ? "Saving…" : "Submit answer"}</Text>\n' +
+      '      </Pressable>'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    <Pressable
+            className={`h-14 rounded-full items-center justify-center ${answer.trim() && !isSaving ? "bg-[#2f211c]" : "bg-[#d8c2b4]"}`}
+            disabled={!answer.trim() || isSaving}
+            onPress={handleSave}
+          >
+            <Text className="font-bold text-white">{isSaving ? "Saving…" : "Submit answer"}</Text>
+          </Pressable>
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (/Users/austinftacnik/dev/ourcutelife/.tmp/daily-prompt-accessibility-red/daily-prompt-accessibility.test.js:27:22)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..3
+# tests 3
+# suites 0
+# pass 0
+# fail 3
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 63.6145

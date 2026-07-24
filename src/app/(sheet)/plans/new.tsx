@@ -79,6 +79,7 @@ export default function NewPlanItemScreen(): JSX.Element {
       <View className="gap-2">
         <Text className="text-sm font-semibold text-[#6f5a50]">Title</Text>
         <TextInput
+          accessibilityLabel="Plan item title"
           className="h-12 rounded-2xl border border-[#e6d2c2] bg-white/80 px-4 text-base text-[#2f211c]"
           value={title}
           onChangeText={setTitle}
@@ -88,6 +89,7 @@ export default function NewPlanItemScreen(): JSX.Element {
       <View className="gap-2">
         <Text className="text-sm font-semibold text-[#6f5a50]">Description</Text>
         <TextInput
+          accessibilityLabel="Plan item description"
           multiline
           className="min-h-28 rounded-2xl border border-[#e6d2c2] bg-white/80 px-4 py-3 text-base leading-6 text-[#2f211c]"
           value={description}
@@ -105,6 +107,9 @@ export default function NewPlanItemScreen(): JSX.Element {
           ].map((item) => (
             <Pressable
               key={item.value}
+              accessibilityLabel={`Set plan item type to ${item.label}`}
+              accessibilityRole="button"
+              accessibilityState={{ selected: kind === item.value }}
               className={`rounded-full px-4 py-2 ${kind === item.value ? "bg-[#2f211c]" : "bg-white/80 border border-[#e6d2c2]"}`}
               onPress={() => setKind(item.value)}
             >
@@ -123,6 +128,9 @@ export default function NewPlanItemScreen(): JSX.Element {
           {categories.map((item) => (
             <Pressable
               key={item.value}
+              accessibilityLabel={`Set plan item category to ${item.label}`}
+              accessibilityRole="button"
+              accessibilityState={{ selected: category === item.value }}
               className={`rounded-full px-4 py-2 ${category === item.value ? "bg-[#2f211c]" : "bg-white/80 border border-[#e6d2c2]"}`}
               onPress={() => setCategory(item.value)}
             >
@@ -138,6 +146,7 @@ export default function NewPlanItemScreen(): JSX.Element {
       <View className="gap-2">
         <Text className="text-sm font-semibold text-[#6f5a50]">Hashtags / subcategories</Text>
         <TextInput
+          accessibilityLabel="Plan item hashtags or subcategories"
           className="h-12 rounded-2xl border border-[#e6d2c2] bg-white/80 px-4 text-base text-[#2f211c]"
           value={tags}
           onChangeText={setTags}
@@ -146,6 +155,9 @@ export default function NewPlanItemScreen(): JSX.Element {
       </View>
       {error ? <Text className="text-center text-sm text-red-700">{error}</Text> : null}
       <Pressable
+        accessibilityLabel="Save private suggestion"
+        accessibilityRole="button"
+        accessibilityState={{ disabled: !canSave, busy: isSaving }}
         className={`h-14 rounded-full items-center justify-center ${canSave ? "bg-[#2f211c]" : "bg-[#d8c2b4]"}`}
         disabled={!canSave}
         onPress={handleSave}

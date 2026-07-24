@@ -1,0 +1,228 @@
+$ pnpm test:unit
+$ rm -rf .tmp/unit-tests && tsc --ignoreConfig tests/unit/*.test.ts convex/planPrivacy.ts --module Node16 --target ES2022 --moduleResolution node16 --types node --skipLibCheck --esModuleInterop --outDir .tmp/unit-tests && node --test .tmp/unit-tests/tests/unit/*.test.js
+TAP version 13
+# Subtest: Today daily-prompt entry is an explicitly named button
+ok 1 - Today daily-prompt entry is an explicitly named button
+  ---
+  duration_ms: 0.937458
+  type: 'test'
+  ...
+# Subtest: Daily Prompt answer input has an explicit accessible name
+ok 2 - Daily Prompt answer input has an explicit accessible name
+  ---
+  duration_ms: 0.119708
+  type: 'test'
+  ...
+# Subtest: Submit is a named button whose accessibility state mirrors its disabled and saving state
+ok 3 - Submit is a named button whose accessibility state mirrors its disabled and saving state
+  ---
+  duration_ms: 0.20275
+  type: 'test'
+  ...
+# Subtest: date plan item keys are stable regardless of item order
+ok 4 - date plan item keys are stable regardless of item order
+  ---
+  duration_ms: 2.154875
+  type: 'test'
+  ...
+# Subtest: date plan item keys ignore duplicate item ids
+ok 5 - date plan item keys ignore duplicate item ids
+  ---
+  duration_ms: 0.16275
+  type: 'test'
+  ...
+# Subtest: date plan creation skips an existing single-item date
+ok 6 - date plan creation skips an existing single-item date
+  ---
+  duration_ms: 0.094042
+  type: 'test'
+  ...
+# Subtest: date plan creation skips an existing pair regardless of item order
+ok 7 - date plan creation skips an existing pair regardless of item order
+  ---
+  duration_ms: 0.128
+  type: 'test'
+  ...
+# Subtest: date plan creation proceeds when the item bundle is new
+ok 8 - date plan creation proceeds when the item bundle is new
+  ---
+  duration_ms: 0.14825
+  type: 'test'
+  ...
+# Subtest: date plan item-key backfill preview only targets missing keys
+ok 9 - date plan item-key backfill preview only targets missing keys
+  ---
+  duration_ms: 0.628792
+  type: 'test'
+  ...
+# Subtest: date plan item-key backfill preview is no-op when all rows are keyed
+ok 10 - date plan item-key backfill preview is no-op when all rows are keyed
+  ---
+  duration_ms: 0.078292
+  type: 'test'
+  ...
+# Subtest: date plan rating summaries use the latest stored ratings
+ok 11 - date plan rating summaries use the latest stored ratings
+  ---
+  duration_ms: 0.089458
+  type: 'test'
+  ...
+# Subtest: date plan ratings accept each whole-star choice shown in the app
+ok 12 - date plan ratings accept each whole-star choice shown in the app
+  ---
+  duration_ms: 0.34725
+  type: 'test'
+  ...
+# Subtest: date plan ratings are available only after completion
+ok 13 - date plan ratings are available only after completion
+  ---
+  duration_ms: 0.744833
+  type: 'test'
+  ...
+# Subtest: rating authorization rejects a completed lifecycle owned by another couple
+ok 14 - rating authorization rejects a completed lifecycle owned by another couple
+  ---
+  duration_ms: 0.409667
+  type: 'test'
+  ...
+# Subtest: rating authorization rejects ambiguous duplicate lifecycle rows
+ok 15 - rating authorization rejects ambiguous duplicate lifecycle rows
+  ---
+  duration_ms: 0.1525
+  type: 'test'
+  ...
+# Subtest: rating authorization allows exactly one completed lifecycle for the same couple
+ok 16 - rating authorization allows exactly one completed lifecycle for the same couple
+  ---
+  duration_ms: 0.07675
+  type: 'test'
+  ...
+# Subtest: date lifecycle actions require exactly one active Our Dates row for the couple
+ok 17 - date lifecycle actions require exactly one active Our Dates row for the couple
+  ---
+  duration_ms: 0.10775
+  type: 'test'
+  ...
+# Subtest: date plan rating summaries stay safe with no ratings
+ok 18 - date plan rating summaries stay safe with no ratings
+  ---
+  duration_ms: 0.053292
+  type: 'test'
+  ...
+# Subtest: date plan save engagement is counted only for new or restored saves
+ok 19 - date plan save engagement is counted only for new or restored saves
+  ---
+  duration_ms: 0.293083
+  type: 'test'
+  ...
+# Subtest: date plan like engagement is counted only once per member
+ok 20 - date plan like engagement is counted only once per member
+  ---
+  duration_ms: 0.071709
+  type: 'test'
+  ...
+# Subtest: date plan completion engagement is counted only on the first completion
+ok 21 - date plan completion engagement is counted only on the first completion
+  ---
+  duration_ms: 0.059834
+  type: 'test'
+  ...
+# Subtest: scheduling a completed date starts a fresh scheduled lifecycle
+ok 22 - scheduling a completed date starts a fresh scheduled lifecycle
+  ---
+  duration_ms: 0.136125
+  type: 'test'
+  ...
+# Subtest: mock date lifecycle follows saved to scheduled to completed to rated
+ok 23 - mock date lifecycle follows saved to scheduled to completed to rated
+  ---
+  duration_ms: 0.842541
+  type: 'test'
+  ...
+# Subtest: mock scheduling a completed date clears its prior completion
+ok 24 - mock scheduling a completed date clears its prior completion
+  ---
+  duration_ms: 0.078375
+  type: 'test'
+  ...
+# Subtest: mock rating fails closed before completion and outside the one-to-five scale
+ok 25 - mock rating fails closed before completion and outside the one-to-five scale
+  ---
+  duration_ms: 0.335292
+  type: 'test'
+  ...
+# Subtest: mock like and save mutations are idempotent
+ok 26 - mock like and save mutations are idempotent
+  ---
+  duration_ms: 0.056041
+  type: 'test'
+  ...
+# Subtest: date plan items without a creator are safe to reveal
+ok 27 - date plan items without a creator are safe to reveal
+  ---
+  duration_ms: 0.060333
+  type: 'test'
+  ...
+# Subtest: date plan items created by the viewer are safe to reveal before a match
+ok 28 - date plan items created by the viewer are safe to reveal before a match
+  ---
+  duration_ms: 0.043792
+  type: 'test'
+  ...
+# Subtest: partner-created date plan items stay hidden until mutual match
+ok 29 - partner-created date plan items stay hidden until mutual match
+  ---
+  duration_ms: 0.039916
+  type: 'test'
+  ...
+# Subtest: partner-created date plan items are revealed after mutual match
+ok 30 - partner-created date plan items are revealed after mutual match
+  ---
+  duration_ms: 0.046583
+  type: 'test'
+  ...
+# Subtest: account actions expose explicit native button semantics
+ok 31 - account actions expose explicit native button semantics
+  ---
+  duration_ms: 1.492208
+  type: 'test'
+  ...
+# Subtest: leave couple remains a non-destructive confirmation placeholder
+ok 32 - leave couple remains a non-destructive confirmation placeholder
+  ---
+  duration_ms: 0.126333
+  type: 'test'
+  ...
+# Subtest: Moment detail edit and delete actions are explicitly named buttons
+ok 33 - Moment detail edit and delete actions are explicitly named buttons
+  ---
+  duration_ms: 0.919833
+  type: 'test'
+  ...
+# Subtest: plan-item match actions expose explicit native button semantics and labels
+ok 34 - plan-item match actions expose explicit native button semantics and labels
+  ---
+  duration_ms: 1.570417
+  type: 'test'
+  ...
+# Subtest: plan-item match vote actions retain their disabled state contract
+ok 35 - plan-item match vote actions retain their disabled state contract
+  ---
+  duration_ms: 0.228292
+  type: 'test'
+  ...
+# Subtest: Today add-moment control is an explicitly named button
+ok 36 - Today add-moment control is an explicitly named button
+  ---
+  duration_ms: 1.312417
+  type: 'test'
+  ...
+1..36
+# tests 36
+# suites 0
+# pass 36
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 76.462125

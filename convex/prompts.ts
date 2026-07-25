@@ -1,3 +1,4 @@
+import { makeFunctionReference } from "convex/server";
 import { v } from "convex/values";
 import type { GenericId } from "convex/values";
 import { internal } from "./_generated/api";
@@ -10,6 +11,11 @@ import {
   validateDailyPromptDeliveryStepTransition,
 } from "./dailyPromptLifecycle";
 import { getAuthoritativePromptDate, getLatestLifecycle } from "./dailyPromptDateResolver";
+
+const dispatchDailyPrompt = makeFunctionReference<
+  "action",
+  { lifecycleId: Id<"dailyPromptLifecycles">; step: "first" | "second" }
+>("dailyPromptDispatch:dispatchDailyPrompt");
 
 async function getAuthenticatedUser(ctx: QueryCtx | MutationCtx): Promise<Doc<"users"> | null> {
   const identity = await ctx.auth.getUserIdentity();
@@ -142,7 +148,8 @@ function validatePendingSecondState(lifecycle: Doc<"dailyPromptLifecycles">) {
   if (
     lifecycle.secondScheduledAt !== undefined ||
     lifecycle.secondDeliveryKey !== undefined ||
-    lifecycle.secondSchedulerJobId !== undefined
+    lifecycle.secondSchedulerJobId !== undefined ||
+    lifecycle.secondDispatchSchedulerJobId !== undefined
   ) {
     throw new Error("Malformed pending second daily prompt state.");
   }
@@ -179,6 +186,38 @@ async function validateScheduledSecondState(
     !expectedJobStates.some((state) => state === scheduled.state.kind) ||
     JSON.stringify(scheduled.args) !== JSON.stringify([{ lifecycleId: lifecycle._id }])
   ) {
+    throw new Error("Malformed scheduled second daily prompt state.");
+  }
+  if (scheduled.state.kind === "success") {
+    if (!lifecycle.secondDispatchSchedulerJobId) {
+      const attempts = await ctx.db
+        .query("dailyPromptDeliveryAttempts")
+        .withIndex("by_idempotency_key", (q) => q.eq("idempotencyKey", expectedDeliveryKey))
+        .take(2);
+      if (attempts.length !== 0) {
+        throw new Error("Malformed scheduled second daily prompt state.");
+      }
+      return scheduled;
+    }
+    let dispatchJob;
+    try {
+      dispatchJob = await ctx.db.system.get(
+        "_scheduled_functions",
+        lifecycle.secondDispatchSchedulerJobId as GenericId<"_scheduled_functions">,
+      );
+    } catch {
+      throw new Error("Malformed scheduled second daily prompt state.");
+    }
+    if (
+      !dispatchJob ||
+      dispatchJob.name !== "dailyPromptDispatch:dispatchDailyPrompt" ||
+      dispatchJob.scheduledTime < expectedScheduledAt ||
+      JSON.stringify(dispatchJob.args) !==
+        JSON.stringify([{ lifecycleId: lifecycle._id, step: "second" }])
+    ) {
+      throw new Error("Malformed scheduled second daily prompt state.");
+    }
+  } else if (lifecycle.secondDispatchSchedulerJobId !== undefined) {
     throw new Error("Malformed scheduled second daily prompt state.");
   }
   return scheduled;
@@ -481,7 +520,7 @@ export const today = query({
       .query("coupleMembers")
       .withIndex("by_couple", (q) => q.eq("coupleId", membership.coupleId))
       .collect();
-    const prompt = ownResponse?.prompt ?? partnerResponse?.prompt ?? generated.prompt;
+    const prompt = getDailyPromptQuestions(promptDate).question;
 
     return {
       promptDate,
@@ -551,7 +590,8 @@ export const startAnswering = mutation({
 export const answer = mutation({
   args: {
     promptDate: v.string(),
-    prompt: v.string(),
+    // Rollout compatibility only. Legacy clients sent prompt text, but the server never trusts it.
+    prompt: v.optional(v.string()),
     response: v.string(),
   },
   handler: async (ctx, args) => {
@@ -578,7 +618,7 @@ export const answer = mutation({
       coupleId: membership.coupleId,
       userId: user._id,
       promptDate: args.promptDate,
-      prompt: args.prompt,
+      prompt: getDailyPromptQuestions(lifecycle.promptDate).question,
       response,
     };
     if (shouldRecordStart) {
@@ -656,7 +696,14 @@ export const secondAnswerBoundary = internalMutation({
             ? "skipped_permission_unavailable"
             : null;
     if (!skippedReason) {
-      // Provider reservation/dispatch is intentionally outside Slice 05-05.
+      const secondDispatchSchedulerJobId = await ctx.scheduler.runAfter(0, dispatchDailyPrompt, {
+        lifecycleId: lifecycle._id,
+        step: "second",
+      });
+      await ctx.db.patch(lifecycle._id, {
+        secondDispatchSchedulerJobId: String(secondDispatchSchedulerJobId),
+        updatedAt: Date.now(),
+      });
       return { status: "eligible" as const };
     }
     validateDailyPromptDeliveryStepTransition(lifecycle.secondStatus, "skipped");

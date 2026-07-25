@@ -1,22 +1,41 @@
 import { useAppMutation, useAppQuery } from "@/lib/devMock";
 import { Redirect, router } from "expo-router";
 import type { JSX } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 
 import { api } from "../../../../convex/_generated/api";
 import { useSession } from "@/lib/betterAuth";
+import { runSingleInFlight } from "@/lib/runSingleInFlight";
 
 export default function TodayPromptSheet(): JSX.Element {
   const betterAuthSession = useSession();
   const viewer = useAppQuery(api.auth.viewer, {});
   const todayPrompt = useAppQuery(api.prompts.today, {});
+  const reconcileLifecycle = useAppMutation(api.dailyPromptLifecycles.reconcileToday);
   const startAnswering = useAppMutation(api.prompts.startAnswering);
   const saveAnswer = useAppMutation(api.prompts.answer);
   const [answer, setAnswer] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const answerStartPromiseRef = useRef<Promise<number> | null>(null);
+  const lifecycleReconcilePromiseRef = useRef<ReturnType<typeof reconcileLifecycle> | null>(null);
+
+  const ensureLifecycleReconciled = useCallback(() => {
+    return runSingleInFlight(lifecycleReconcilePromiseRef, () => reconcileLifecycle({}));
+  }, [reconcileLifecycle]);
+
+  useEffect(() => {
+    if (!betterAuthSession.data?.session || !viewer?.couple || viewer.memberCount < 2) return;
+    void ensureLifecycleReconciled().catch((err) => {
+      setError(err instanceof Error ? err.message : "Could not prepare today's prompt.");
+    });
+  }, [
+    betterAuthSession.data?.session,
+    ensureLifecycleReconciled,
+    viewer?.couple,
+    viewer?.memberCount,
+  ]);
 
   useEffect(() => {
     if (todayPrompt?.response) setAnswer(todayPrompt.response);
@@ -36,10 +55,12 @@ export default function TodayPromptSheet(): JSX.Element {
 
   function ensureAnswerStarted(): Promise<number> {
     if (answerStartPromiseRef.current) return answerStartPromiseRef.current;
-    const promise = startAnswering({}).catch((err) => {
-      if (answerStartPromiseRef.current === promise) answerStartPromiseRef.current = null;
-      throw err;
-    });
+    const promise = ensureLifecycleReconciled()
+      .then(() => startAnswering({}))
+      .catch((err) => {
+        if (answerStartPromiseRef.current === promise) answerStartPromiseRef.current = null;
+        throw err;
+      });
     answerStartPromiseRef.current = promise;
     return promise;
   }
@@ -65,7 +86,6 @@ export default function TodayPromptSheet(): JSX.Element {
       if (!promptData.response?.trim()) await ensureAnswerStarted();
       await saveAnswer({
         promptDate: promptData.promptDate,
-        prompt: promptData.prompt,
         response: answer,
       });
       router.back();

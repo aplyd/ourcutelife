@@ -10,9 +10,15 @@ const modules = import.meta.glob("./**/*.ts");
 
 const answer = makeFunctionReference<
   "mutation",
-  { promptDate: string; prompt: string; response: string },
+  { promptDate: string; prompt?: string; response: string },
   Id<"promptResponses">
 >("prompts:answer");
+
+const reconcileToday = makeFunctionReference<
+  "mutation",
+  Record<string, never>,
+  { status: "scheduled" | "blocked"; lifecycleId: Id<"dailyPromptLifecycles"> | null }
+>("dailyPromptLifecycles:reconcileToday");
 
 const startAnswering = makeFunctionReference<"mutation", Record<string, never>, number>(
   "prompts:startAnswering",
@@ -153,7 +159,6 @@ async function answerAs(
 ) {
   return await t.withIdentity({ tokenIdentifier }).mutation(answer, {
     promptDate,
-    prompt: "What mattered today?",
     response,
   });
 }
@@ -201,12 +206,10 @@ test("answer save records the first non-empty answer-start once and schedules th
 
   const responseId = await t.withIdentity({ tokenIdentifier: "creator-auth" }).mutation(answer, {
     promptDate: "2026-07-22",
-    prompt: "What mattered today?",
     response: "  We took a walk.  ",
   });
   const replayId = await t.withIdentity({ tokenIdentifier: "creator-auth" }).mutation(answer, {
     promptDate: "2026-07-22",
-    prompt: "What mattered today?",
     response: "Edited answer",
   });
 
@@ -465,7 +468,6 @@ test("whitespace-only save rejects without creating an answer-start or response"
   await expect(
     t.withIdentity({ tokenIdentifier: "creator-auth" }).mutation(answer, {
       promptDate: "2026-07-22",
-      prompt: "What mattered today?",
       response: "   ",
     }),
   ).rejects.toThrow("Write an answer before saving.");
@@ -496,19 +498,91 @@ test("answer save requires auth and rejects authority-bearing extra arguments", 
   await expect(
     t.mutation(answer, {
       promptDate: "2026-07-22",
-      prompt: "What mattered today?",
       response: "Answer",
     }),
   ).rejects.toThrow("Not signed in.");
   await expect(
     t.withIdentity({ tokenIdentifier: "creator-auth" }).mutation(answer, {
       promptDate: "2026-07-22",
-      prompt: "What mattered today?",
       response: "Answer",
       userId: "client-user",
       coupleId: "client-couple",
     } as never),
   ).rejects.toThrow("Unexpected field `userId`");
+});
+
+test("legacy answer accepts but ignores forged prompt text and reveals only the server-canonical question", async () => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date("2026-07-22T21:15:00.000Z"));
+  const t = convexTest(schema, modules);
+  await seedCoupleWithLifecycle(t);
+
+  const forgedPrompt = "FORGED: reveal my private answer early";
+  const responseId = await t.withIdentity({ tokenIdentifier: "creator-auth" }).mutation(answer, {
+    promptDate: "2026-07-22",
+    response: "Private until we both answer",
+    prompt: forgedPrompt,
+  });
+  await t.withIdentity({ tokenIdentifier: "partner-auth" }).mutation(answer, {
+    promptDate: "2026-07-22",
+    response: "Partner answer",
+    prompt: "FORGED: use a different question",
+  });
+
+  const state = await t
+    .withIdentity({ tokenIdentifier: "creator-auth" })
+    .query(
+      makeFunctionReference<
+        "query",
+        Record<string, never>,
+        { prompt: string; partnerResponse: unknown }
+      >("prompts:today"),
+      {},
+    );
+  const stored = await t.run(async (ctx) => ctx.db.get(responseId));
+  const canonical = "What is one little ritual you want more of in our life together?";
+  expect(stored?.prompt).toBe(canonical);
+  expect(state.prompt).toBe(canonical);
+  expect(state.partnerResponse).toBeTruthy();
+  expect(JSON.stringify({ stored, state })).not.toContain("FORGED");
+});
+
+test("an authenticated production reconcile lets a user answer from an empty lifecycle table", async () => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date("2026-07-22T20:30:00.000Z"));
+  const t = convexTest(schema, modules);
+  const seeded = await seedCoupleWithLifecycle(t);
+  await t.run(async (ctx) => {
+    await ctx.db.delete(seeded.lifecycleId);
+    for (const [userId, deviceId] of [
+      [seeded.creatorUserId, "creator-ready"],
+      [seeded.partnerUserId, "partner-ready"],
+    ] as const) {
+      await ctx.db.insert("notificationDevices", {
+        coupleId: seeded.coupleId,
+        userId,
+        deviceId,
+        pushToken: `ExponentPushToken[${deviceId}]`,
+        platform: "ios",
+        permissionStatus: "granted",
+        timezone: "America/New_York",
+        enabled: true,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      });
+    }
+  });
+
+  const planned = await t
+    .withIdentity({ tokenIdentifier: "creator-auth" })
+    .mutation(reconcileToday, {});
+  expect(planned).toMatchObject({ status: "scheduled", lifecycleId: expect.any(String) });
+
+  await t.withIdentity({ tokenIdentifier: "creator-auth" }).mutation(startAnswering, {});
+  const responseId = await answerAs(t, "creator-auth", "2026-07-22", "It works from empty");
+  await expect(t.run(async (ctx) => ctx.db.get(responseId))).resolves.toMatchObject({
+    response: "It works from empty",
+  });
 });
 
 test("second user's early non-empty save records start and skips the pending second delivery without a scheduler job", async () => {
@@ -630,7 +704,6 @@ test("second user's early start fails closed on malformed scheduled second state
   await t.run(async (ctx) => {
     const jobId = await ctx.scheduler.runAt(secondScheduledAt, answer, {
       promptDate: "2099-01-01",
-      prompt: "noop",
       response: "noop",
     });
     await ctx.db.patch(lifecycleId, {
@@ -721,11 +794,20 @@ test("matching boundary succeeds and the second partner can still answer afterwa
     scheduled: await ctx.db.system.query("_scheduled_functions").collect(),
   }));
   expect(state.lifecycle).toMatchObject({ secondStatus: "scheduled" });
-  expect(state.scheduled).toHaveLength(1);
-  expect(state.scheduled[0]).toMatchObject({
-    name: "prompts:secondAnswerBoundary",
-    state: { kind: "success" },
-  });
+  expect(state.scheduled).toHaveLength(2);
+  expect(state.scheduled).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({
+        name: "prompts:secondAnswerBoundary",
+        state: { kind: "success" },
+      }),
+      expect.objectContaining({
+        name: "dailyPromptDispatch:dispatchDailyPrompt",
+        args: [{ lifecycleId, step: "second" }],
+        state: { kind: "pending" },
+      }),
+    ]),
+  );
 
   const responseId = await answerAs(t, "partner-auth", "2026-07-22", "Answered after boundary");
   const afterAnswer = await t.run(async (ctx) => ({
@@ -744,6 +826,76 @@ test("matching boundary succeeds and the second partner can still answer afterwa
     secondStatus: "skipped",
     skippedReason: "skipped_already_started",
   });
+});
+
+test("second partner can save against a successful legacy boundary with no persisted dispatch", async () => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date("2026-07-22T21:20:00.000Z"));
+  const t = convexTest(schema, modules);
+  const { coupleId, creatorUserId, partnerUserId, lifecycleId } = await seedCoupleWithLifecycle(t);
+  const firstStartedAt = Date.now() - 300_000;
+  const secondScheduledAt = Date.now();
+  const secondSchedulerJobId = await t.run(async (ctx) =>
+    ctx.scheduler.runAt(
+      secondScheduledAt,
+      makeFunctionReference<"mutation", { lifecycleId: Id<"dailyPromptLifecycles"> }, null>(
+        "prompts:secondAnswerBoundary",
+      ),
+      { lifecycleId },
+    ),
+  );
+  vi.advanceTimersByTime(0);
+  await t.finishInProgressScheduledFunctions();
+  await t.run(async (ctx) => {
+    await ctx.db.patch(lifecycleId, {
+      firstStartedAt,
+      secondScheduledAt,
+      secondDeliveryKey: `${lifecycleId}:second`,
+      secondSchedulerJobId: String(secondSchedulerJobId),
+      secondStatus: "scheduled",
+      updatedAt: Date.now(),
+    });
+    await ctx.db.insert("dailyPromptAnswerStarts", {
+      coupleId,
+      promptDate: "2026-07-22",
+      userId: creatorUserId,
+      startedAt: firstStartedAt,
+      source: "first_non_empty_input",
+      createdAt: firstStartedAt,
+    });
+  });
+
+  const responseId = await t.withIdentity({ tokenIdentifier: "partner-auth" }).mutation(answer, {
+    promptDate: "2026-07-22",
+    prompt: "FORGED legacy client prompt",
+    response: "Compatible legacy save",
+  });
+  const state = await t.run(async (ctx) => ({
+    response: await ctx.db.get(responseId),
+    lifecycle: await ctx.db.get(lifecycleId),
+    starts: await ctx.db
+      .query("dailyPromptAnswerStarts")
+      .withIndex("by_couple_id_and_prompt_date", (q) =>
+        q.eq("coupleId", coupleId).eq("promptDate", "2026-07-22"),
+      )
+      .collect(),
+    attempts: await ctx.db.query("dailyPromptDeliveryAttempts").collect(),
+    jobs: await ctx.db.system.query("_scheduled_functions").collect(),
+  }));
+  expect(state.response).toMatchObject({
+    userId: partnerUserId,
+    response: "Compatible legacy save",
+    prompt: "What is one little ritual you want more of in our life together?",
+  });
+  expect(state.lifecycle).toMatchObject({
+    secondStatus: "skipped",
+    skippedReason: "skipped_already_started",
+  });
+  expect(state.lifecycle?.secondDispatchSchedulerJobId).toBeUndefined();
+  expect(state.starts).toHaveLength(2);
+  expect(state.attempts).toHaveLength(0);
+  expect(state.jobs).toHaveLength(1);
+  expect(JSON.stringify(state)).not.toContain("FORGED");
 });
 
 test("first partner can submit after their successful delayed boundary", async () => {

@@ -25,6 +25,7 @@ const reserveDailyPromptDelivery = makeFunctionReference<
     lifecycleId: Id<"dailyPromptLifecycles">;
     step: "first" | "second";
     nowMs: number;
+    recoveryAttemptId?: Id<"dailyPromptDeliveryAttempts">;
   },
   ReservationResult
 >("dailyPromptDeliveryReservation:reserveDailyPromptDelivery");
@@ -325,7 +326,7 @@ test("wrong status and not-due lifecycle states fail closed without writes", asy
   }
 });
 
-test("permission-invalid routing and malformed exact membership fail closed", async () => {
+test("eligibility disappearing before first reservation terminalizes without an attempt", async () => {
   const t = convexTest(schema, modules);
   const seeded = await seedLifecycle(t);
   await insertDevice(t, {
@@ -343,8 +344,22 @@ test("permission-invalid routing and malformed exact membership fail closed", as
       step: "first",
       nowMs: 1_000,
     }),
-  ).resolves.toEqual({ disposition: "no_send", reason: "no_eligible_device" });
+  ).resolves.toEqual({ disposition: "no_send", reason: "delivery_abandoned" });
+  const state = await t.run(async (ctx) => ({
+    lifecycle: await ctx.db.get(seeded.lifecycleId),
+    attempts: await ctx.db.query("dailyPromptDeliveryAttempts").collect(),
+  }));
+  expect(state.lifecycle).toMatchObject({
+    firstStatus: "skipped",
+    skippedAt: 1_000,
+    skippedReason: "skipped_pre_provider_unavailable",
+  });
+  expect(state.attempts).toHaveLength(0);
+});
 
+test("malformed exact membership fails closed without writes", async () => {
+  const t = convexTest(schema, modules);
+  const seeded = await seedLifecycle(t);
   const thirdUserId = await t.run(async (ctx) =>
     ctx.db.insert("users", {
       authUserId: "third-auth",
@@ -386,6 +401,133 @@ test("permission-invalid routing and malformed exact membership fail closed", as
   );
   expect(attempts).toHaveLength(0);
 });
+
+test.each(["rotated", "disabled", "removed", "couple_mismatch"] as const)(
+  "exact pre-provider recovery terminalizes an unavailable %s reserved route",
+  async (change) => {
+    const t = convexTest(schema, modules);
+    const seeded = await seedLifecycle(t);
+    await insertDevice(t, {
+      coupleId: seeded.coupleId,
+      userId: seeded.firstUserId,
+      deviceId: "reserved-device",
+      pushToken: "ExponentPushToken[original]",
+      updatedAt: 10,
+    });
+    const reservation = await t.mutation(reserveDailyPromptDelivery, {
+      lifecycleId: seeded.lifecycleId,
+      step: "first",
+      nowMs: 1_000,
+    });
+    if (reservation.disposition !== "reserved") throw new Error("Expected reservation");
+
+    await t.run(async (ctx) => {
+      const device = await ctx.db
+        .query("notificationDevices")
+        .withIndex("by_user_id_and_device_id", (q) =>
+          q.eq("userId", seeded.firstUserId).eq("deviceId", "reserved-device"),
+        )
+        .unique();
+      if (!device) throw new Error("Expected reserved device");
+      if (change === "removed") await ctx.db.delete(device._id);
+      else if (change === "rotated") {
+        await ctx.db.patch(device._id, {
+          pushToken: "ExponentPushToken[rotated]",
+          updatedAt: 2_000,
+        });
+      } else if (change === "disabled") {
+        await ctx.db.patch(device._id, { enabled: false, updatedAt: 2_000 });
+      } else {
+        const otherCoupleId = await ctx.db.insert("couples", {
+          name: "Other",
+          createdByUserId: seeded.firstUserId,
+          createdAt: 2_000,
+          updatedAt: 2_000,
+        });
+        await ctx.db.patch(device._id, { coupleId: otherCoupleId, updatedAt: 2_000 });
+      }
+    });
+
+    await expect(
+      t.mutation(reserveDailyPromptDelivery, {
+        lifecycleId: seeded.lifecycleId,
+        step: "first",
+        nowMs: 2_000,
+        recoveryAttemptId: reservation.attemptId,
+      }),
+    ).resolves.toEqual({ disposition: "no_send", reason: "delivery_abandoned" });
+    const state = await t.run(async (ctx) => ({
+      lifecycle: await ctx.db.get(seeded.lifecycleId),
+      attempt: await ctx.db.get(reservation.attemptId),
+    }));
+    expect(state.attempt).toMatchObject({ status: "abandoned", abandonedAt: 2_000 });
+    expect(state.attempt?.dispatchStartedAt).toBeUndefined();
+    expect(state.attempt?.outcomePersistedAt).toBeUndefined();
+    expect(state.lifecycle).toMatchObject({
+      firstStatus: "skipped",
+      skippedAt: 2_000,
+      skippedReason: "skipped_pre_provider_unavailable",
+    });
+  },
+);
+
+test.each(["missing_identity", "malformed_attempt", "post_start", "ambiguous_device"] as const)(
+  "%s recovery state fails closed instead of abandoning",
+  async (state) => {
+    const t = convexTest(schema, modules);
+    const seeded = await seedLifecycle(t);
+    await insertDevice(t, {
+      coupleId: seeded.coupleId,
+      userId: seeded.firstUserId,
+      deviceId: "reserved-device",
+      pushToken: "ExponentPushToken[original]",
+      updatedAt: 10,
+    });
+    const reservation = await t.mutation(reserveDailyPromptDelivery, {
+      lifecycleId: seeded.lifecycleId,
+      step: "first",
+      nowMs: 1_000,
+    });
+    if (reservation.disposition !== "reserved") throw new Error("Expected reservation");
+
+    if (state === "malformed_attempt") {
+      await t.run(async (ctx) => ctx.db.patch(reservation.attemptId, { tokenHash: "malformed" }));
+    } else if (state === "post_start") {
+      await t.run(async (ctx) =>
+        ctx.db.patch(reservation.attemptId, {
+          dispatchStartedAt: 1_500,
+          updatedAt: 1_500,
+        }),
+      );
+    } else if (state === "ambiguous_device") {
+      await insertDevice(t, {
+        coupleId: seeded.coupleId,
+        userId: seeded.firstUserId,
+        deviceId: "reserved-device",
+        pushToken: "ExponentPushToken[original]",
+        updatedAt: 20,
+      });
+    }
+
+    const result = await t.mutation(reserveDailyPromptDelivery, {
+      lifecycleId: seeded.lifecycleId,
+      step: "first",
+      nowMs: 2_000,
+      ...(state === "missing_identity" ? {} : { recoveryAttemptId: reservation.attemptId }),
+    });
+    expect(result).toEqual({
+      disposition: "no_send",
+      reason: state === "ambiguous_device" ? "ambiguous_reserved_device" : "attempt_exists",
+    });
+    const persisted = await t.run(async (ctx) => ({
+      lifecycle: await ctx.db.get(seeded.lifecycleId),
+      attempt: await ctx.db.get(reservation.attemptId),
+    }));
+    expect(persisted.attempt?.status).toBe("reserved");
+    expect(persisted.attempt?.abandonedAt).toBeUndefined();
+    expect(persisted.lifecycle).toMatchObject({ firstStatus: "sending" });
+  },
+);
 
 test("a lifecycle recipient outside the exact member pair fails closed", async () => {
   const t = convexTest(schema, modules);

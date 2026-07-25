@@ -37,6 +37,9 @@ export const persistDailyPromptDeliveryOutcome = internalMutation({
   handler: async (ctx, args) => {
     const attempt = await ctx.db.get(args.attemptId);
     if (!attempt) throw new ConvexError("Delivery attempt not found");
+    if (attempt.status === "abandoned") {
+      throw new ConvexError("Delivery attempt was abandoned before provider dispatch");
+    }
 
     if (attempt.outcomePersistedAt !== undefined) {
       if (attempt.status === "reserved") {

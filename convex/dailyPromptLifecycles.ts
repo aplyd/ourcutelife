@@ -1,3 +1,5 @@
+import { makeFunctionReference } from "convex/server";
+import type { GenericId } from "convex/values";
 import { v } from "convex/values";
 
 import type { Doc, Id } from "./_generated/dataModel";
@@ -7,6 +9,7 @@ import { getCurrentAppUser } from "./auth";
 import {
   choosePromptRecipientOrder,
   chooseRandomFirstLocalMinute,
+  createDailyPromptDeliveryKey,
   getPromptDateInTimezone,
   isValidIanaTimezone,
   localDateMinuteToTimestamp,
@@ -23,6 +26,22 @@ type PromptQuestions = {
   question: string;
   quizQuestion: string;
 };
+
+const dispatchDailyPrompt = makeFunctionReference<
+  "action",
+  {
+    lifecycleId: Id<"dailyPromptLifecycles">;
+    step: "first" | "second";
+    recoveryAttemptId?: Id<"dailyPromptDeliveryAttempts">;
+  }
+>("dailyPromptDispatch:dispatchDailyPrompt");
+const continueDailyPromptPlanning = makeFunctionReference<"mutation", { cursor: string | null }>(
+  "dailyPromptLifecycles:planDailyPrompts",
+);
+const secondAnswerBoundary = makeFunctionReference<
+  "mutation",
+  { lifecycleId: Id<"dailyPromptLifecycles"> }
+>("prompts:secondAnswerBoundary");
 
 async function getAuthenticatedUser(ctx: QueryCtx | MutationCtx): Promise<Doc<"users"> | null> {
   let appUser: Doc<"users"> | null = null;
@@ -182,6 +201,179 @@ async function getSetupBlocker(
   return { blockedReason: null, members, prompt };
 }
 
+async function scheduleDispatchJob(
+  ctx: MutationCtx,
+  lifecycle: Doc<"dailyPromptLifecycles">,
+  step: "first" | "second",
+  nowMs: number,
+) {
+  const status = step === "first" ? lifecycle.firstStatus : lifecycle.secondStatus;
+  if (status !== "scheduled" && status !== "sending") return;
+  const scheduledAt = step === "first" ? lifecycle.firstScheduledAt : lifecycle.secondScheduledAt;
+  const deliveryKey = createDailyPromptDeliveryKey(lifecycle._id, step);
+  const persistedDeliveryKey =
+    step === "first" ? lifecycle.firstDeliveryKey : lifecycle.secondDeliveryKey;
+  const schedulerJobId =
+    step === "first" ? lifecycle.firstSchedulerJobId : lifecycle.secondDispatchSchedulerJobId;
+
+  if (scheduledAt === undefined || (persistedDeliveryKey && persistedDeliveryKey !== deliveryKey)) {
+    throw new Error(`Malformed ${step} daily prompt dispatch state.`);
+  }
+  if (!schedulerJobId) {
+    if (status !== "scheduled") return;
+    if (step === "second") {
+      if (
+        lifecycle.firstStartedAt === undefined ||
+        lifecycle.secondScheduledAt !== lifecycle.firstStartedAt + 300_000 ||
+        lifecycle.secondDeliveryKey !== deliveryKey ||
+        !lifecycle.secondSchedulerJobId
+      ) {
+        throw new Error("Malformed second daily prompt boundary state.");
+      }
+      let boundaryJob;
+      try {
+        boundaryJob = await ctx.db.system.get(
+          "_scheduled_functions",
+          lifecycle.secondSchedulerJobId as GenericId<"_scheduled_functions">,
+        );
+      } catch {
+        throw new Error("Malformed second daily prompt boundary scheduler.");
+      }
+      const boundaryArgs = boundaryJob?.args[0] as { lifecycleId?: unknown } | undefined;
+      if (
+        !boundaryJob ||
+        boundaryJob.name !== "prompts:secondAnswerBoundary" ||
+        boundaryJob.scheduledTime !== lifecycle.secondScheduledAt ||
+        boundaryJob.args.length !== 1 ||
+        boundaryArgs?.lifecycleId !== lifecycle._id ||
+        Object.keys(boundaryArgs ?? {}).length !== 1
+      ) {
+        throw new Error("Malformed second daily prompt boundary scheduler.");
+      }
+      const attempts = await ctx.db
+        .query("dailyPromptDeliveryAttempts")
+        .withIndex("by_idempotency_key", (q) => q.eq("idempotencyKey", deliveryKey))
+        .take(2);
+      if (attempts.length !== 0) {
+        throw new Error("Ambiguous second daily prompt delivery attempt.");
+      }
+      if (boundaryJob.state.kind === "pending" || boundaryJob.state.kind === "inProgress") return;
+      if (boundaryJob.state.kind === "success") {
+        const jobId = await ctx.scheduler.runAt(scheduledAt, dispatchDailyPrompt, {
+          lifecycleId: lifecycle._id,
+          step,
+        });
+        await ctx.db.patch(lifecycle._id, {
+          secondDispatchSchedulerJobId: String(jobId),
+          updatedAt: nowMs,
+        });
+        return;
+      }
+      if (boundaryJob.state.kind === "failed" || boundaryJob.state.kind === "canceled") {
+        const replacementBoundaryJobId = await ctx.scheduler.runAt(
+          scheduledAt,
+          secondAnswerBoundary,
+          { lifecycleId: lifecycle._id },
+        );
+        await ctx.db.patch(lifecycle._id, {
+          secondSchedulerJobId: String(replacementBoundaryJobId),
+          updatedAt: nowMs,
+        });
+      }
+      return;
+    }
+    const jobId = await ctx.scheduler.runAt(scheduledAt, dispatchDailyPrompt, {
+      lifecycleId: lifecycle._id,
+      step,
+    });
+    await ctx.db.patch(lifecycle._id, {
+      firstDeliveryKey: deliveryKey,
+      firstSchedulerJobId: String(jobId),
+      updatedAt: nowMs,
+    });
+    return;
+  }
+
+  let job;
+  try {
+    job = await ctx.db.system.get(
+      "_scheduled_functions",
+      schedulerJobId as GenericId<"_scheduled_functions">,
+    );
+  } catch {
+    throw new Error(`Malformed ${step} daily prompt dispatch scheduler.`);
+  }
+  const jobArgs = job?.args[0] as
+    | {
+        lifecycleId?: unknown;
+        step?: unknown;
+        recoveryAttemptId?: unknown;
+      }
+    | undefined;
+  const jobArgKeys = Object.keys(jobArgs ?? {});
+  if (
+    !job ||
+    job.name !== "dailyPromptDispatch:dispatchDailyPrompt" ||
+    job.scheduledTime < scheduledAt ||
+    job.args.length !== 1 ||
+    jobArgs?.lifecycleId !== lifecycle._id ||
+    jobArgs.step !== step ||
+    jobArgKeys.some((key) => key !== "lifecycleId" && key !== "step" && key !== "recoveryAttemptId")
+  ) {
+    throw new Error(`Malformed ${step} daily prompt dispatch scheduler.`);
+  }
+
+  const attempts = await ctx.db
+    .query("dailyPromptDeliveryAttempts")
+    .withIndex("by_idempotency_key", (q) => q.eq("idempotencyKey", deliveryKey))
+    .take(2);
+  if (attempts.length > 1) throw new Error(`Ambiguous ${step} daily prompt delivery attempt.`);
+  const attempt = attempts[0];
+  if (
+    jobArgs.recoveryAttemptId !== undefined &&
+    (!attempt ||
+      jobArgs.recoveryAttemptId !== attempt._id ||
+      attempt.status !== "reserved" ||
+      attempt.dispatchStartedAt !== undefined ||
+      attempt.outcomePersistedAt !== undefined ||
+      status !== "sending")
+  ) {
+    throw new Error(`Malformed ${step} daily prompt dispatch scheduler.`);
+  }
+  if (job.state.kind !== "failed" && job.state.kind !== "canceled") return;
+
+  const retryIsProvenPreProvider =
+    (!attempt && status === "scheduled") ||
+    (attempt?.status === "reserved" &&
+      attempt.dispatchStartedAt === undefined &&
+      attempt.outcomePersistedAt === undefined &&
+      status === "sending");
+  if (!retryIsProvenPreProvider) return;
+
+  const replacementJobId = await ctx.scheduler.runAt(scheduledAt, dispatchDailyPrompt, {
+    lifecycleId: lifecycle._id,
+    step,
+    ...(attempt ? { recoveryAttemptId: attempt._id } : {}),
+  });
+  await ctx.db.patch(lifecycle._id, {
+    ...(step === "first"
+      ? { firstSchedulerJobId: String(replacementJobId) }
+      : { secondDispatchSchedulerJobId: String(replacementJobId) }),
+    updatedAt: nowMs,
+  });
+}
+
+async function reconcileDispatchJobs(
+  ctx: MutationCtx,
+  lifecycle: Doc<"dailyPromptLifecycles">,
+  nowMs: number,
+) {
+  await scheduleDispatchJob(ctx, lifecycle, "first", nowMs);
+  const refreshed = await ctx.db.get(lifecycle._id);
+  if (!refreshed) throw new Error("Daily prompt lifecycle was not found.");
+  await scheduleDispatchJob(ctx, refreshed, "second", nowMs);
+}
+
 async function reconcileForMembership({
   ctx,
   membership,
@@ -221,6 +413,7 @@ async function reconcileForMembership({
     couple.promptTimezone,
   );
   if (existing) {
+    await reconcileDispatchJobs(ctx, existing, nowMs);
     return {
       status: "scheduled" as const,
       lifecycleId: existing._id,
@@ -280,6 +473,9 @@ async function reconcileForMembership({
     createdAt: nowMs,
     updatedAt: nowMs,
   });
+  const lifecycle = await ctx.db.get(lifecycleId);
+  if (!lifecycle) throw new Error("Daily prompt lifecycle was not saved.");
+  await reconcileDispatchJobs(ctx, lifecycle, nowMs);
 
   return { status: "scheduled" as const, lifecycleId, promptDate, blockedReason: null };
 }
@@ -294,6 +490,41 @@ export const reconcileToday = mutation({
       nowMs: Date.now(),
       randomMinute: randomMinuteFromMathRandom,
     });
+  },
+});
+
+export const planDailyPrompts = internalMutation({
+  args: { cursor: v.union(v.string(), v.null()) },
+  handler: async (ctx, args) => {
+    const page = await ctx.db.query("couples").paginate({ cursor: args.cursor, numItems: 50 });
+    const nowMs = Date.now();
+    for (const couple of page.page) {
+      const membership = await ctx.db
+        .query("coupleMembers")
+        .withIndex("by_couple", (q) => q.eq("coupleId", couple._id))
+        .first();
+      if (!membership) continue;
+      try {
+        await reconcileForMembership({
+          ctx,
+          membership,
+          nowMs,
+          randomMinute: randomMinuteFromMathRandom,
+        });
+      } catch (error) {
+        // oxlint-disable-next-line no-console -- isolate one malformed couple while retaining operator evidence.
+        console.error("Daily prompt planning failed for a couple", couple._id, error);
+      }
+    }
+    if (!page.isDone) {
+      await ctx.scheduler.runAfter(0, continueDailyPromptPlanning, {
+        cursor: page.continueCursor,
+      });
+    }
+    return {
+      processed: page.page.length,
+      continueCursor: page.isDone ? null : page.continueCursor,
+    };
   },
 });
 

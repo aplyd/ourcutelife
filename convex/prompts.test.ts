@@ -4,6 +4,8 @@ import { makeFunctionReference } from "convex/server";
 import { afterEach, expect, test, vi } from "vitest";
 
 import type { Id } from "./_generated/dataModel";
+import { DAILY_PROMPT_SEEDS } from "./dailyPromptLibrary";
+import { chooseGeneratedContent } from "./prompts";
 import schema from "./schema";
 
 const modules = import.meta.glob("./**/*.ts");
@@ -13,6 +15,24 @@ const answer = makeFunctionReference<
   { promptDate: string; prompt?: string; response: string },
   Id<"promptResponses">
 >("prompts:answer");
+
+const today = makeFunctionReference<
+  "query",
+  Record<string, never>,
+  {
+    prompt: string;
+    promptPrinciple: string;
+    response: string | null;
+    partnerResponse: { response: string; answeredAt: number } | null;
+    isRevealed: boolean;
+  }
+>("prompts:today");
+
+const getTodayStateForTesting = makeFunctionReference<
+  "query",
+  { nowMs: number; promptContentForTesting?: string },
+  { prompt?: { question: string; quizQuestion: string; principle?: string } }
+>("dailyPromptLifecycles:getTodayStateForTesting");
 
 const reconcileToday = makeFunctionReference<
   "mutation",
@@ -88,10 +108,22 @@ async function seedCoupleWithLifecycle(t: ReturnType<typeof convexTest>): Promis
       joinedAt: 20,
     });
   });
-  const lifecycleId = await t.run(async (ctx) =>
-    ctx.db.insert("dailyPromptLifecycles", {
+  const lifecycleId = await t.run(async (ctx) => {
+    const promptId = await ctx.db.insert("dailyPrompts", {
+      text: "What is one little ritual you want more of in our life together?",
+      normalizedFingerprint: "what is one little ritual you want more of in our life together",
+      principle: "shared meaning",
+      category: "rituals",
+      source: "seed",
+      safetyStatus: "approved",
+      completionCount: 0,
+      createdAt: 1,
+      updatedAt: 1,
+    });
+    return await ctx.db.insert("dailyPromptLifecycles", {
       coupleId,
       promptDate: "2026-07-22",
+      promptId,
       timezone: "America/New_York",
       firstUserId: creatorUserId,
       secondUserId: partnerUserId,
@@ -101,8 +133,8 @@ async function seedCoupleWithLifecycle(t: ReturnType<typeof convexTest>): Promis
       secondStatus: "pending",
       createdAt: 1,
       updatedAt: 1,
-    }),
-  );
+    });
+  });
 
   return { coupleId, creatorUserId, partnerUserId, lifecycleId };
 }
@@ -162,6 +194,302 @@ async function answerAs(
     response,
   });
 }
+
+test("canonical reads and writes use the immutable assignment while tags and forged text cannot alter it", async () => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date("2026-07-22T21:15:00.000Z"));
+  const t = convexTest(schema, modules);
+  const seeded = await seedCoupleWithLifecycle(t);
+  const assigned = {
+    text: "Which small shared ritual would feel especially meaningful this week?",
+    normalizedFingerprint: "which small shared ritual would feel especially meaningful this week",
+    principle: "assigned shared meaning",
+  };
+  await t.run(async (ctx) => {
+    const lifecycle = await ctx.db.get(seeded.lifecycleId);
+    if (!lifecycle?.promptId) throw new Error("Expected assigned prompt.");
+    await ctx.db.patch(lifecycle.promptId, assigned);
+    await ctx.db.insert("dailyPrompts", {
+      text: "A newly added fallback that must not replace the assignment",
+      normalizedFingerprint: "a newly added fallback that must not replace the assignment",
+      principle: "new fallback principle",
+      category: "fixture",
+      source: "ai",
+      safetyStatus: "approved",
+      completionCount: 999,
+      createdAt: 2,
+      updatedAt: 2,
+    });
+    await ctx.db.insert("moments", {
+      coupleId: seeded.coupleId,
+      authorUserId: seeded.creatorUserId,
+      happenedAt: Date.now(),
+      summary: "Private tag fixture",
+      feeling: "Private reflection",
+      tone: "good",
+      tags: ["FORGED_PRIVATE_TAG"],
+      createdAt: 2,
+    });
+  });
+
+  const [creatorToday, partnerToday, lifecycleState] = await Promise.all([
+    t.withIdentity({ tokenIdentifier: "creator-auth" }).query(today, {}),
+    t.withIdentity({ tokenIdentifier: "partner-auth" }).query(today, {}),
+    t.withIdentity({ tokenIdentifier: "creator-auth" }).query(getTodayStateForTesting, {
+      nowMs: Date.now(),
+      promptContentForTesting: "missing_quiz_question",
+    }),
+  ]);
+  expect(creatorToday).toMatchObject({
+    prompt: assigned.text,
+    promptPrinciple: assigned.principle,
+    response: null,
+    partnerResponse: null,
+    isRevealed: false,
+  });
+  expect(partnerToday.prompt).toBe(assigned.text);
+  expect(partnerToday.promptPrinciple).toBe(assigned.principle);
+  expect(lifecycleState.prompt).toMatchObject({
+    question: assigned.text,
+    principle: assigned.principle,
+  });
+  expect(JSON.stringify({ creatorToday, partnerToday, lifecycleState })).not.toContain(
+    "FORGED_PRIVATE_TAG",
+  );
+
+  const creatorResponseId = await t
+    .withIdentity({ tokenIdentifier: "creator-auth" })
+    .mutation(answer, {
+      promptDate: "2026-07-22",
+      prompt: "FORGED CLIENT QUESTION",
+      response: "Creator private answer",
+    });
+  const beforeBoth = await t.withIdentity({ tokenIdentifier: "partner-auth" }).query(today, {});
+  expect(beforeBoth.partnerResponse).toBeNull();
+  expect(beforeBoth.isRevealed).toBe(false);
+
+  await t.withIdentity({ tokenIdentifier: "partner-auth" }).mutation(answer, {
+    promptDate: "2026-07-22",
+    prompt: "ANOTHER FORGED CLIENT QUESTION",
+    response: "Partner private answer",
+  });
+  const afterBoth = await t.withIdentity({ tokenIdentifier: "creator-auth" }).query(today, {});
+  const stored = await t.run((ctx) => ctx.db.get(creatorResponseId));
+  expect(stored?.prompt).toBe(assigned.text);
+  expect(afterBoth).toMatchObject({
+    prompt: assigned.text,
+    promptPrinciple: assigned.principle,
+    isRevealed: true,
+    partnerResponse: { response: "Partner private answer" },
+  });
+  expect(JSON.stringify({ stored, afterBoth })).not.toContain("FORGED CLIENT QUESTION");
+});
+
+test("today fails closed before revealing responses whose compatibility prompt mismatches the assignment", async () => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date("2026-07-22T21:15:00.000Z"));
+  const t = convexTest(schema, modules);
+  const seeded = await seedCoupleWithLifecycle(t);
+  await t.run(async (ctx) => {
+    for (const [userId, response] of [
+      [seeded.creatorUserId, "Creator content must not be misattributed"],
+      [seeded.partnerUserId, "Partner content must not be misattributed"],
+    ] as const) {
+      await ctx.db.insert("promptResponses", {
+        coupleId: seeded.coupleId,
+        userId,
+        promptDate: "2026-07-22",
+        prompt: "A corrupted question that is not the assignment",
+        response,
+        createdAt: 1,
+      });
+    }
+  });
+
+  await expect(
+    t.withIdentity({ tokenIdentifier: "creator-auth" }).query(today, {}),
+  ).rejects.toThrow("Daily prompt response mismatch.");
+});
+
+test("rollout reads use the shared deterministic seed fallback before a blocked planner creates a lifecycle", async () => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date("2026-07-22T21:15:00.000Z"));
+  const t = convexTest(schema, modules);
+  const seeded = await seedCoupleWithLifecycle(t);
+  await t.run(async (ctx) => ctx.db.delete(seeded.lifecycleId));
+
+  const [promptState, lifecycleState] = await Promise.all([
+    t.withIdentity({ tokenIdentifier: "creator-auth" }).query(today, {}),
+    t.withIdentity({ tokenIdentifier: "creator-auth" }).query(getTodayStateForTesting, {
+      nowMs: Date.now(),
+    }),
+  ]);
+  const expected = DAILY_PROMPT_SEEDS[5];
+  expect(promptState).toMatchObject({
+    promptDate: "2026-07-22",
+    prompt: expected.text,
+    promptPrinciple: expected.principle,
+  });
+  expect(lifecycleState).toMatchObject({
+    status: "blocked",
+    blockedReason: "not_all_members_ready",
+    promptDate: "2026-07-22",
+    prompt: {
+      question: expected.text,
+      principle: expected.principle,
+    },
+  });
+  await expect(answerAs(t, "creator-auth")).rejects.toThrow("Daily prompt is not scheduled.");
+});
+
+test("rollout reads fall back for a legacy unassigned lifecycle while answer remains assignment-required", async () => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date("2026-07-22T21:15:00.000Z"));
+  const t = convexTest(schema, modules);
+  const seeded = await seedCoupleWithLifecycle(t);
+  await t.run(async (ctx) => ctx.db.patch(seeded.lifecycleId, { promptId: undefined }));
+
+  const [promptState, lifecycleState] = await Promise.all([
+    t.withIdentity({ tokenIdentifier: "creator-auth" }).query(today, {}),
+    t.withIdentity({ tokenIdentifier: "creator-auth" }).query(getTodayStateForTesting, {
+      nowMs: Date.now(),
+    }),
+  ]);
+  const expected = DAILY_PROMPT_SEEDS[5];
+  expect(promptState).toMatchObject({ prompt: expected.text, promptPrinciple: expected.principle });
+  expect(lifecycleState).toMatchObject({
+    status: "scheduled",
+    prompt: { question: expected.text, principle: expected.principle },
+    lifecycle: { promptDate: "2026-07-22" },
+  });
+  await expect(answerAs(t, "creator-auth")).rejects.toThrow("Daily prompt assignment is missing.");
+});
+
+test("rollout reads reject duplicate lifecycle state instead of selecting a fallback", async () => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date("2026-07-22T21:15:00.000Z"));
+  const t = convexTest(schema, modules);
+  const seeded = await seedCoupleWithLifecycle(t);
+  await t.run(async (ctx) => {
+    const lifecycle = await ctx.db.get(seeded.lifecycleId);
+    if (!lifecycle) throw new Error("Expected lifecycle.");
+    const { _id: _ignoredId, _creationTime: _ignoredCreationTime, ...duplicate } = lifecycle;
+    await ctx.db.insert("dailyPromptLifecycles", duplicate);
+  });
+
+  await expect(
+    t.withIdentity({ tokenIdentifier: "creator-auth" }).query(today, {}),
+  ).rejects.toThrow("Duplicate daily prompt lifecycle.");
+  await expect(
+    t.withIdentity({ tokenIdentifier: "creator-auth" }).query(getTodayStateForTesting, {
+      nowMs: Date.now(),
+    }),
+  ).rejects.toThrow("Duplicate daily prompt lifecycle.");
+  await expect(answerAs(t, "creator-auth")).rejects.toThrow("Duplicate daily prompt lifecycle.");
+});
+
+test("shared seeds solely determine fallback prompt text while tags preserve weekly game and quiz selection", () => {
+  const baseline = chooseGeneratedContent("2026-07-22", []);
+  const tagged = chooseGeneratedContent("2026-07-22", ["connection"]);
+  const seed = DAILY_PROMPT_SEEDS.find((candidate) => candidate.text === baseline.prompt);
+
+  expect(seed).toBeDefined();
+  expect(baseline.promptPrinciple).toBe(seed?.principle);
+  expect(tagged.prompt).toBe(baseline.prompt);
+  expect(tagged.promptPrinciple).toBe(baseline.promptPrinciple);
+  expect(baseline.weeklyGame.title).toBe("Two appreciations, one ask");
+  expect(baseline.quiz.title).toBe("Do I know your current stress?");
+  expect(tagged.weeklyGame.title).toBe("Repair phrase practice");
+  expect(tagged.quiz.title).toBe("Ritual audit");
+});
+
+test.each([
+  { name: "pending", safetyStatus: "pending" },
+  { name: "rejected", safetyStatus: "rejected" },
+] as const)(
+  "$name assignment fails closed for canonical reads and answer writes",
+  async (fixture) => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-07-22T21:15:00.000Z"));
+    const t = convexTest(schema, modules);
+    const seeded = await seedCoupleWithLifecycle(t);
+    await t.run(async (ctx) => {
+      const lifecycle = await ctx.db.get(seeded.lifecycleId);
+      if (!lifecycle?.promptId) throw new Error("Expected assigned prompt.");
+      await ctx.db.patch(lifecycle.promptId, { safetyStatus: fixture.safetyStatus });
+    });
+
+    await expect(
+      t.withIdentity({ tokenIdentifier: "creator-auth" }).query(today, {}),
+    ).rejects.toThrow(/assignment|assigned daily prompt/i);
+    await expect(
+      t.withIdentity({ tokenIdentifier: "creator-auth" }).query(getTodayStateForTesting, {
+        nowMs: Date.now(),
+      }),
+    ).rejects.toThrow(/assignment|assigned daily prompt/i);
+    await expect(answerAs(t, "creator-auth")).rejects.toThrow(/assignment|assigned daily prompt/i);
+    const responses = await t.run((ctx) => ctx.db.query("promptResponses").take(1));
+    expect(responses).toEqual([]);
+  },
+);
+
+test("a lifecycle referencing a missing assignment fails closed for both reads and answer writes", async () => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date("2026-07-22T21:15:00.000Z"));
+  const t = convexTest(schema, modules);
+  const seeded = await seedCoupleWithLifecycle(t);
+  await t.run(async (ctx) => {
+    const lifecycle = await ctx.db.get(seeded.lifecycleId);
+    if (!lifecycle?.promptId) throw new Error("Expected assigned prompt.");
+    await ctx.db.delete(lifecycle.promptId);
+  });
+
+  await expect(
+    t.withIdentity({ tokenIdentifier: "creator-auth" }).query(today, {}),
+  ).rejects.toThrow("Assigned daily prompt was not found.");
+  await expect(
+    t.withIdentity({ tokenIdentifier: "creator-auth" }).query(getTodayStateForTesting, {
+      nowMs: Date.now(),
+    }),
+  ).rejects.toThrow("Assigned daily prompt was not found.");
+  await expect(answerAs(t, "creator-auth")).rejects.toThrow("Assigned daily prompt was not found.");
+});
+
+test("duplicate assigned prompt fingerprint fails closed before reading or saving", async () => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date("2026-07-22T21:15:00.000Z"));
+  const t = convexTest(schema, modules);
+  const seeded = await seedCoupleWithLifecycle(t);
+  await t.run(async (ctx) => {
+    const lifecycle = await ctx.db.get(seeded.lifecycleId);
+    if (!lifecycle?.promptId) throw new Error("Expected assigned prompt.");
+    const prompt = await ctx.db.get(lifecycle.promptId);
+    if (!prompt) throw new Error("Expected assigned prompt row.");
+    await ctx.db.insert("dailyPrompts", {
+      text: `${prompt.text}!`,
+      normalizedFingerprint: prompt.normalizedFingerprint,
+      principle: prompt.principle,
+      category: prompt.category,
+      source: "ai",
+      safetyStatus: "approved",
+      completionCount: 0,
+      createdAt: 2,
+      updatedAt: 2,
+    });
+  });
+
+  await expect(
+    t.withIdentity({ tokenIdentifier: "creator-auth" }).query(today, {}),
+  ).rejects.toThrow("Duplicate daily prompt fingerprint.");
+  await expect(
+    t.withIdentity({ tokenIdentifier: "creator-auth" }).query(getTodayStateForTesting, {
+      nowMs: Date.now(),
+    }),
+  ).rejects.toThrow("Duplicate daily prompt fingerprint.");
+  await expect(answerAs(t, "creator-auth")).rejects.toThrow("Duplicate daily prompt fingerprint.");
+  const responses = await t.run((ctx) => ctx.db.query("promptResponses").take(1));
+  expect(responses).toEqual([]);
+});
 
 test("first non-whitespace input records the authoritative start before a later submit", async () => {
   vi.useFakeTimers();
@@ -545,6 +873,204 @@ test("legacy answer accepts but ignores forged prompt text and reveals only the 
   expect(state.prompt).toBe(canonical);
   expect(state.partnerResponse).toBeTruthy();
   expect(JSON.stringify({ stored, state })).not.toContain("FORGED");
+});
+
+test("a prompt completion and aggregate count are created exactly once after both partners answer", async () => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date("2026-07-22T21:15:00.000Z"));
+  const t = convexTest(schema, modules);
+  const seeded = await seedCoupleWithLifecycle(t);
+
+  await answerAs(t, "creator-auth", "2026-07-22", "First private answer");
+  const afterFirst = await t.run(async (ctx) => {
+    const lifecycle = await ctx.db.get(seeded.lifecycleId);
+    return {
+      completions: await ctx.db.query("dailyPromptCompletions").take(2),
+      prompt: await ctx.db.get(lifecycle!.promptId!),
+    };
+  });
+  expect(afterFirst.completions).toEqual([]);
+  expect(afterFirst.prompt?.completionCount).toBe(0);
+
+  await answerAs(t, "partner-auth", "2026-07-22", "Second private answer");
+  await answerAs(t, "partner-auth", "2026-07-22", "Edited second answer");
+  await answerAs(t, "creator-auth", "2026-07-22", "Edited first answer");
+
+  const completed = await t.run(async (ctx) => {
+    const lifecycle = await ctx.db.get(seeded.lifecycleId);
+    return {
+      completions: await ctx.db.query("dailyPromptCompletions").take(2),
+      prompt: await ctx.db.get(lifecycle!.promptId!),
+    };
+  });
+  expect(completed.completions).toHaveLength(1);
+  expect(completed.completions[0]).toMatchObject({
+    lifecycleId: seeded.lifecycleId,
+    coupleId: seeded.coupleId,
+    promptDate: "2026-07-22",
+  });
+  expect(completed.prompt?.completionCount).toBe(1);
+  expect(Object.keys(completed.completions[0]).sort()).toEqual(
+    [
+      "_creationTime",
+      "_id",
+      "completedAt",
+      "coupleId",
+      "createdAt",
+      "lifecycleId",
+      "promptDate",
+      "promptId",
+    ].sort(),
+  );
+});
+
+test("concurrent and replayed second-partner answers create one completion and one aggregate increment", async () => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date("2026-07-22T21:15:00.000Z"));
+  const t = convexTest(schema, modules);
+  const seeded = await seedCoupleWithLifecycle(t);
+  await answerAs(t, "creator-auth", "2026-07-22", "First private answer");
+
+  const attempts = await Promise.allSettled([
+    answerAs(t, "partner-auth", "2026-07-22", "Concurrent second answer A"),
+    answerAs(t, "partner-auth", "2026-07-22", "Concurrent second answer B"),
+  ]);
+  expect(attempts.every((attempt) => attempt.status === "fulfilled")).toBe(true);
+  if (attempts[0].status !== "fulfilled" || attempts[1].status !== "fulfilled") {
+    throw new Error("Expected both concurrent saves to succeed.");
+  }
+  expect(attempts[0].value).toBe(attempts[1].value);
+  await answerAs(t, "partner-auth", "2026-07-22", "Replayed second answer");
+
+  const state = await t.run(async (ctx) => {
+    const lifecycle = await ctx.db.get(seeded.lifecycleId);
+    return {
+      completions: await ctx.db
+        .query("dailyPromptCompletions")
+        .withIndex("by_lifecycle_id", (q) => q.eq("lifecycleId", seeded.lifecycleId))
+        .take(2),
+      prompt: await ctx.db.get(lifecycle!.promptId!),
+      responses: await ctx.db
+        .query("promptResponses")
+        .withIndex("by_couple_and_date", (q) =>
+          q.eq("coupleId", seeded.coupleId).eq("promptDate", "2026-07-22"),
+        )
+        .take(3),
+    };
+  });
+  expect(state.completions).toHaveLength(1);
+  expect(state.prompt?.completionCount).toBe(1);
+  expect(state.responses).toHaveLength(2);
+});
+
+test("two couples completing the same prompt create two private rows and increment the shared aggregate twice", async () => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date("2026-07-22T21:15:00.000Z"));
+  const t = convexTest(schema, modules);
+  const first = await seedCoupleWithLifecycle(t);
+  const second = await seedOtherCouple(t);
+  const { promptId, secondLifecycleId } = await t.run(async (ctx) => {
+    const firstLifecycle = await ctx.db.get(first.lifecycleId);
+    if (!firstLifecycle?.promptId) throw new Error("Expected shared prompt.");
+    const secondLifecycleId = await ctx.db.insert("dailyPromptLifecycles", {
+      coupleId: second.coupleId,
+      promptDate: "2026-07-22",
+      promptId: firstLifecycle.promptId,
+      timezone: "America/New_York",
+      firstUserId: second.userId,
+      secondUserId: second.partnerUserId,
+      randomizedFirstLocalMinute: 1140,
+      firstScheduledAt: Date.UTC(2026, 6, 22, 23, 0),
+      firstStatus: "scheduled",
+      secondStatus: "pending",
+      createdAt: 1,
+      updatedAt: 1,
+    });
+    return { promptId: firstLifecycle.promptId, secondLifecycleId };
+  });
+
+  await answerAs(t, "creator-auth", "2026-07-22", "First couple first answer");
+  await answerAs(t, "partner-auth", "2026-07-22", "First couple second answer");
+  await answerAs(t, "other-auth", "2026-07-22", "Second couple first answer");
+  await answerAs(t, "other-partner-auth", "2026-07-22", "Second couple second answer");
+  await answerAs(t, "partner-auth", "2026-07-22", "First couple replay");
+  await answerAs(t, "other-partner-auth", "2026-07-22", "Second couple replay");
+
+  const state = await t.run(async (ctx) => ({
+    prompt: await ctx.db.get(promptId),
+    completions: await ctx.db
+      .query("dailyPromptCompletions")
+      .withIndex("by_prompt_id_and_completed_at", (q) => q.eq("promptId", promptId))
+      .take(3),
+  }));
+  expect(state.prompt?.completionCount).toBe(2);
+  expect(state.completions).toHaveLength(2);
+  expect(new Set(state.completions.map((row) => row.coupleId))).toEqual(
+    new Set([first.coupleId, second.coupleId]),
+  );
+  expect(new Set(state.completions.map((row) => row.lifecycleId))).toEqual(
+    new Set([first.lifecycleId, secondLifecycleId]),
+  );
+  expect(
+    state.completions.every(
+      (row) =>
+        !("response" in row) && !("userId" in row) && !("tags" in row) && !("notification" in row),
+    ),
+  ).toBe(true);
+});
+
+test("premature completion state fails closed without changing rank or saving an answer", async () => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date("2026-07-22T21:15:00.000Z"));
+  const t = convexTest(schema, modules);
+  const seeded = await seedCoupleWithLifecycle(t);
+  const promptId = await t.run(async (ctx) => {
+    const lifecycle = await ctx.db.get(seeded.lifecycleId);
+    if (!lifecycle?.promptId) throw new Error("Expected assigned prompt.");
+    await ctx.db.insert("dailyPromptCompletions", {
+      lifecycleId: seeded.lifecycleId,
+      coupleId: seeded.coupleId,
+      promptDate: "2026-07-22",
+      promptId: lifecycle.promptId,
+      completedAt: 1,
+      createdAt: 1,
+    });
+    return lifecycle.promptId;
+  });
+
+  await expect(answerAs(t, "creator-auth")).rejects.toThrow(
+    "Daily prompt completion exists before both partners answered.",
+  );
+  const state = await t.run(async (ctx) => ({
+    prompt: await ctx.db.get(promptId),
+    responses: await ctx.db.query("promptResponses").take(1),
+  }));
+  expect(state.prompt?.completionCount).toBe(0);
+  expect(state.responses).toEqual([]);
+});
+
+test("a lifecycle-linked completion under another couple fails closed", async () => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date("2026-07-22T21:15:00.000Z"));
+  const t = convexTest(schema, modules);
+  const seeded = await seedCoupleWithLifecycle(t);
+  const other = await seedOtherCouple(t);
+  await t.run(async (ctx) => {
+    const lifecycle = await ctx.db.get(seeded.lifecycleId);
+    if (!lifecycle?.promptId) throw new Error("Expected assigned prompt.");
+    await ctx.db.insert("dailyPromptCompletions", {
+      lifecycleId: seeded.lifecycleId,
+      coupleId: other.coupleId,
+      promptDate: "2026-07-22",
+      promptId: lifecycle.promptId,
+      completedAt: 1,
+      createdAt: 1,
+    });
+  });
+
+  await expect(answerAs(t, "creator-auth")).rejects.toThrow("Daily prompt completion mismatch.");
+  const responses = await t.run((ctx) => ctx.db.query("promptResponses").take(1));
+  expect(responses).toEqual([]);
 });
 
 test("an authenticated production reconcile lets a user answer from an empty lifecycle table", async () => {

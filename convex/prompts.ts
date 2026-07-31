@@ -10,7 +10,12 @@ import {
   getPromptDateInTimezone,
   validateDailyPromptDeliveryStepTransition,
 } from "./dailyPromptLifecycle";
-import { getAuthoritativePromptDate, getLatestLifecycle } from "./dailyPromptDateResolver";
+import {
+  existingLifecycleForDate,
+  getAuthoritativePromptDate,
+  getLatestLifecycle,
+} from "./dailyPromptDateResolver";
+import { getAssignedDailyPrompt, getDeterministicDailyPromptFallback } from "./dailyPromptLibrary";
 
 const dispatchDailyPrompt = makeFunctionReference<
   "action",
@@ -136,6 +141,124 @@ async function getExistingStart(
     throw new Error("Daily prompt answer start mismatch.");
   }
   return start;
+}
+
+async function reconcileDailyPromptCompletion({
+  ctx,
+  lifecycle,
+  assignedPrompt,
+  now,
+}: {
+  ctx: MutationCtx;
+  lifecycle: Doc<"dailyPromptLifecycles">;
+  assignedPrompt: Doc<"dailyPrompts">;
+  now: number;
+}) {
+  if (!lifecycle.promptId || lifecycle.promptId !== assignedPrompt._id) {
+    throw new Error("Daily prompt assignment mismatch.");
+  }
+
+  const [firstResponses, secondResponses, coupleResponses] = await Promise.all([
+    ctx.db
+      .query("promptResponses")
+      .withIndex("by_user_and_date", (q) =>
+        q.eq("userId", lifecycle.firstUserId).eq("promptDate", lifecycle.promptDate),
+      )
+      .take(2),
+    ctx.db
+      .query("promptResponses")
+      .withIndex("by_user_and_date", (q) =>
+        q.eq("userId", lifecycle.secondUserId).eq("promptDate", lifecycle.promptDate),
+      )
+      .take(2),
+    ctx.db
+      .query("promptResponses")
+      .withIndex("by_couple_and_date", (q) =>
+        q.eq("coupleId", lifecycle.coupleId).eq("promptDate", lifecycle.promptDate),
+      )
+      .take(3),
+  ]);
+  if (firstResponses.length > 1 || secondResponses.length > 1 || coupleResponses.length > 2) {
+    throw new Error("Duplicate daily prompt response.");
+  }
+  const responses = [...firstResponses, ...secondResponses];
+  const expectedUserIds = new Set([lifecycle.firstUserId, lifecycle.secondUserId]);
+  const responseUserIds = new Set(responses.map((response) => response.userId));
+  const expectedResponseIds = new Set(responses.map((response) => response._id));
+  if (
+    responseUserIds.size !== responses.length ||
+    coupleResponses.length !== responses.length ||
+    coupleResponses.some((response) => !expectedResponseIds.has(response._id)) ||
+    responses.some(
+      (response) =>
+        !expectedUserIds.has(response.userId) ||
+        response.coupleId !== lifecycle.coupleId ||
+        response.promptDate !== lifecycle.promptDate ||
+        response.prompt !== assignedPrompt.text ||
+        !response.response.trim(),
+    )
+  ) {
+    throw new Error("Daily prompt response mismatch.");
+  }
+
+  const [coupleCompletions, lifecycleCompletions] = await Promise.all([
+    ctx.db
+      .query("dailyPromptCompletions")
+      .withIndex("by_couple_id_and_prompt_date", (q) =>
+        q.eq("coupleId", lifecycle.coupleId).eq("promptDate", lifecycle.promptDate),
+      )
+      .take(2),
+    ctx.db
+      .query("dailyPromptCompletions")
+      .withIndex("by_lifecycle_id", (q) => q.eq("lifecycleId", lifecycle._id))
+      .take(2),
+  ]);
+  if (coupleCompletions.length > 1 || lifecycleCompletions.length > 1) {
+    throw new Error("Duplicate daily prompt completion.");
+  }
+  const completion = coupleCompletions[0] ?? lifecycleCompletions[0] ?? null;
+  if (
+    coupleCompletions[0]?._id !== lifecycleCompletions[0]?._id ||
+    (completion &&
+      (completion.lifecycleId !== lifecycle._id ||
+        completion.coupleId !== lifecycle.coupleId ||
+        completion.promptDate !== lifecycle.promptDate ||
+        completion.promptId !== assignedPrompt._id))
+  ) {
+    throw new Error("Daily prompt completion mismatch.");
+  }
+
+  const bothPartnersAnswered =
+    responses.length === 2 &&
+    expectedUserIds.size === 2 &&
+    responseUserIds.has(lifecycle.firstUserId) &&
+    responseUserIds.has(lifecycle.secondUserId);
+  if (!bothPartnersAnswered) {
+    if (completion)
+      throw new Error("Daily prompt completion exists before both partners answered.");
+    return;
+  }
+  if (completion) return;
+  if (
+    !Number.isSafeInteger(assignedPrompt.completionCount) ||
+    assignedPrompt.completionCount < 0 ||
+    assignedPrompt.completionCount === Number.MAX_SAFE_INTEGER
+  ) {
+    throw new Error("Incompatible daily prompt completion count.");
+  }
+
+  await ctx.db.insert("dailyPromptCompletions", {
+    lifecycleId: lifecycle._id,
+    coupleId: lifecycle.coupleId,
+    promptDate: lifecycle.promptDate,
+    promptId: assignedPrompt._id,
+    completedAt: now,
+    createdAt: now,
+  });
+  await ctx.db.patch(assignedPrompt._id, {
+    completionCount: assignedPrompt.completionCount + 1,
+    updatedAt: now,
+  });
 }
 
 function validateFirstAnswerCanStart(lifecycle: Doc<"dailyPromptLifecycles">) {
@@ -376,38 +499,6 @@ async function recordAnswerStartFromSave({
   return start;
 }
 
-const promptBank = [
-  {
-    principle: "appreciation",
-    prompt:
-      "What is one specific thing your partner did recently that you want them to know mattered?",
-  },
-  {
-    principle: "love maps",
-    prompt:
-      "What is one small detail about your inner world this week that your partner might not know yet?",
-  },
-  {
-    principle: "bids for connection",
-    prompt:
-      "What is one tiny way your partner could get your attention or affection today that would land well?",
-  },
-  {
-    principle: "repair",
-    prompt:
-      "Is there a small moment from this week that would feel better with a quick repair or clarification?",
-  },
-  {
-    principle: "stress reducing conversation",
-    prompt:
-      "What stress are you carrying that you do not need your partner to fix, only understand?",
-  },
-  {
-    principle: "shared meaning",
-    prompt: "What is one little ritual you want more of in our life together?",
-  },
-];
-
 const weeklyGames = [
   {
     title: "Bid bingo",
@@ -463,12 +554,11 @@ const quizzes = [
 
 export function chooseGeneratedContent(promptDate: string, tags: string[]) {
   const seed = `${promptDate}:${tags.join(",")}`;
-  const tagText = tags[0] ? ` Recent theme: ${tags[0]}.` : "";
-  const prompt = promptBank[stableIndex(seed, promptBank.length)];
+  const prompt = getDeterministicDailyPromptFallback(promptDate);
   const weeklyGame = weeklyGames[stableIndex(`${seed}:game`, weeklyGames.length)];
   const quiz = quizzes[stableIndex(`${seed}:quiz`, quizzes.length)];
   return {
-    prompt: `${prompt.prompt}${tagText}`,
+    prompt: prompt.text,
     promptPrinciple: prompt.principle,
     weeklyGame,
     quiz,
@@ -480,6 +570,7 @@ export function getDailyPromptQuestions(promptDate: string) {
   return {
     question: content.prompt,
     quizQuestion: content.quiz.question,
+    principle: content.promptPrinciple,
   };
 }
 
@@ -497,35 +588,55 @@ export const today = query({
       .then((items) => items.filter((item) => !item.deletedAt));
     const tags = Array.from(new Set(recent.flatMap((moment) => moment.tags)));
     const couple = await ctx.db.get(membership.coupleId);
-    const promptDate = couple?.promptTimezone
-      ? (
-          await getAuthoritativePromptDate(
-            ctx,
-            membership.coupleId,
-            Date.now(),
-            couple.promptTimezone,
-          )
-        ).promptDate
-      : todayKey();
+    const resolved = couple?.promptTimezone
+      ? await getAuthoritativePromptDate(
+          ctx,
+          membership.coupleId,
+          Date.now(),
+          couple.promptTimezone,
+        )
+      : {
+          promptDate: todayKey(),
+          existing: await existingLifecycleForDate(ctx, membership.coupleId, todayKey()),
+        };
+    const { promptDate } = resolved;
     const generated = chooseGeneratedContent(promptDate, tags);
+    const lifecycle = resolved.existing;
+    if (lifecycle) await validateLifecycleRecipients(ctx, lifecycle, user._id);
+    const prompt = lifecycle?.promptId
+      ? await getAssignedDailyPrompt(ctx, lifecycle)
+      : getDeterministicDailyPromptFallback(promptDate);
     const responses = await ctx.db
       .query("promptResponses")
       .withIndex("by_couple_and_date", (q) =>
         q.eq("coupleId", membership.coupleId).eq("promptDate", promptDate),
       )
-      .collect();
+      .take(3);
+    if (
+      responses.length > 2 ||
+      new Set(responses.map((row) => row.userId)).size !== responses.length
+    ) {
+      throw new Error("Duplicate daily prompt response.");
+    }
+    const members = await getExactCoupleMembers(ctx, membership.coupleId);
+    const memberUserIds = new Set(members.map((member) => member.userId));
+    if (
+      responses.some(
+        (row) =>
+          !memberUserIds.has(row.userId) ||
+          !lifecycle?.promptId ||
+          row.prompt !== prompt.text ||
+          !row.response.trim(),
+      )
+    ) {
+      throw new Error("Daily prompt response mismatch.");
+    }
     const ownResponse = responses.find((response) => response.userId === user._id) ?? null;
     const partnerResponse = responses.find((response) => response.userId !== user._id) ?? null;
-    const members = await ctx.db
-      .query("coupleMembers")
-      .withIndex("by_couple", (q) => q.eq("coupleId", membership.coupleId))
-      .collect();
-    const prompt = getDailyPromptQuestions(promptDate).question;
-
     return {
       promptDate,
-      prompt,
-      promptPrinciple: generated.promptPrinciple,
+      prompt: prompt.text,
+      promptPrinciple: prompt.principle,
       weeklyTopic: generated.weeklyGame.description,
       weeklyGame: generated.weeklyGame,
       quiz: generated.quiz,
@@ -601,6 +712,7 @@ export const answer = mutation({
     if (response.length > 2000) throw new Error("Keep today's answer under 2,000 characters.");
     const lifecycle = await getCurrentLifecycle(ctx, membership.coupleId, args.promptDate);
     await validateLifecycleRecipients(ctx, lifecycle, user._id);
+    const assignedPrompt = await getAssignedDailyPrompt(ctx, lifecycle);
     const existing = await ctx.db
       .query("promptResponses")
       .withIndex("by_user_and_date", (q) =>
@@ -618,17 +730,21 @@ export const answer = mutation({
       coupleId: membership.coupleId,
       userId: user._id,
       promptDate: args.promptDate,
-      prompt: getDailyPromptQuestions(lifecycle.promptDate).question,
+      prompt: assignedPrompt.text,
       response,
     };
     if (shouldRecordStart) {
       await recordAnswerStartFromSave({ ctx, lifecycle, userId: user._id, now });
     }
+    let responseId: Id<"promptResponses">;
     if (existingResponse) {
       await ctx.db.patch(existingResponse._id, payload);
-      return existingResponse._id;
+      responseId = existingResponse._id;
+    } else {
+      responseId = await ctx.db.insert("promptResponses", { ...payload, createdAt: now });
     }
-    return await ctx.db.insert("promptResponses", { ...payload, createdAt: now });
+    await reconcileDailyPromptCompletion({ ctx, lifecycle, assignedPrompt, now });
+    return responseId;
   },
 });
 

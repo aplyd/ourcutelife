@@ -15,6 +15,12 @@ import {
   localDateMinuteToTimestamp,
 } from "./dailyPromptLifecycle";
 import { existingLifecycleForDate, getAuthoritativePromptDate } from "./dailyPromptDateResolver";
+import {
+  DAILY_PROMPT_SEEDS,
+  getAssignedDailyPrompt,
+  normalizeDailyPromptText,
+  validateDailyPromptDocument,
+} from "./dailyPromptLibrary";
 import { getDailyPromptQuestions } from "./prompts";
 
 type CurrentMembership = {
@@ -25,6 +31,7 @@ type CurrentMembership = {
 type PromptQuestions = {
   question: string;
   quizQuestion: string;
+  principle?: string;
 };
 
 const dispatchDailyPrompt = makeFunctionReference<
@@ -128,6 +135,175 @@ async function getLatestPriorLifecycle(
 
 function randomMinuteFromMathRandom(minInclusive: number, maxInclusive: number) {
   return Math.floor(Math.random() * (maxInclusive - minInclusive + 1)) + minInclusive;
+}
+
+const maxApprovedPromptCandidates = 64;
+const recentPromptAssignmentLimit = 12;
+
+function stablePromptIndex(seed: string, length: number): number {
+  let hash = 0;
+  for (let index = 0; index < seed.length; index += 1) {
+    hash = (hash * 31 + seed.charCodeAt(index)) >>> 0;
+  }
+  return hash % length;
+}
+
+async function ensureDailyPromptSeeds(ctx: MutationCtx, nowMs: number) {
+  for (const seed of DAILY_PROMPT_SEEDS) {
+    const matching = await ctx.db
+      .query("dailyPrompts")
+      .withIndex("by_normalized_fingerprint", (q) =>
+        q.eq("normalizedFingerprint", seed.normalizedFingerprint),
+      )
+      .take(2);
+    if (matching.length > 1) throw new Error("Duplicate daily prompt fingerprint.");
+    const existing = matching[0];
+    if (!existing) {
+      await ctx.db.insert("dailyPrompts", {
+        ...seed,
+        completionCount: 0,
+        createdAt: nowMs,
+        updatedAt: nowMs,
+      });
+      continue;
+    }
+    if (
+      existing.text !== seed.text ||
+      existing.principle !== seed.principle ||
+      existing.category !== seed.category ||
+      existing.source !== "seed" ||
+      existing.safetyStatus !== "approved" ||
+      !Number.isSafeInteger(existing.completionCount) ||
+      existing.completionCount < 0
+    ) {
+      throw new Error("Incompatible daily prompt seed state.");
+    }
+  }
+}
+
+async function selectPromptForLifecycle({
+  ctx,
+  coupleId,
+  promptDate,
+  selectionSeed,
+}: {
+  ctx: MutationCtx;
+  coupleId: Id<"couples">;
+  promptDate: string;
+  selectionSeed?: string;
+}) {
+  const candidates = await ctx.db
+    .query("dailyPrompts")
+    .withIndex("by_safety_status_and_completion_count_and_created_at", (q) =>
+      q.eq("safetyStatus", "approved"),
+    )
+    .take(maxApprovedPromptCandidates);
+  if (candidates.length === 0) throw new Error("No approved daily prompts are available.");
+  for (const candidate of candidates) validateDailyPromptDocument(candidate);
+  if (
+    new Set(candidates.map((candidate) => candidate.normalizedFingerprint)).size !==
+    candidates.length
+  ) {
+    throw new Error("Duplicate daily prompt fingerprint.");
+  }
+
+  const recentLifecycles = await ctx.db
+    .query("dailyPromptLifecycles")
+    .withIndex("by_couple_id_and_prompt_date", (q) =>
+      q.eq("coupleId", coupleId).lt("promptDate", promptDate),
+    )
+    .order("desc")
+    .take(recentPromptAssignmentLimit);
+  if (
+    new Set(recentLifecycles.map((lifecycle) => lifecycle.promptDate)).size !==
+    recentLifecycles.length
+  ) {
+    throw new Error("Duplicate daily prompt lifecycle.");
+  }
+  const recentPromptIds = new Set(
+    recentLifecycles.flatMap((lifecycle) => (lifecycle.promptId ? [lifecycle.promptId] : [])),
+  );
+  const freshCandidates = candidates.filter((candidate) => !recentPromptIds.has(candidate._id));
+  const eligible = (freshCandidates.length > 0 ? freshCandidates : candidates).toSorted(
+    (left, right) => left.normalizedFingerprint.localeCompare(right.normalizedFingerprint),
+  );
+  const selected =
+    eligible[stablePromptIndex(selectionSeed ?? `${coupleId}:${promptDate}`, eligible.length)];
+  const exactFingerprintRows = await ctx.db
+    .query("dailyPrompts")
+    .withIndex("by_normalized_fingerprint", (q) =>
+      q.eq("normalizedFingerprint", selected.normalizedFingerprint),
+    )
+    .take(2);
+  if (exactFingerprintRows.length !== 1 || exactFingerprintRows[0]._id !== selected._id) {
+    throw new Error("Duplicate daily prompt fingerprint.");
+  }
+  return selected;
+}
+
+async function assignLegacyLifecyclePrompt(
+  ctx: MutationCtx,
+  lifecycle: Doc<"dailyPromptLifecycles">,
+  nowMs: number,
+  selectionSeed?: string,
+) {
+  await ensureDailyPromptSeeds(ctx, nowMs);
+  if (lifecycle.promptId) {
+    await getAssignedDailyPrompt(ctx, lifecycle);
+    return lifecycle;
+  }
+  const responses = await ctx.db
+    .query("promptResponses")
+    .withIndex("by_couple_and_date", (q) =>
+      q.eq("coupleId", lifecycle.coupleId).eq("promptDate", lifecycle.promptDate),
+    )
+    .take(3);
+  if (responses.length > 2) throw new Error("Duplicate daily prompt response.");
+  const expectedUserIds = new Set([lifecycle.firstUserId, lifecycle.secondUserId]);
+  if (
+    new Set(responses.map((response) => response.userId)).size !== responses.length ||
+    responses.some(
+      (response) =>
+        !expectedUserIds.has(response.userId) ||
+        response.coupleId !== lifecycle.coupleId ||
+        response.promptDate !== lifecycle.promptDate ||
+        !response.prompt.trim() ||
+        !response.response.trim(),
+    )
+  ) {
+    throw new Error("Daily prompt response mismatch.");
+  }
+  const responsePrompts = await Promise.all(
+    responses.map(async (response) => {
+      const fingerprint = normalizeDailyPromptText(response.prompt);
+      const matches = await ctx.db
+        .query("dailyPrompts")
+        .withIndex("by_normalized_fingerprint", (q) => q.eq("normalizedFingerprint", fingerprint))
+        .take(2);
+      if (matches.length > 1) throw new Error("Duplicate daily prompt fingerprint.");
+      const match = matches[0];
+      if (!match || match.text !== response.prompt || match.safetyStatus !== "approved") {
+        throw new Error("Legacy daily prompt response is not canonical.");
+      }
+      validateDailyPromptDocument(match);
+      return match;
+    }),
+  );
+  if (new Set(responsePrompts.map((prompt) => prompt._id)).size > 1) {
+    throw new Error("Daily prompt response mismatch.");
+  }
+  const prompt =
+    responsePrompts[0] ??
+    (await selectPromptForLifecycle({
+      ctx,
+      coupleId: lifecycle.coupleId,
+      promptDate: lifecycle.promptDate,
+      selectionSeed,
+    }));
+  await ctx.db.patch(lifecycle._id, { promptId: prompt._id, updatedAt: nowMs });
+  const assigned = await ctx.db.get(lifecycle._id);
+  if (!assigned?.promptId) throw new Error("Daily prompt assignment was not saved.");
+  return assigned;
 }
 
 function getLocalMinuteOfDay(timestampMs: number, timezone: string) {
@@ -380,12 +556,14 @@ async function reconcileForMembership({
   nowMs,
   randomMinute,
   getPromptQuestions,
+  promptSelectionSeedForTesting,
 }: {
   ctx: MutationCtx;
   membership: Doc<"coupleMembers">;
   nowMs: number;
   randomMinute: (minInclusive: number, maxInclusive: number) => number;
   getPromptQuestions?: (promptDate: string) => PromptQuestions;
+  promptSelectionSeedForTesting?: string;
 }) {
   const couple = await ctx.db.get(membership.coupleId);
   if (!couple) throw new Error("Couple not found.");
@@ -413,7 +591,13 @@ async function reconcileForMembership({
     couple.promptTimezone,
   );
   if (existing) {
-    await reconcileDispatchJobs(ctx, existing, nowMs);
+    const assigned = await assignLegacyLifecyclePrompt(
+      ctx,
+      existing,
+      nowMs,
+      promptSelectionSeedForTesting,
+    );
+    await reconcileDispatchJobs(ctx, assigned, nowMs);
     return {
       status: "scheduled" as const,
       lifecycleId: existing._id,
@@ -459,10 +643,18 @@ async function reconcileForMembership({
     randomizedFirstLocalMinute,
     couple.promptTimezone,
   );
+  await ensureDailyPromptSeeds(ctx, nowMs);
+  const prompt = await selectPromptForLifecycle({
+    ctx,
+    coupleId: membership.coupleId,
+    promptDate,
+    selectionSeed: promptSelectionSeedForTesting,
+  });
 
   const lifecycleId = await ctx.db.insert("dailyPromptLifecycles", {
     coupleId: membership.coupleId,
     promptDate,
+    promptId: prompt._id,
     timezone: couple.promptTimezone,
     firstUserId: recipients.firstUserId as Id<"users">,
     secondUserId: recipients.secondUserId as Id<"users">,
@@ -533,6 +725,7 @@ export const reconcileTodayForTesting = internalMutation({
     nowMs: v.number(),
     randomMinute: v.number(),
     promptContentForTesting: v.optional(v.string()),
+    promptSelectionSeedForTesting: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const { membership } = await requireCurrentMembership(ctx);
@@ -543,6 +736,7 @@ export const reconcileTodayForTesting = internalMutation({
       randomMinute: () => args.randomMinute,
       getPromptQuestions: (promptDate) =>
         promptContentForTesting(args.promptContentForTesting, promptDate),
+      promptSelectionSeedForTesting: args.promptSelectionSeedForTesting,
     });
   },
 });
@@ -577,7 +771,7 @@ async function getTodayStateForMembership(
   );
   const lifecycle =
     existing ?? (await existingLifecycleForDate(ctx, membership.coupleId, promptDate));
-  const prompt = getPromptQuestions(promptDate);
+  const generatedPrompt = getPromptQuestions(promptDate);
   const setup = lifecycle
     ? { blockedReason: null }
     : await getSetupBlocker(ctx, membership.coupleId, promptDate, getPromptQuestions);
@@ -586,14 +780,22 @@ async function getTodayStateForMembership(
       status: "blocked" as const,
       blockedReason: setup.blockedReason,
       promptDate,
+      prompt: generatedPrompt,
     };
   }
 
+  const assignedPrompt = lifecycle?.promptId ? await getAssignedDailyPrompt(ctx, lifecycle) : null;
   return {
     status: lifecycle ? ("scheduled" as const) : ("not_scheduled" as const),
     blockedReason: null,
     promptDate,
-    prompt,
+    prompt: assignedPrompt
+      ? {
+          question: assignedPrompt.text,
+          quizQuestion: generatedPrompt.quizQuestion,
+          principle: assignedPrompt.principle,
+        }
+      : generatedPrompt,
     lifecycle: lifecycle
       ? {
           promptDate: lifecycle.promptDate,

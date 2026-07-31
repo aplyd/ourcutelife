@@ -116,16 +116,22 @@ Required slices:
 
 ## Phase 6 — Generated and reusable daily prompts
 
-**Status:** pending_discussion_and_plan
+**Status:** persistence_foundation_locally_complete_and_approved
 **Goal:** Generate warm, varied daily prompts and build a privacy-safe library whose ranking improves when couples actually complete them.
+
+Audit: `phases/06-generated-reusable-daily-prompts/06-01-AUDIT.md`
+
+Foundation plan: `phases/06-generated-reusable-daily-prompts/06-02-PLAN.md`
 
 Required slices:
 
-- Read the Convex AI guidelines and audit the current prompt schema/cloud-function path.
+- [x] Read the Convex AI guidelines and audit the current prompt schema/cloud-function path.
+- [x] Plan the pre-AI immutable assignment and exact-once private completion foundation.
+- [x] Implement immutable assignment, canonical answer persistence, and exact-once private completion/counting locally.
 - Integrate the Vercel AI SDK in the cloud function with explicit model/provider configuration and failure fallback.
 - Write and test generation guidance inspired by evidence-based Gottman principles without affiliation, copied proprietary material, diagnosis, or therapy claims.
-- Add answered-prompt persistence after both partners submit, with no cross-couple answer or identity leakage.
-- Seed new couples from reusable prompts and increment ranking on each additional couple completion.
+- [x] Add answered-prompt completion persistence after both partners submit, with no answer or identity leakage into reusable ranking records.
+- Seed new couples from reusable prompts and use completion evidence in broader ranking.
 - Balance ranking with recency, diversity, deduplication, safety filtering, and per-couple prompt history.
 
 ## Phase 7 — Quality Time

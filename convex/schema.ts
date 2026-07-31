@@ -91,6 +91,26 @@ export default defineSchema({
   })
     .index("by_user_and_date", ["userId", "promptDate"])
     .index("by_couple_and_date", ["coupleId", "promptDate"]),
+  dailyPrompts: defineTable({
+    text: v.string(),
+    normalizedFingerprint: v.string(),
+    principle: v.string(),
+    category: v.string(),
+    source: v.union(v.literal("seed"), v.literal("ai")),
+    safetyStatus: v.union(v.literal("pending"), v.literal("approved"), v.literal("rejected")),
+    model: v.optional(v.string()),
+    generationPromptVersion: v.optional(v.string()),
+    generatedAt: v.optional(v.number()),
+    completionCount: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_normalized_fingerprint", ["normalizedFingerprint"])
+    .index("by_safety_status_and_completion_count_and_created_at", [
+      "safetyStatus",
+      "completionCount",
+      "createdAt",
+    ]),
   pushTokens: defineTable({
     userId: v.id("users"),
     token: v.string(),
@@ -148,6 +168,7 @@ export default defineSchema({
   dailyPromptLifecycles: defineTable({
     coupleId: v.id("couples"),
     promptDate: v.string(),
+    promptId: v.optional(v.id("dailyPrompts")),
     timezone: v.string(),
     firstUserId: v.id("users"),
     secondUserId: v.id("users"),
@@ -184,6 +205,17 @@ export default defineSchema({
     .index("by_couple_id_and_prompt_date", ["coupleId", "promptDate"])
     .index("by_first_scheduled_at_and_first_status", ["firstScheduledAt", "firstStatus"])
     .index("by_second_scheduled_at_and_second_status", ["secondScheduledAt", "secondStatus"]),
+  dailyPromptCompletions: defineTable({
+    lifecycleId: v.id("dailyPromptLifecycles"),
+    coupleId: v.id("couples"),
+    promptDate: v.string(),
+    promptId: v.id("dailyPrompts"),
+    completedAt: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_couple_id_and_prompt_date", ["coupleId", "promptDate"])
+    .index("by_lifecycle_id", ["lifecycleId"])
+    .index("by_prompt_id_and_completed_at", ["promptId", "completedAt"]),
   dailyPromptDeliveryAttempts: defineTable({
     lifecycleId: v.id("dailyPromptLifecycles"),
     coupleId: v.id("couples"),

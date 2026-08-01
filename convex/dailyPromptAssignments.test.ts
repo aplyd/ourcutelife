@@ -395,6 +395,35 @@ test("missing assigned prompt fails closed", async () => {
   await expect(reconcile(t)).rejects.toThrow("Assigned daily prompt was not found.");
 });
 
+test("selection ranks approved inventory by aggregate completion evidence", async () => {
+  const t = convexTest(schema, modules);
+  await seedReadyCouple(t);
+  const leastCompletedId = await t.run(async (ctx) => {
+    for (const seed of DAILY_PROMPT_SEEDS) {
+      await ctx.db.insert("dailyPrompts", {
+        ...seed,
+        completionCount: 10,
+        createdAt: 1,
+        updatedAt: 1,
+      });
+    }
+    const leastCompletedId = await ctx.db.insert(
+      "dailyPrompts",
+      approvedAiPrompt("Least completed fixture?", { completionCount: 1, createdAt: 2 }),
+    );
+    await ctx.db.insert(
+      "dailyPrompts",
+      approvedAiPrompt("More completed fixture?", { completionCount: 2, createdAt: 3 }),
+    );
+    return leastCompletedId;
+  });
+
+  const result = await reconcile(t, "completion-evidence");
+  const lifecycle = await t.run((ctx) => ctx.db.get(result.lifecycleId!));
+
+  expect(lifecycle?.promptId).toBe(leastCompletedId);
+});
+
 test("selection uses only approved candidates", async () => {
   const t = convexTest(schema, modules);
   await seedReadyCouple(t);

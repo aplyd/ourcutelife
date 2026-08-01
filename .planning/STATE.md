@@ -1,6 +1,6 @@
 # State
 
-Updated: 2026-07-31T07:13:51-07:00
+Updated: 2026-08-01T12:43:18-07:00
 
 ## Current position
 
@@ -16,6 +16,8 @@ Our Cute Life is on `main` at the current local tip, two commits ahead of `origi
 - Current app spine: Expo Router iOS app with Today, Chat, Plans, Me tabs; Convex-backed couples/moments/prompts/plans/date-plan flows; mock-auth simulator path for local walkthroughs.
 
 ## Latest work / verification
+
+- Implemented and independently approved Phase 6 Slice 06-04 locally without schema, UI, provider, cron, or notification changes. A pure bounded ranking boundary now selects only from the existing approved 64-row inventory window, excludes up to 12 recent couple assignments when a fresh candidate exists, prefers the lowest exact-once aggregate completion count, prefers category/principle diversity among equal-count candidates, and resolves remaining ties deterministically. Duplicate IDs/fingerprints, malformed counts/evidence, and oversized windows fail closed; the lifecycle retains its exact selected-fingerprint lookup, immutable assignment, and automatic six-seed fallback. RED captured the missing pure module and the lifecycle's prior failure to choose the uniquely least-completed prompt; focused selection/assignment/prompt/generation coverage passed 107/107, unit 84/84, Convex 214/214, typecheck, lint with 0 warnings/errors across 125 files, formatting, whitespace, `tools/agent_validate`, `tools/agent_review`, and `tools/agent_commit_sweep` passed. A strict no-edit review inspected all tracked and untracked Slice 06-04 files and returned PASS / APPROVE with 0 Critical, 0 High, 0 Medium, and 0 Low findings; it independently reran focused coverage at 107/107, typecheck, and `git diff --check` and proved the worktree status unchanged. An earlier read-only Codex review separately found no Medium-or-higher risks. The ranking input excludes prompt text, answers, responses, identities, Moments, Chat, devices/tokens, delivery/notification state, and provider output. Argent is not applicable to this backend-only slice. No external effect, commit, or push occurred. Implementation record: `phases/06-generated-reusable-daily-prompts/06-04-IMPLEMENTATION.md`.
 
 - Finalized Phase 6 Slice 06-03 as a coherent local commit (`feat: add safe reusable prompt generation boundary`) without pushing. Required formatting completed without broadening the intended ten-file slice; focused generation, assignment, and prompt coverage passed 98/98; full typecheck and `git diff --check` passed; and the worktree returned clean. No provider call, credential access, deployment, migration, notification, live data operation, or mobile behavior change occurred.
 
@@ -244,7 +246,7 @@ No hard blocker for local code/planning slices. Do not deploy, run production mi
 ## Next safe actions
 
 1. Keep real Expo/APNs delivery and receipt-polling verification behind an explicit non-production physical-device gate; do not infer delivery from the simulator.
-2. Plan the next bounded Phase 6 library selection/ranking slice around approved persisted prompts and aggregate completion evidence; do not invoke a real model, schedule generation, or change live configuration.
+2. Preserve the independently approved uncommitted Phase 6 Slice 06-04 baseline; plan any later Phase 6 increment separately without invoking a real model, scheduling generation, or changing live configuration.
 3. Keep existing date-plan behavior and the optional `itemKey` backfill preserved; do not run a live migration while Phase 7's replacement model is still being designed.
 
 ## Blockers / questions

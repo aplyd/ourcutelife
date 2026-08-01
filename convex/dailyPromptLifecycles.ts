@@ -21,6 +21,11 @@ import {
   normalizeDailyPromptText,
   validateDailyPromptDocument,
 } from "./dailyPromptLibrary";
+import {
+  MAX_APPROVED_DAILY_PROMPT_CANDIDATES,
+  rankApprovedDailyPrompt,
+  RECENT_DAILY_PROMPT_ASSIGNMENT_LIMIT,
+} from "./dailyPromptSelection";
 import { getDailyPromptQuestions } from "./prompts";
 
 type CurrentMembership = {
@@ -137,17 +142,6 @@ function randomMinuteFromMathRandom(minInclusive: number, maxInclusive: number) 
   return Math.floor(Math.random() * (maxInclusive - minInclusive + 1)) + minInclusive;
 }
 
-const maxApprovedPromptCandidates = 64;
-const recentPromptAssignmentLimit = 12;
-
-function stablePromptIndex(seed: string, length: number): number {
-  let hash = 0;
-  for (let index = 0; index < seed.length; index += 1) {
-    hash = (hash * 31 + seed.charCodeAt(index)) >>> 0;
-  }
-  return hash % length;
-}
-
 async function ensureDailyPromptSeeds(ctx: MutationCtx, nowMs: number) {
   for (const seed of DAILY_PROMPT_SEEDS) {
     const matching = await ctx.db
@@ -197,7 +191,7 @@ async function selectPromptForLifecycle({
     .withIndex("by_safety_status_and_completion_count_and_created_at", (q) =>
       q.eq("safetyStatus", "approved"),
     )
-    .take(maxApprovedPromptCandidates);
+    .take(MAX_APPROVED_DAILY_PROMPT_CANDIDATES);
   if (candidates.length === 0) throw new Error("No approved daily prompts are available.");
   for (const candidate of candidates) validateDailyPromptDocument(candidate);
   if (
@@ -213,22 +207,40 @@ async function selectPromptForLifecycle({
       q.eq("coupleId", coupleId).lt("promptDate", promptDate),
     )
     .order("desc")
-    .take(recentPromptAssignmentLimit);
+    .take(RECENT_DAILY_PROMPT_ASSIGNMENT_LIMIT);
   if (
     new Set(recentLifecycles.map((lifecycle) => lifecycle.promptDate)).size !==
     recentLifecycles.length
   ) {
     throw new Error("Duplicate daily prompt lifecycle.");
   }
-  const recentPromptIds = new Set(
-    recentLifecycles.flatMap((lifecycle) => (lifecycle.promptId ? [lifecycle.promptId] : [])),
-  );
-  const freshCandidates = candidates.filter((candidate) => !recentPromptIds.has(candidate._id));
-  const eligible = (freshCandidates.length > 0 ? freshCandidates : candidates).toSorted(
-    (left, right) => left.normalizedFingerprint.localeCompare(right.normalizedFingerprint),
-  );
-  const selected =
-    eligible[stablePromptIndex(selectionSeed ?? `${coupleId}:${promptDate}`, eligible.length)];
+  const recentAssignments = [];
+  for (const lifecycle of recentLifecycles) {
+    if (!lifecycle.promptId) continue;
+    const prompt = await ctx.db.get(lifecycle.promptId);
+    if (!prompt || prompt.safetyStatus !== "approved") {
+      throw new Error("Recent daily prompt assignment is not approved.");
+    }
+    validateDailyPromptDocument(prompt);
+    recentAssignments.push({
+      promptId: prompt._id,
+      principle: prompt.principle,
+      category: prompt.category,
+    });
+  }
+  const selectedId = rankApprovedDailyPrompt({
+    candidates: candidates.map((candidate) => ({
+      id: candidate._id,
+      normalizedFingerprint: candidate.normalizedFingerprint,
+      principle: candidate.principle,
+      category: candidate.category,
+      completionCount: candidate.completionCount,
+    })),
+    recentAssignments,
+    selectionSeed: selectionSeed ?? `${coupleId}:${promptDate}`,
+  });
+  const selected = candidates.find((candidate) => candidate._id === selectedId);
+  if (!selected) throw new Error("Selected daily prompt was not found.");
   const exactFingerprintRows = await ctx.db
     .query("dailyPrompts")
     .withIndex("by_normalized_fingerprint", (q) =>

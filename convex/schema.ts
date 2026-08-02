@@ -155,7 +155,7 @@ export default defineSchema({
   })
     .index("by_user_id_and_device_id", ["userId", "deviceId"])
     .index("by_couple_id_and_user_id", ["coupleId", "userId"])
-    .index("by_couple_id_and_user_id_and_enabled_and_permission_status_and_updated_at", [
+    .index("by_couple_user_delivery_readiness", [
       "coupleId",
       "userId",
       "enabled",

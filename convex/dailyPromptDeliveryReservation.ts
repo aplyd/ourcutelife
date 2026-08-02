@@ -165,7 +165,7 @@ export const reserveDailyPromptDelivery = internalMutation({
       args.step === "first" ? lifecycle.firstUserId : lifecycle.secondUserId;
     const device = await ctx.db
       .query("notificationDevices")
-      .withIndex("by_couple_id_and_user_id_and_enabled_and_permission_status_and_updated_at", (q) =>
+      .withIndex("by_couple_user_delivery_readiness", (q) =>
         q
           .eq("coupleId", lifecycle.coupleId)
           .eq("userId", recipientUserId)

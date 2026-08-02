@@ -254,6 +254,113 @@ export default defineSchema({
   })
     .index("by_couple_id_and_prompt_date", ["coupleId", "promptDate"])
     .index("by_user_id_and_prompt_date", ["userId", "promptDate"]),
+  qualityTimeRequests: defineTable({
+    coupleId: v.id("couples"),
+    initiatorUserId: v.id("users"),
+    responderUserId: v.id("users"),
+    timingKind: v.union(v.literal("now"), v.literal("future")),
+    scheduledFor: v.optional(v.number()),
+    selectedCategories: v.array(
+      v.union(
+        v.literal("eat"),
+        v.literal("drink"),
+        v.literal("explore_adventure"),
+        v.literal("entertainment"),
+        v.literal("romance"),
+      ),
+    ),
+    responderCategories: v.optional(
+      v.array(
+        v.union(
+          v.literal("eat"),
+          v.literal("drink"),
+          v.literal("explore_adventure"),
+          v.literal("entertainment"),
+          v.literal("romance"),
+        ),
+      ),
+    ),
+    status: v.union(
+      v.literal("draft"),
+      v.literal("sent"),
+      v.literal("responding"),
+      v.literal("completed"),
+      v.literal("canceled"),
+      v.literal("expired"),
+    ),
+    version: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+    sentAt: v.optional(v.number()),
+    completedAt: v.optional(v.number()),
+    canceledAt: v.optional(v.number()),
+    expiresAt: v.optional(v.number()),
+  })
+    .index("by_couple_id_and_updated_at", ["coupleId", "updatedAt"])
+    .index("by_couple_id_and_status_and_updated_at", ["coupleId", "status", "updatedAt"]),
+  qualityTimeOptions: defineTable({
+    requestId: v.id("qualityTimeRequests"),
+    coupleId: v.id("couples"),
+    category: v.union(
+      v.literal("eat"),
+      v.literal("drink"),
+      v.literal("explore_adventure"),
+      v.literal("entertainment"),
+      v.literal("romance"),
+    ),
+    planIdeaId: v.id("planIdeas"),
+    title: v.string(),
+    description: v.string(),
+    kind: v.union(v.literal("activity"), v.literal("place")),
+    costLevel: v.number(),
+    durationMinutes: v.number(),
+    vibeTags: v.array(v.string()),
+    photoUrl: v.optional(v.string()),
+    address: v.optional(v.string()),
+    sourceCreatedByUserId: v.optional(v.id("users")),
+    createdAt: v.number(),
+  })
+    .index("by_request_id_and_category_and_created_at", ["requestId", "category", "createdAt"])
+    .index("by_request_id_and_plan_idea_id", ["requestId", "planIdeaId"]),
+  qualityTimeDecisions: defineTable({
+    requestId: v.id("qualityTimeRequests"),
+    coupleId: v.id("couples"),
+    optionId: v.id("qualityTimeOptions"),
+    category: v.union(
+      v.literal("eat"),
+      v.literal("drink"),
+      v.literal("explore_adventure"),
+      v.literal("entertainment"),
+      v.literal("romance"),
+    ),
+    userId: v.id("users"),
+    decision: v.union(v.literal("accept"), v.literal("pass")),
+    createdAt: v.number(),
+  })
+    .index("by_request_id_and_user_id_and_category_and_created_at", [
+      "requestId",
+      "userId",
+      "category",
+      "createdAt",
+    ])
+    .index("by_request_id_and_option_id_and_user_id", ["requestId", "optionId", "userId"])
+    .index("by_option_id", ["optionId"]),
+  qualityTimeOutcomes: defineTable({
+    requestId: v.id("qualityTimeRequests"),
+    coupleId: v.id("couples"),
+    category: v.union(
+      v.literal("eat"),
+      v.literal("drink"),
+      v.literal("explore_adventure"),
+      v.literal("entertainment"),
+      v.literal("romance"),
+    ),
+    optionId: v.id("qualityTimeOptions"),
+    matchedAt: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_request_id_and_category", ["requestId", "category"])
+    .index("by_request_id_and_created_at", ["requestId", "createdAt"]),
   planIdeas: defineTable({
     coupleId: v.id("couples"),
     createdByUserId: v.optional(v.id("users")),

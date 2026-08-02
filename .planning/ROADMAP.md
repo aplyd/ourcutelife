@@ -141,15 +141,23 @@ Required slices:
 
 ## Phase 7 — Quality Time
 
-**Status:** pending_discussion_and_plan
+**Status:** slice_07_02_stages_1_4_complete_quality_time_server_foundation_verified
 **Goal:** Replace draining back-and-forth planning with a private, mutual flow that turns each partner's current preferences into concrete shared options.
+
+Context: `phases/07-quality-time/CONTEXT.md`
+
+Pure policy plan: `phases/07-quality-time/07-01-PLAN.md`
+
+Persistence/API plan: `phases/07-quality-time/07-02-PLAN.md`
 
 Required slices:
 
-- Map reusable data/routes from the current Plans model and write a migration-safe replacement plan.
+- [x] Map reusable data/routes from the current Plans model and write a migration-safe replacement plan.
+- [x] Implement and independently approve the pure category, shortlist-readiness, and mutual-reveal policy contract.
+- [x] Complete Slice 07-02's additive request-scoped server API foundation: draft, private inventory/initiator decisions, transactional send, responder selection/decisions, mutual-only outcomes, exhaustion, expiry, and participant-safe cancellation are implemented and verified.
 - Initiator chooses now/future time plus Eat, Drink, Explore/Adventure, Entertainment, and/or Romance.
 - Initiator accepts 3–5 private cards per selected category before the request can be sent.
 - Partner receives the completed request, chooses current-interest categories, and swipes only relevant inventory.
 - Stop each agreed category when a mutual option is found and present the combined Quality Time outcome.
 - Preserve private rejections and authorship; cover no-match, insufficient inventory, abandonment, expiration, rescheduling, and cancellation.
-- Verify the complete two-partner lifecycle with tests and Argent evidence.
+- Verify the complete server-side two-partner lifecycle with focused and full tests; carry Argent evidence forward to the first Quality Time mobile slice because Slice 07-02 changes no mobile surface.

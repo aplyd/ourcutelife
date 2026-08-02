@@ -41,7 +41,23 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm convex:deploy
+      - name: Deploy Convex
+        shell: bash
+        run: |
+          set +e
+          deploy_output="$(pnpm convex:deploy 2>&1)"
+          deploy_status=$?
+          printf '%s\n' "$deploy_output"
+          if [ "$deploy_status" -ne 0 ]; then
+            diagnostic="$(printf '%s' "$deploy_output" | node -e '
+              const fs = require("node:fs");
+              const lines = fs.readFileSync(0, "utf8").split(/\r?\n/).filter(Boolean).slice(-12);
+              const escaped = lines.join(" | ").replaceAll("%", "%25").replaceAll("\r", "%0D").replaceAll("\n", "%0A");
+              process.stdout.write(escaped.slice(0, 3500));
+            ')"
+            echo "::error title=Convex deploy failed::$diagnostic"
+            exit "$deploy_status"
+          fi
 
   eas-update-ios:
     name: EAS iOS OTA update

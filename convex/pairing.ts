@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import type { Id } from "./_generated/dataModel";
+import type { Doc, Id } from "./_generated/dataModel";
 import type { MutationCtx } from "./_generated/server";
 import { mutation } from "./_generated/server";
 import { getCurrentAppUser } from "./auth";
@@ -28,6 +28,59 @@ async function expireActiveCodesForCouple(ctx: MutationCtx, coupleId: Id<"couple
 
   await Promise.all(activeCodes.map((code) => ctx.db.patch(code._id, { usedAt: now })));
 }
+
+async function getAuthenticatedPairingUser(ctx: MutationCtx): Promise<Doc<"users"> | null> {
+  let appUser: Doc<"users"> | null = null;
+  try {
+    appUser = await getCurrentAppUser(ctx);
+  } catch (error) {
+    if (!(error instanceof Error) || !error.message.includes('Component "betterAuth"')) {
+      throw error;
+    }
+  }
+  if (appUser) return appUser;
+
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity?.tokenIdentifier) return null;
+  return await ctx.db
+    .query("users")
+    .withIndex("by_auth_user_id", (q) => q.eq("authUserId", identity.tokenIdentifier))
+    .unique();
+}
+
+export const leaveCouple = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const user = await getAuthenticatedPairingUser(ctx);
+    if (!user) throw new Error("Not signed in.");
+
+    const memberships = await ctx.db
+      .query("coupleMembers")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .take(2);
+    if (memberships.length > 1) throw new Error("Ambiguous couple membership.");
+    const membership = memberships[0];
+    if (!membership) throw new Error("Pair with your partner first.");
+    if (!(await ctx.db.get(membership.coupleId))) throw new Error("Couple not found.");
+
+    const now = Date.now();
+    for await (const code of ctx.db
+      .query("pairingCodes")
+      .withIndex("by_couple", (q) => q.eq("coupleId", membership.coupleId))) {
+      if (!code.usedAt && code.expiresAt > now) await ctx.db.patch(code._id, { usedAt: now });
+    }
+    for await (const device of ctx.db
+      .query("notificationDevices")
+      .withIndex("by_couple_id_and_user_id", (q) =>
+        q.eq("coupleId", membership.coupleId).eq("userId", user._id),
+      )) {
+      if (device.enabled) await ctx.db.patch(device._id, { enabled: false, updatedAt: now });
+    }
+
+    await ctx.db.delete(membership._id);
+    return { left: true as const };
+  },
+});
 
 export const createCoupleAndCode = mutation({
   args: {

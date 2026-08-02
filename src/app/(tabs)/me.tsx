@@ -1,6 +1,6 @@
-import { useAppQuery } from "@/lib/devMock";
+import { useAppMutation, useAppQuery } from "@/lib/devMock";
 import { Redirect, router } from "expo-router";
-import type { JSX } from "react";
+import { useState, type JSX } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -19,7 +19,10 @@ import { useAppTheme } from "@/lib/theme";
 export default function MeTab(): JSX.Element {
   const betterAuthSession = useSession();
   const viewer = useAppQuery(api.auth.viewer, {});
+  const leaveCouple = useAppMutation(api.pairing.leaveCouple);
   const { preference: theme, setPreference: setTheme } = useAppTheme();
+  const [isLeavingCouple, setIsLeavingCouple] = useState(false);
+  const [leaveCoupleError, setLeaveCoupleError] = useState<string | null>(null);
 
   if (!betterAuthSession.data?.session) return <Redirect href="/auth" />;
   if (viewer === undefined)
@@ -38,11 +41,33 @@ export default function MeTab(): JSX.Element {
       )
     : "Not set yet";
 
+  async function leaveCurrentCouple() {
+    if (isLeavingCouple) return;
+    setLeaveCoupleError(null);
+    setIsLeavingCouple(true);
+    try {
+      await leaveCouple({});
+      router.replace("/pairing");
+    } catch (error) {
+      setLeaveCoupleError(error instanceof Error ? error.message : "Could not leave the couple.");
+    } finally {
+      setIsLeavingCouple(false);
+    }
+  }
+
   function confirmLeaveCouple() {
+    if (isLeavingCouple) return;
     Alert.alert(
       "Leave couple?",
-      "This is intentionally not wired yet. Leaving a couple needs a safe data-retention decision first.",
-      [{ text: "OK" }],
+      "You will leave this couple and return to pairing. Your partner and shared history will remain.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Leave couple",
+          style: "destructive",
+          onPress: () => void leaveCurrentCouple(),
+        },
+      ],
     );
   }
 
@@ -139,11 +164,22 @@ export default function MeTab(): JSX.Element {
         <Pressable
           accessibilityLabel="Leave couple"
           accessibilityRole="button"
+          accessibilityState={{ disabled: isLeavingCouple, busy: isLeavingCouple }}
           className="h-12 rounded-full border border-[#fecdd3] bg-[#fff1f2] items-center justify-center"
+          disabled={isLeavingCouple}
           onPress={confirmLeaveCouple}
         >
-          <Text className="font-bold text-[#be123c]">Leave couple</Text>
+          {isLeavingCouple ? (
+            <Text className="font-bold text-[#be123c]">Leaving couple…</Text>
+          ) : (
+            <Text className="font-bold text-[#be123c]">Leave couple</Text>
+          )}
         </Pressable>
+        {leaveCoupleError ? (
+          <Text accessibilityRole="alert" className="text-sm text-[#be123c]">
+            {leaveCoupleError}
+          </Text>
+        ) : null}
       </View>
     </ScrollView>
   );

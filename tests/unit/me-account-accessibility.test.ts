@@ -26,7 +26,23 @@ void test("account actions expose explicit native button semantics", () => {
   }
 });
 
-void test("leave couple remains a non-destructive confirmation placeholder", () => {
+void test("leave couple is mutation-wired only behind destructive confirmation", () => {
+  assert.match(source, /useAppMutation\(api\.pairing\.leaveCouple\)/);
   assert.match(pressableForText("Leave couple"), /onPress=\{confirmLeaveCouple\}/);
-  assert.match(source, /This is intentionally not wired yet\./);
+  assert.match(source, /text: "Cancel", style: "cancel"/);
+  assert.match(source, /text: "Leave couple",[\s\S]{0,80}style: "destructive"/);
+  assert.match(source, /onPress: \(\) => void leaveCurrentCouple\(\)/);
+});
+
+void test("leave couple exposes pending and error state and redirects only after success", () => {
+  assert.match(
+    source,
+    /accessibilityState=\{\{ disabled: isLeavingCouple, busy: isLeavingCouple \}\}/,
+  );
+  assert.match(source, /disabled=\{isLeavingCouple\}/);
+  assert.match(source, /Leaving couple…/);
+  assert.match(source, /setLeaveCoupleError\(null\)/);
+  assert.match(source, /await leaveCouple\(\{\}\);\s*router\.replace\("\/pairing"\)/s);
+  assert.match(source, /catch \(error\)[\s\S]*setLeaveCoupleError\(/);
+  assert.match(source, /accessibilityRole="alert"/);
 });

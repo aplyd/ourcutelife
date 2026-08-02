@@ -798,20 +798,13 @@ export const listDraftInventory = query({
 });
 
 export const recordDecision = mutation({
-  args: v.union(
-    v.object({
-      requestId: v.id("qualityTimeRequests"),
-      expectedVersion: v.number(),
-      planIdeaId: v.id("planIdeas"),
-      decision: v.union(v.literal("accept"), v.literal("pass")),
-    }),
-    v.object({
-      requestId: v.id("qualityTimeRequests"),
-      expectedVersion: v.number(),
-      optionId: v.id("qualityTimeOptions"),
-      decision: v.union(v.literal("accept"), v.literal("pass")),
-    }),
-  ),
+  args: {
+    requestId: v.id("qualityTimeRequests"),
+    expectedVersion: v.number(),
+    planIdeaId: v.optional(v.id("planIdeas")),
+    optionId: v.optional(v.id("qualityTimeOptions")),
+    decision: v.union(v.literal("accept"), v.literal("pass")),
+  },
   handler: async (ctx, args) => {
     const pair = await requireExactPair(ctx);
     const request = await ctx.db.get(args.requestId);
@@ -819,7 +812,10 @@ export const recordDecision = mutation({
     if (!request || !role) throw new Error("Request not found.");
 
     if (role === "responder") {
-      if (!("optionId" in args)) throw new Error("Request not found.");
+      const optionId = args.optionId;
+      if (optionId === undefined || args.planIdeaId !== undefined) {
+        throw new Error("Request not found.");
+      }
       if (request.status !== "responding" || !request.responderCategories) {
         throw new Error("Request not found.");
       }
@@ -829,7 +825,6 @@ export const recordDecision = mutation({
       const expired = await expireIfOverdue(ctx, request, now);
       if (expired) return expired;
 
-      const optionId: Id<"qualityTimeOptions"> = args.optionId;
       const option = await ctx.db.get(optionId);
       if (
         !option ||
@@ -911,8 +906,10 @@ export const recordDecision = mutation({
     if (request.status !== "draft" || !requestMatchesExactPair(request, pair)) {
       throw new Error("Request not found.");
     }
-    if (!("planIdeaId" in args)) throw new Error("Request not found.");
-    const planIdeaId: Id<"planIdeas"> = args.planIdeaId;
+    const planIdeaId = args.planIdeaId;
+    if (planIdeaId === undefined || args.optionId !== undefined) {
+      throw new Error("Request not found.");
+    }
     validateRequestVersion(request, args.expectedVersion);
     validateDraftRequestEvidence(request);
 

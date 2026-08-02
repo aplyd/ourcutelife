@@ -4,9 +4,15 @@ import { makeFunctionReference } from "convex/server";
 import { expect, test, vi } from "vitest";
 
 import type { Id } from "./_generated/dataModel";
+import { recordDecision as recordDecisionDefinition } from "./qualityTime";
 import schema from "./schema";
 
 const modules = import.meta.glob("./**/*.ts");
+
+test("recordDecision exports the top-level object validator required by Convex mutations", () => {
+  const registered = recordDecisionDefinition as unknown as { exportArgs: () => string };
+  expect(JSON.parse(registered.exportArgs())).toMatchObject({ type: "object" });
+});
 
 type Category = "eat" | "drink" | "explore_adventure" | "entertainment" | "romance";
 type Timing = { kind: "now" } | { kind: "future"; scheduledFor: number };
@@ -2006,7 +2012,7 @@ test("the responder decides using only an optionId from the public request proje
       expectedVersion: projection.version,
       decision: "accept",
     } as never),
-  ).rejects.toThrow("Validator error");
+  ).rejects.toThrow("Request not found");
   await expect(
     responder.mutation(recordDecision, {
       requestId,

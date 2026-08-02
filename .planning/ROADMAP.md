@@ -116,7 +116,7 @@ Required slices:
 
 ## Phase 6 — Generated and reusable daily prompts
 
-**Status:** generation_fallback_slice_locally_complete_and_approved
+**Status:** replenishment_readiness_implemented_and_independently_approved
 **Goal:** Generate warm, varied daily prompts and build a privacy-safe library whose ranking improves when couples actually complete them.
 
 Audit: `phases/06-generated-reusable-daily-prompts/06-01-AUDIT.md`
@@ -135,8 +135,9 @@ Required slices:
 - [x] Plan the no-credential Vercel AI SDK generation boundary, deterministic safety validation, provenance, deduplication, and seed fallback.
 - [x] Implement the planned generation boundary with mocked provider evidence before any live configuration or invocation.
 - [x] Add answered-prompt completion persistence after both partners submit, with no answer or identity leakage into reusable ranking records.
-- Seed new couples from reusable prompts and use completion evidence in broader ranking.
-- Balance ranking with recency, diversity, deduplication, safety filtering, and per-couple prompt history.
+- [x] Seed new couples from approved reusable prompts and use exact-once aggregate completion evidence in broader ranking.
+- [x] Balance ranking with bounded recency, category/principle diversity, exact-fingerprint deduplication, safety filtering, and per-couple assignment history.
+- [x] Implement the provider-free inventory replenishment readiness boundary in `phases/06-generated-reusable-daily-prompts/06-05-PLAN.md`; keep automatic/model invocation behind a later explicit gate.
 
 ## Phase 7 — Quality Time
 

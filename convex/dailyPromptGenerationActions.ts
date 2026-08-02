@@ -12,9 +12,16 @@ import {
   type DailyPromptGenerationCandidate,
 } from "./dailyPromptGenerationPolicy";
 import {
-  orchestrateDailyPromptGeneration,
+  preflightDailyPromptGeneration,
   type DailyPromptGenerationProvider,
+  type DailyPromptInventoryReadinessSnapshot,
 } from "./dailyPromptGenerationOrchestration";
+
+const getInventoryReadiness = makeFunctionReference<
+  "query",
+  Record<string, never>,
+  DailyPromptInventoryReadinessSnapshot
+>("dailyPromptInventory:getReusableDailyPromptInventoryReadiness");
 
 const persistGeneratedPrompt = makeFunctionReference<
   "mutation",
@@ -52,26 +59,28 @@ function createDailyPromptProvider(
 }
 
 export const generateReusableDailyPrompts = internalAction({
-  args: { candidateCount: v.number() },
+  args: {},
   returns: v.object({
     outcome: v.union(
       v.literal("completed"),
       v.literal("provider_unavailable"),
       v.literal("provider_error"),
+      v.literal("inventory_healthy"),
+      v.literal("inventory_invalid"),
     ),
     requested: v.number(),
     generated: v.number(),
     deduplicated: v.number(),
     rejected: v.number(),
   }),
-  handler: async (ctx, args) => {
+  handler: async (ctx) => {
     const apiKey = env.OPENAI_API_KEY?.trim() ?? "";
     const model = (env.OPENAI_MODEL ?? "gpt-4o-mini").trim();
     const generatedAt = Date.now();
-    return await orchestrateDailyPromptGeneration({
+    return await preflightDailyPromptGeneration({
+      loadReadiness: async () => await ctx.runQuery(getInventoryReadiness, {}),
       configured: Boolean(apiKey && model),
-      requestedCount: args.candidateCount,
-      provider: createDailyPromptProvider(apiKey, model),
+      createProvider: () => createDailyPromptProvider(apiKey, model),
       persist: async (candidate: DailyPromptGenerationCandidate) => {
         const result = await ctx.runMutation(persistGeneratedPrompt, {
           candidate: {

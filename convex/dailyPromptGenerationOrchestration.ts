@@ -41,6 +41,7 @@ function emptyResult(
 
 export async function preflightDailyPromptGeneration(args: {
   loadReadiness: () => Promise<DailyPromptInventoryReadinessSnapshot>;
+  mode?: "readiness" | "scheduled_daily";
   configured: boolean;
   createProvider: () => DailyPromptGenerationProvider;
   persist: DailyPromptGenerationPersistence;
@@ -56,14 +57,18 @@ export async function preflightDailyPromptGeneration(args: {
     return emptyResult("inventory_invalid", 0);
   }
   if (readiness.status === "invalid") return emptyResult("inventory_invalid", 0);
-  if (readiness.status === "healthy") return emptyResult("inventory_healthy", 0);
+  const requestedCount =
+    readiness.status === "healthy" && args.mode === "scheduled_daily"
+      ? 1
+      : readiness.requestedCount;
+  if (requestedCount === 0) return emptyResult("inventory_healthy", 0);
   if (!args.configured) {
-    return emptyResult("provider_unavailable", readiness.requestedCount);
+    return emptyResult("provider_unavailable", requestedCount);
   }
 
   return await orchestrateDailyPromptGeneration({
     configured: true,
-    requestedCount: readiness.requestedCount,
+    requestedCount,
     existingPromptTexts: readiness.duplicateFingerprints,
     provider: args.createProvider(),
     persist: args.persist,

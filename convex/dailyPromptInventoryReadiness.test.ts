@@ -15,6 +15,7 @@ import {
   preflightDailyPromptGeneration,
   type DailyPromptInventoryReadinessSnapshot,
 } from "./dailyPromptGenerationOrchestration";
+import { DAILY_PROMPT_GENERATION_PROMPT_VERSION } from "./dailyPromptGenerationPolicy";
 import { DAILY_PROMPT_SEEDS, normalizeDailyPromptText } from "./dailyPromptLibrary";
 import schema from "./schema";
 
@@ -25,6 +26,16 @@ const getInventoryReadiness = makeFunctionReference<
   Record<string, never>,
   DailyPromptInventoryReadinessSnapshot
 >("dailyPromptInventory:getReusableDailyPromptInventoryReadiness");
+const persistGeneratedPrompt = makeFunctionReference<
+  "mutation",
+  {
+    candidate: { text: string; principle: string; category: string };
+    model: string;
+    generationPromptVersion: string;
+    generatedAt: number;
+  },
+  { outcome: "generated" | "deduplicated"; promptId: Id<"dailyPrompts"> }
+>("dailyPromptGeneration:persistGeneratedPrompt");
 
 function evidence(index: number, source: "seed" | "ai" = "ai"): DailyPromptInventoryEvidence {
   const seed = source === "seed" ? DAILY_PROMPT_SEEDS[index] : undefined;
@@ -278,6 +289,71 @@ describe("generation action preflight", () => {
     },
   );
 
+  test("scheduled-daily mode generates and persists at least one candidate for healthy inventory", async () => {
+    const t = convexTest(schema, modules);
+    const provider = vi.fn().mockResolvedValue([
+      {
+        text: "What made you feel especially connected today?",
+        principle: "bids for connection",
+        category: "connection",
+      },
+    ]);
+    const createProvider = vi.fn(() => provider);
+    const persist = vi.fn(async (generatedCandidate) => {
+      const persisted = await t.mutation(persistGeneratedPrompt, {
+        candidate: {
+          text: generatedCandidate.text,
+          principle: generatedCandidate.principle,
+          category: generatedCandidate.category,
+        },
+        model: "mock-model",
+        generationPromptVersion: DAILY_PROMPT_GENERATION_PROMPT_VERSION,
+        generatedAt: 1234,
+      });
+      return persisted.outcome;
+    });
+
+    const result = await preflightDailyPromptGeneration({
+      loadReadiness: vi.fn().mockResolvedValue(healthy),
+      mode: "scheduled_daily",
+      configured: true,
+      createProvider,
+      persist,
+    });
+
+    expect(result).toMatchObject({ outcome: "completed", requested: 1, generated: 1 });
+    expect(createProvider).toHaveBeenCalledTimes(1);
+    expect(provider).toHaveBeenCalledTimes(1);
+    expect(provider.mock.calls[0][0]).toMatchObject({
+      candidateCount: 1,
+      existingFingerprints: healthy.duplicateFingerprints,
+    });
+    expect(persist).toHaveBeenCalledTimes(1);
+    expect(await t.run((ctx) => ctx.db.query("dailyPrompts").take(2))).toMatchObject([
+      {
+        text: "What made you feel especially connected today?",
+        source: "ai",
+        safetyStatus: "approved",
+      },
+    ]);
+  });
+
+  test("scheduled-daily mode still fails closed for invalid inventory", async () => {
+    const createProvider = vi.fn();
+    const persist = vi.fn();
+    const result = await preflightDailyPromptGeneration({
+      loadReadiness: vi.fn().mockResolvedValue({ ...healthy, status: "invalid" }),
+      mode: "scheduled_daily",
+      configured: true,
+      createProvider,
+      persist,
+    });
+
+    expect(result).toMatchObject({ outcome: "inventory_invalid", requested: 0 });
+    expect(createProvider).not.toHaveBeenCalled();
+    expect(persist).not.toHaveBeenCalled();
+  });
+
   test("unavailable or ambiguous readiness fails closed before constructing a provider", async () => {
     for (const loadReadiness of [
       vi.fn().mockRejectedValue(new Error("private inventory failure")),
@@ -336,7 +412,7 @@ describe("generation action preflight", () => {
     },
   );
 
-  test("below-floor inventory passes only computed count and fingerprints", async () => {
+  test("scheduled-daily below-floor inventory passes only the computed shortage", async () => {
     const provider = vi.fn().mockResolvedValue([]);
     const createProvider = vi.fn(() => provider);
     const persist = vi.fn();
@@ -351,6 +427,7 @@ describe("generation action preflight", () => {
     };
     const result = await preflightDailyPromptGeneration({
       loadReadiness: vi.fn().mockResolvedValue(readiness),
+      mode: "scheduled_daily",
       configured: true,
       createProvider,
       persist,

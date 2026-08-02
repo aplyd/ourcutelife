@@ -59,7 +59,7 @@ function createDailyPromptProvider(
 }
 
 export const generateReusableDailyPrompts = internalAction({
-  args: {},
+  args: { mode: v.optional(v.literal("scheduled_daily")) },
   returns: v.object({
     outcome: v.union(
       v.literal("completed"),
@@ -73,12 +73,13 @@ export const generateReusableDailyPrompts = internalAction({
     deduplicated: v.number(),
     rejected: v.number(),
   }),
-  handler: async (ctx) => {
+  handler: async (ctx, args) => {
     const apiKey = env.OPENAI_API_KEY?.trim() ?? "";
     const model = (env.OPENAI_MODEL ?? "gpt-4o-mini").trim();
     const generatedAt = Date.now();
     return await preflightDailyPromptGeneration({
       loadReadiness: async () => await ctx.runQuery(getInventoryReadiness, {}),
+      mode: args.mode,
       configured: Boolean(apiKey && model),
       createProvider: () => createDailyPromptProvider(apiKey, model),
       persist: async (candidate: DailyPromptGenerationCandidate) => {

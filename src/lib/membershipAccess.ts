@@ -21,7 +21,12 @@ export type MembershipAccess = "loading" | "signed-out" | "pairing" | "paired";
 function isRealDistinctPartner(viewer: MembershipViewer): boolean {
   const partner = viewer.partner;
   if (!partner || partner._id === viewer.user._id) return false;
-  return Boolean(partner.authUserId && !partner.authUserId.startsWith("test-partner:"));
+  return Boolean(
+    viewer.user.authUserId &&
+    partner.authUserId &&
+    partner.authUserId !== viewer.user.authUserId &&
+    !partner.authUserId.startsWith("test-partner:"),
+  );
 }
 
 export function resolveMembershipAccess(input: MembershipAccessInput): MembershipAccess {

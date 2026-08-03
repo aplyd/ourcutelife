@@ -1,4 +1,5 @@
 import { v } from "convex/values";
+import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
 import type { MutationCtx } from "./_generated/server";
 import { internalMutation, mutation } from "./_generated/server";
@@ -48,6 +49,94 @@ async function getAuthenticatedPairingUser(ctx: MutationCtx): Promise<Doc<"users
     .unique();
 }
 
+const DEPARTURE_CLEANUP_PAGE_SIZE = 64;
+
+async function expireDepartedPairingCodePage(
+  ctx: MutationCtx,
+  coupleId: Id<"couples">,
+  cursor: string | null,
+  now: number,
+): Promise<string | null> {
+  const page = await ctx.db
+    .query("pairingCodes")
+    .withIndex("by_couple", (q) => q.eq("coupleId", coupleId))
+    .paginate({ cursor, numItems: DEPARTURE_CLEANUP_PAGE_SIZE });
+  await Promise.all(
+    page.page.map((code) =>
+      !code.usedAt && code.expiresAt > now
+        ? ctx.db.patch(code._id, { usedAt: now })
+        : Promise.resolve(),
+    ),
+  );
+  return page.isDone ? null : page.continueCursor;
+}
+
+async function disableDepartedDevicePage(
+  ctx: MutationCtx,
+  coupleId: Id<"couples">,
+  userId: Id<"users">,
+  cursor: string | null,
+  now: number,
+): Promise<string | null> {
+  const page = await ctx.db
+    .query("notificationDevices")
+    .withIndex("by_couple_id_and_user_id", (q) => q.eq("coupleId", coupleId).eq("userId", userId))
+    .paginate({ cursor, numItems: DEPARTURE_CLEANUP_PAGE_SIZE });
+  await Promise.all(
+    page.page.map((device) =>
+      device.enabled
+        ? ctx.db.patch(device._id, { enabled: false, updatedAt: now })
+        : Promise.resolve(),
+    ),
+  );
+  return page.isDone ? null : page.continueCursor;
+}
+
+export const cleanupDepartedPairingCodes = internalMutation({
+  args: {
+    coupleId: v.id("couples"),
+    cursor: v.union(v.string(), v.null()),
+  },
+  handler: async (ctx, args) => {
+    const nextCursor = await expireDepartedPairingCodePage(
+      ctx,
+      args.coupleId,
+      args.cursor,
+      Date.now(),
+    );
+    if (nextCursor) {
+      await ctx.scheduler.runAfter(0, internal.pairing.cleanupDepartedPairingCodes, {
+        coupleId: args.coupleId,
+        cursor: nextCursor,
+      });
+    }
+  },
+});
+
+export const cleanupDepartedDevices = internalMutation({
+  args: {
+    coupleId: v.id("couples"),
+    userId: v.id("users"),
+    cursor: v.union(v.string(), v.null()),
+  },
+  handler: async (ctx, args) => {
+    const nextCursor = await disableDepartedDevicePage(
+      ctx,
+      args.coupleId,
+      args.userId,
+      args.cursor,
+      Date.now(),
+    );
+    if (nextCursor) {
+      await ctx.scheduler.runAfter(0, internal.pairing.cleanupDepartedDevices, {
+        coupleId: args.coupleId,
+        userId: args.userId,
+        cursor: nextCursor,
+      });
+    }
+  },
+});
+
 export const leaveCouple = mutation({
   args: {},
   handler: async (ctx) => {
@@ -57,27 +146,29 @@ export const leaveCouple = mutation({
     const memberships = await ctx.db
       .query("coupleMembers")
       .withIndex("by_user", (q) => q.eq("userId", user._id))
-      .take(2);
-    if (memberships.length > 1) throw new Error("Ambiguous couple membership.");
-    const membership = memberships[0];
-    if (!membership) throw new Error("Pair with your partner first.");
-    if (!(await ctx.db.get(membership.coupleId))) throw new Error("Couple not found.");
+      .take(17);
+    if (memberships.length === 0) throw new Error("Pair with your partner first.");
+    if (memberships.length > 16) throw new Error("Too many relationship links to reset safely.");
 
-    const now = Date.now();
-    for await (const code of ctx.db
-      .query("pairingCodes")
-      .withIndex("by_couple", (q) => q.eq("coupleId", membership.coupleId))) {
-      if (!code.usedAt && code.expiresAt > now) await ctx.db.patch(code._id, { usedAt: now });
-    }
-    for await (const device of ctx.db
-      .query("notificationDevices")
-      .withIndex("by_couple_id_and_user_id", (q) =>
-        q.eq("coupleId", membership.coupleId).eq("userId", user._id),
-      )) {
-      if (device.enabled) await ctx.db.patch(device._id, { enabled: false, updatedAt: now });
+    const coupleIds = new Map<string, Id<"couples">>();
+    for (const membership of memberships) {
+      coupleIds.set(membership.coupleId, membership.coupleId);
     }
 
-    await ctx.db.delete(membership._id);
+    for (const coupleId of coupleIds.values()) {
+      if (!(await ctx.db.get(coupleId))) continue;
+      await ctx.scheduler.runAfter(0, internal.pairing.cleanupDepartedPairingCodes, {
+        coupleId,
+        cursor: null,
+      });
+      await ctx.scheduler.runAfter(0, internal.pairing.cleanupDepartedDevices, {
+        coupleId,
+        userId: user._id,
+        cursor: null,
+      });
+    }
+
+    for (const membership of memberships) await ctx.db.delete(membership._id);
     return { left: true as const };
   },
 });

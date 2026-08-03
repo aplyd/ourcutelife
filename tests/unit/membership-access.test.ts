@@ -42,6 +42,12 @@ void test("membership access fails closed for singleton, duplicate, and syntheti
       user: realUser,
       partner: { _id: "legacy-user" },
     },
+    {
+      couple: { _id: "couple" },
+      memberCount: 2,
+      user: realUser,
+      partner: { _id: "duplicate-auth-user", authUserId: "auth-a" },
+    },
     { couple: { _id: "couple" }, memberCount: 3, user: realUser, partner: realPartner },
   ]) {
     assert.equal(
@@ -83,6 +89,8 @@ void test("pairing uses the same fail-closed membership projection as the root g
   assert.match(pairing, /membershipAccess === "paired"/);
   assert.doesNotMatch(pairing, /memberCount >= 2/);
   assert.doesNotMatch(pairing, /router\.replace\("\/\(tabs\)"\)/);
+  assert.match(pairing, /api\.pairing\.leaveCouple/);
+  assert.match(pairing, /Reset pairing setup/);
 });
 
 void test("auth and pairing wait for the protected navigator instead of forcing guarded routes", () => {

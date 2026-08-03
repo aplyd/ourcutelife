@@ -4,6 +4,7 @@ import type { JSX } from "react";
 import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Pressable,
   ScrollView,
   Share,
@@ -36,6 +37,7 @@ export default function PairingScreen(): JSX.Element {
   const viewer = useAppQuery(api.auth.viewer, {});
   const createCoupleAndCode = useAppMutation(api.pairing.createCoupleAndCode);
   const joinWithCode = useAppMutation(api.pairing.joinWithCode);
+  const leaveCouple = useAppMutation(api.pairing.leaveCouple);
   const membershipAccess = resolveMembershipAccess({
     sessionPending: betterAuthSession.isPending,
     hasSession: Boolean(betterAuthSession.data?.session),
@@ -100,6 +102,29 @@ export default function PairingScreen(): JSX.Element {
     } finally {
       setIsWorking(false);
     }
+  }
+
+  function handleResetPairing() {
+    Alert.alert(
+      "Reset pairing setup?",
+      "This removes your account from every current relationship link so you can pair again. Your partner, shared memories, and relationship data are not deleted.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Reset pairing setup",
+          style: "destructive",
+          onPress: () => {
+            setError(null);
+            setIsWorking(true);
+            void leaveCouple({})
+              .catch((err: unknown) => {
+                setError(err instanceof Error ? err.message : "Could not reset pairing setup.");
+              })
+              .finally(() => setIsWorking(false));
+          },
+        },
+      ],
+    );
   }
 
   const displayedCode = generatedCode ?? viewer?.activePairingCode ?? null;
@@ -182,6 +207,23 @@ export default function PairingScreen(): JSX.Element {
           <Text className="font-semibold text-[#fff8f1]">Join partner</Text>
         </Pressable>
       </View>
+
+      {viewer?.membership ? (
+        <View className="rounded-3xl bg-white/80 p-4 gap-3 border border-[#f1dfd2]">
+          <Text className="text-lg font-semibold text-[#2f211c]">Pairing not working?</Text>
+          <Text className="text-sm leading-5 text-[#6f5a50]">
+            Clear this account’s current relationship links, then create or join a fresh pairing.
+          </Text>
+          <Pressable
+            accessibilityRole="button"
+            className="h-11 rounded-full border border-red-300 items-center justify-center"
+            disabled={isWorking}
+            onPress={handleResetPairing}
+          >
+            <Text className="font-semibold text-red-700">Reset pairing setup</Text>
+          </Pressable>
+        </View>
+      ) : null}
 
       {error ? <Text className="text-center text-sm text-red-700">{error}</Text> : null}
       <Pressable className="items-center" onPress={() => void authClient.signOut()}>

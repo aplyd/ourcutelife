@@ -3,11 +3,21 @@ import { useMutation, useQuery } from "convex/react";
 import { useSyncExternalStore } from "react";
 
 import { applyMockDatePlanMutation, type MockDatePlanMutationName } from "@/lib/mockDatePlanState";
+import {
+  installMockQualityTimeTestBridge,
+  mockQualityTimeState,
+  type MockQualityTimeTestBridge,
+} from "@/lib/mockQualityTimeState";
 
 const TRUE_VALUES = new Set(["1", "true", "yes", "on"]);
 
 export const isDevMockAuthEnabled =
   __DEV__ && TRUE_VALUES.has(String(process.env.EXPO_PUBLIC_MOCK_AUTH ?? "").toLowerCase());
+
+const qualityTimeMockGlobal = globalThis as typeof globalThis & {
+  __OUR_CUTE_LIFE_QUALITY_TIME_MOCK__?: MockQualityTimeTestBridge;
+};
+installMockQualityTimeTestBridge(qualityTimeMockGlobal, isDevMockAuthEnabled, mockQualityTimeState);
 
 const now = Date.now();
 const startedDatingAt = new Date("2022-02-14T12:00:00Z").getTime();
@@ -124,6 +134,11 @@ let mockDatePlan = {
 let mockVersion = 0;
 const mockListeners = new Set<() => void>();
 
+mockQualityTimeState.subscribe(() => {
+  mockVersion += 1;
+  for (const listener of mockListeners) listener();
+});
+
 function updateMockDatePlan(mutationName: MockDatePlanMutationName, args: Record<string, unknown>) {
   const nextDatePlan = applyMockDatePlanMutation(mockDatePlan, mutationName, args, Date.now());
   if (nextDatePlan === mockDatePlan) return;
@@ -218,6 +233,10 @@ function mockQueryResult(query: unknown, args: unknown): unknown {
       return [mockDatePlan];
     case "plans:ourDates":
       return [mockDatePlan];
+    case "qualityTime:getRequest":
+      return mockQualityTimeState.getRequest(args as never);
+    case "qualityTime:listDraftInventory":
+      return mockQualityTimeState.listDraftInventory(args as never);
     case "chat:list":
       return mockChatMessages;
     case "reviews:latestMine":
@@ -251,6 +270,16 @@ export const useAppMutation: typeof useMutation = ((mutation: any): any => {
         case "plans:rateDate":
           updateMockDatePlan(mutationName, args);
           break;
+        case "qualityTime:createDraft":
+          return mockQualityTimeState.createDraft(args as never);
+        case "qualityTime:beginResponse":
+          return mockQualityTimeState.beginResponse(args as never);
+        case "qualityTime:recordDecision":
+          return mockQualityTimeState.recordDecision(args as never);
+        case "qualityTime:sendRequest":
+          return mockQualityTimeState.sendRequest(args as never);
+        case "qualityTime:cancelRequest":
+          return mockQualityTimeState.cancelRequest(args as never);
       }
       return {
         code: "123-456",

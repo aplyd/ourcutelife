@@ -36,6 +36,7 @@ export default function PairingScreen(): JSX.Element {
   const createCoupleAndCode = useAppMutation(api.pairing.createCoupleAndCode);
   const joinWithCode = useAppMutation(api.pairing.joinWithCode);
   const pairWithTestPartner = useAppMutation(api.pairing.pairWithTestPartner);
+  const cleanupMySyntheticTestData = useAppMutation(api.testDataCleanup.cleanupMySyntheticTestData);
 
   const [anniversaryDateText, setAnniversaryDateText] = useState(() =>
     new Date().toISOString().slice(0, 10),
@@ -45,6 +46,12 @@ export default function PairingScreen(): JSX.Element {
   const [generatedCodeExpiresAt, setGeneratedCodeExpiresAt] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isWorking, setIsWorking] = useState(false);
+  const [cleanupPreview, setCleanupPreview] = useState<{
+    eligibleCouples: number;
+    preservedCouples: number;
+    records: number;
+    syntheticUsers: number;
+  } | null>(null);
 
   const daysTogether = useMemo(() => {
     const anniversaryTime = new Date(`${anniversaryDateText}T00:00:00`).getTime();
@@ -111,6 +118,24 @@ export default function PairingScreen(): JSX.Element {
       router.replace("/(tabs)");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not create the test pairing.");
+    } finally {
+      setIsWorking(false);
+    }
+  }
+
+  async function handleCleanupTestData() {
+    setError(null);
+    setIsWorking(true);
+    try {
+      const result = await cleanupMySyntheticTestData({ confirm: cleanupPreview !== null });
+      if (!result.deleted) {
+        setCleanupPreview(result);
+      } else {
+        setCleanupPreview(null);
+        setError(`Removed ${result.records} synthetic test records.`);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not clean up test data.");
     } finally {
       setIsWorking(false);
     }
@@ -209,6 +234,27 @@ export default function PairingScreen(): JSX.Element {
           onPress={handlePairWithTestPartner}
         >
           <Text className="font-semibold text-white">Use test partner</Text>
+        </Pressable>
+        <View className="h-px bg-[#ded0ff]" />
+        <Text className="text-sm leading-5 text-[#6f5a50]">
+          Remove only this account&apos;s synthetic test partner, test-only couples, and their
+          seeded records. Couples containing a real partner are preserved.
+        </Text>
+        {cleanupPreview ? (
+          <Text className="text-sm font-semibold text-[#2f211c]">
+            Ready to remove {cleanupPreview.records} records across {cleanupPreview.eligibleCouples}{" "}
+            test-only couple(s). {cleanupPreview.preservedCouples} real-partner couple(s) will be
+            preserved.
+          </Text>
+        ) : null}
+        <Pressable
+          className="h-12 rounded-full border border-[#7c3aed] items-center justify-center"
+          disabled={isWorking}
+          onPress={handleCleanupTestData}
+        >
+          <Text className="font-semibold text-[#7c3aed]">
+            {cleanupPreview ? "Confirm test data cleanup" : "Preview test data cleanup"}
+          </Text>
         </Pressable>
       </View>
 

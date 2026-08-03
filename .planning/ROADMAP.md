@@ -116,7 +116,7 @@ Required slices:
 
 ## Phase 6 — Generated and reusable daily prompts
 
-**Status:** replenishment_readiness_implemented_and_independently_approved
+**Status:** daily_generation_cron_implemented_locally_pending_convex_deployment
 **Goal:** Generate warm, varied daily prompts and build a privacy-safe library whose ranking improves when couples actually complete them.
 
 Audit: `phases/06-generated-reusable-daily-prompts/06-01-AUDIT.md`
@@ -138,10 +138,11 @@ Required slices:
 - [x] Seed new couples from approved reusable prompts and use exact-once aggregate completion evidence in broader ranking.
 - [x] Balance ranking with bounded recency, category/principle diversity, exact-fingerprint deduplication, safety filtering, and per-couple assignment history.
 - [x] Implement the provider-free inventory replenishment readiness boundary in `phases/06-generated-reusable-daily-prompts/06-05-PLAN.md`; keep automatic/model invocation behind a later explicit gate.
+- [x] Locally wire the existing internal generation action at 12:00 UTC daily in explicit scheduled-daily mode. Valid healthy inventory requests one candidate; shortages retain the existing bounded request of up to five; invalid inventory still fails closed. The cron is not live until a separately approved Convex deployment, and provider invocation still requires valid deployment-side OpenAI configuration.
 
 ## Phase 7 — Quality Time
 
-**Status:** slice_07_02_stages_1_4_complete_quality_time_server_foundation_verified
+**Status:** slice_07_04_in_progress_red_1_2_green_1_2_complete
 **Goal:** Replace draining back-and-forth planning with a private, mutual flow that turns each partner's current preferences into concrete shared options.
 
 Context: `phases/07-quality-time/CONTEXT.md`
@@ -150,14 +151,19 @@ Pure policy plan: `phases/07-quality-time/07-01-PLAN.md`
 
 Persistence/API plan: `phases/07-quality-time/07-02-PLAN.md`
 
+Initiator mobile plan: `phases/07-quality-time/07-03-PLAN.md`
+
+Responder mobile/outcome plan: `phases/07-quality-time/07-04-PLAN.md` (planned; unimplemented)
+
 Required slices:
 
 - [x] Map reusable data/routes from the current Plans model and write a migration-safe replacement plan.
 - [x] Implement and independently approve the pure category, shortlist-readiness, and mutual-reveal policy contract.
 - [x] Complete Slice 07-02's additive request-scoped server API foundation: draft, private inventory/initiator decisions, transactional send, responder selection/decisions, mutual-only outcomes, exhaustion, expiry, and participant-safe cancellation are implemented and verified.
+- [x] Finalize Slice 07-03: the additive initiator path, deterministic mock-auth Argent walkthrough, test-first production corrections, executable stale-latch/exhausted-count regressions, final independent no-edit approval, and repository-wide format/validation gate are complete.
 - Initiator chooses now/future time plus Eat, Drink, Explore/Adventure, Entertainment, and/or Romance.
 - Initiator accepts 3–5 private cards per selected category before the request can be sent.
-- Partner receives the completed request, chooses current-interest categories, and swipes only relevant inventory.
-- Stop each agreed category when a mutual option is found and present the combined Quality Time outcome.
+- [ ] Partner receives the completed request, chooses current-interest categories, and swipes only relevant inventory (Slice 07-04 planned; unimplemented).
+- [ ] Stop each agreed category when a mutual option is found and present the combined Quality Time outcome.
 - Preserve private rejections and authorship; cover no-match, insufficient inventory, abandonment, expiration, rescheduling, and cancellation.
 - Verify the complete server-side two-partner lifecycle with focused and full tests; carry Argent evidence forward to the first Quality Time mobile slice because Slice 07-02 changes no mobile surface.

@@ -14,6 +14,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { api } from "../../convex/_generated/api";
 import { authClient, useSession } from "@/lib/betterAuth";
 import { convex } from "@/lib/convex";
+import { getErrorSupportCode } from "@/lib/errorSupportCode";
 import { ThemeProvider, useAppTheme } from "@/lib/theme";
 import { reconcileServerPushRegistration } from "@/lib/notifications";
 import { UpdateProvider } from "@/providers/update-provider";
@@ -22,12 +23,18 @@ import "../global.css";
 void SplashScreen.preventAutoHideAsync();
 
 export function ErrorBoundary({ error, retry }: ErrorBoundaryProps): JSX.Element {
+  const supportCode = getErrorSupportCode(error);
   return (
     <View className="flex-1 items-center justify-center gap-4 bg-app-bg px-8">
       <Text className="text-center text-3xl font-bold text-ink">We hit a snag</Text>
       <Text className="text-center text-base leading-6 text-muted">
         {__DEV__ ? error.message : "Your data is safe. Try loading this screen again."}
       </Text>
+      {supportCode ? (
+        <Text selectable className="text-center text-xs text-muted">
+          Support code: {supportCode}
+        </Text>
+      ) : null}
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="Try again"

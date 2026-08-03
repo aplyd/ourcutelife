@@ -11,5 +11,7 @@ void test("the root route exports a recoverable Expo Router error boundary", () 
     /export function ErrorBoundary\(\{ error, retry \}: ErrorBoundaryProps\)/,
   );
   assert.match(rootLayoutSource, /onPress=\{retry\}/);
+  assert.match(rootLayoutSource, /getErrorSupportCode\(error\)/);
+  assert.match(rootLayoutSource, /Support code:/);
   assert.match(rootLayoutSource, /Try again/);
 });

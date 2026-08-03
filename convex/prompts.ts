@@ -1,5 +1,5 @@
 import { makeFunctionReference } from "convex/server";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import type { GenericId } from "convex/values";
 import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
@@ -613,31 +613,37 @@ export const today = query({
   handler: async (ctx) => {
     const user = await getAuthenticatedUser(ctx);
     if (!user) throw new Error("Not signed in.");
-    const memberships = await ctx.db
-      .query("coupleMembers")
-      .withIndex("by_user", (q) => q.eq("userId", user._id))
-      .take(2);
-    if (memberships.length === 0) return null;
-    if (memberships.length > 1) {
-      console.error("prompts:today ignored ambiguous couple membership");
-      return null;
-    }
-    const membership = memberships[0];
-    const recent = await ctx.db
-      .query("moments")
-      .withIndex("by_couple_and_author_and_happened_at", (q) =>
-        q.eq("coupleId", membership.coupleId).eq("authorUserId", user._id),
-      )
-      .order("desc")
-      .take(10)
-      .then((items) => items.filter((item) => !item.deletedAt));
-    const tags = Array.from(new Set(recent.flatMap((moment) => moment.tags)));
-    const couple = await ctx.db.get(membership.coupleId);
-    const now = Date.now();
-    const fallbackPromptDate = couple?.promptTimezone
-      ? getPromptDateInTimezone(now, couple.promptTimezone)
-      : todayKey();
+    let phase = "membership";
+    let fallbackPromptDate = todayKey();
     try {
+      const memberships = await ctx.db
+        .query("coupleMembers")
+        .withIndex("by_user", (q) => q.eq("userId", user._id))
+        .take(2);
+      if (memberships.length === 0) return null;
+      if (memberships.length > 1) {
+        console.error("prompts:today ignored ambiguous couple membership");
+        return null;
+      }
+      const membership = memberships[0];
+      phase = "moments";
+      const recent = await ctx.db
+        .query("moments")
+        .withIndex("by_couple_and_author_and_happened_at", (q) =>
+          q.eq("coupleId", membership.coupleId).eq("authorUserId", user._id),
+        )
+        .order("desc")
+        .take(10)
+        .then((items) => items.filter((item) => !item.deletedAt));
+      const tags = Array.from(new Set(recent.flatMap((moment) => moment.tags)));
+      phase = "couple";
+      const couple = await ctx.db.get(membership.coupleId);
+      const now = Date.now();
+      phase = "timezone";
+      fallbackPromptDate = couple?.promptTimezone
+        ? getPromptDateInTimezone(now, couple.promptTimezone)
+        : todayKey();
+      phase = "prompt-date";
       const resolved = couple?.promptTimezone
         ? await getAuthoritativePromptDate(ctx, membership.coupleId, now, couple.promptTimezone)
         : {
@@ -645,12 +651,16 @@ export const today = query({
             existing: await existingLifecycleForDate(ctx, membership.coupleId, todayKey()),
           };
       const { promptDate } = resolved;
+      phase = "generated-content";
       const generated = chooseGeneratedContent(promptDate, tags);
       const lifecycle = resolved.existing;
+      phase = "lifecycle-recipients";
       if (lifecycle) await validateLifecycleRecipients(ctx, lifecycle, user._id);
+      phase = "assigned-prompt";
       const prompt = lifecycle?.promptId
         ? await getAssignedDailyPrompt(ctx, lifecycle)
         : getDeterministicDailyPromptFallback(promptDate);
+      phase = "responses";
       const responses = await ctx.db
         .query("promptResponses")
         .withIndex("by_couple_and_date", (q) =>
@@ -663,6 +673,7 @@ export const today = query({
       ) {
         throw new Error("Duplicate daily prompt response.");
       }
+      phase = "couple-members";
       const members = await getExactCoupleMembers(ctx, membership.coupleId);
       const memberUserIds = new Set(members.map((member) => member.userId));
       const hasIncompatibleResponses = responses.some(
@@ -701,9 +712,12 @@ export const today = query({
         isRevealed: Boolean(ownResponse && partnerResponse),
       };
     } catch (error) {
-      if (!isRecoverableTodayReadError(error)) throw error;
-      console.error("prompts:today returned a private fallback", error.message);
-      return buildPrivateTodayFallback(fallbackPromptDate);
+      if (isRecoverableTodayReadError(error)) {
+        console.error("prompts:today returned a private fallback", error.message);
+        return buildPrivateTodayFallback(fallbackPromptDate);
+      }
+      console.error("prompts:today unexpected read failure", phase, error);
+      throw new ConvexError({ code: "TODAY_READ_UNEXPECTED", phase });
     }
   },
 });

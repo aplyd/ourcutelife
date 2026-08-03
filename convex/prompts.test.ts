@@ -255,7 +255,7 @@ test("startup read returns no couple content for ambiguous membership while writ
   await expect(answerAs(t, "creator-auth")).rejects.toThrow("Ambiguous couple membership.");
 });
 
-test("startup read rethrows unexpected timezone failures", async () => {
+test("startup read rethrows unexpected timezone failures with a privacy-safe phase code", async () => {
   vi.useFakeTimers();
   vi.setSystemTime(new Date("2026-07-22T21:15:00.000Z"));
   const t = convexTest(schema, modules);
@@ -266,7 +266,9 @@ test("startup read rethrows unexpected timezone failures", async () => {
 
   await expect(
     t.withIdentity({ tokenIdentifier: "creator-auth" }).query(today, {}),
-  ).rejects.toThrow("Invalid timezone: not-a-timezone");
+  ).rejects.toMatchObject({
+    data: { code: "TODAY_READ_UNEXPECTED", phase: "timezone" },
+  });
 });
 
 test("canonical reads and writes use the immutable assignment while tags and forged text cannot alter it", async () => {

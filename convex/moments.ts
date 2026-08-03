@@ -22,6 +22,21 @@ async function requireMembership(ctx: QueryCtx | MutationCtx, userId: Id<"users"
   return membership;
 }
 
+async function findReadableMembership(ctx: QueryCtx, userId: Id<"users">) {
+  const memberships = await ctx.db
+    .query("coupleMembers")
+    .withIndex("by_user", (q) => q.eq("userId", userId))
+    .take(2);
+  if (memberships.length !== 1) return null;
+
+  const membership = memberships[0];
+  const members = await ctx.db
+    .query("coupleMembers")
+    .withIndex("by_couple", (q) => q.eq("coupleId", membership.coupleId))
+    .take(3);
+  return members.length === 2 ? membership : null;
+}
+
 function cleanOptionalText(value: string | undefined): string | undefined {
   const trimmed = value?.trim();
   return trimmed ? trimmed : undefined;
@@ -32,7 +47,8 @@ export const listMine = query({
   handler: async (ctx) => {
     const user = await getCurrentAppUser(ctx);
     if (!user) throw new Error("Not signed in.");
-    const membership = await requireMembership(ctx, user._id);
+    const membership = await findReadableMembership(ctx, user._id);
+    if (!membership) return [];
 
     return await ctx.db
       .query("moments")

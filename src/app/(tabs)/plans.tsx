@@ -133,6 +133,26 @@ export default function PlansTab(): JSX.Element {
           </View>
         </View>
 
+        <View className="gap-3 rounded-3xl border border-accent/30 bg-card p-5">
+          <View className="gap-2">
+            <Text className="text-sm font-bold uppercase tracking-widest text-accent">
+              Quality Time
+            </Text>
+            <Text className="text-2xl font-bold text-ink">Find what sounds good together</Text>
+            <Text className="text-base leading-6 text-muted">
+              Build a private shortlist, then share only when you’re ready to find a mutual option.
+            </Text>
+          </View>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Start Quality Time"
+            className="h-12 items-center justify-center rounded-full bg-accent"
+            onPress={() => router.push("/plans/quality-time/new")}
+          >
+            <Text className="font-bold text-app-bg">Start Quality Time</Text>
+          </Pressable>
+        </View>
+
         <Section
           title="Swipe plan items"
           subtitle="Choose a category and privately find your next match."

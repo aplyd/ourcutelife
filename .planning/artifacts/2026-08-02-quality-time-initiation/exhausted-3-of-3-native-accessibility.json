@@ -1,0 +1,135 @@
+{
+  "status": "ok",
+  "screenFrame": {
+    "x": 0,
+    "y": 0,
+    "width": 402,
+    "height": 874
+  },
+  "elements": [
+    {
+      "frame": { "x": 12, "y": 64, "width": 127, "height": 44 },
+      "tapPoint": { "x": 75.5, "y": 86 },
+      "normalizedFrame": {
+        "x": 0.029850746268656716,
+        "y": 0.07322654462242563,
+        "width": 0.31592039800995025,
+        "height": 0.05034324942791762
+      },
+      "normalizedTapPoint": {
+        "x": 0.18781094527363185,
+        "y": 0.09839816933638444
+      },
+      "traits": ["button"],
+      "label": "Back to Plans",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": { "x": 281.6666564941406, "y": 72, "width": 108.33334350585938, "height": 28 },
+      "tapPoint": { "x": 335.8333282470703, "y": 86 },
+      "normalizedFrame": {
+        "x": 0.7006633246122901,
+        "y": 0.08237986270022883,
+        "width": 0.26948592911905317,
+        "height": 0.032036613272311214
+      },
+      "normalizedTapPoint": { "x": 0.8354062891718167, "y": 0.09839816933638444 },
+      "traits": ["staticText"],
+      "label": "Quality Time"
+    },
+    {
+      "frame": { "x": 12, "y": 128, "width": 378, "height": 80 },
+      "tapPoint": { "x": 201, "y": 168 },
+      "normalizedFrame": {
+        "x": 0.029850746268656716,
+        "y": 0.14645308924485126,
+        "width": 0.9402985074626866,
+        "height": 0.09153318077803203
+      },
+      "normalizedTapPoint": { "x": 0.5, "y": 0.19221967963386727 },
+      "traits": ["staticText"],
+      "label": "Build your private shortlist"
+    },
+    {
+      "frame": { "x": 12, "y": 216, "width": 378, "height": 24 },
+      "tapPoint": { "x": 201, "y": 228 },
+      "normalizedFrame": {
+        "x": 0.029850746268656716,
+        "y": 0.2471395881006865,
+        "width": 0.9402985074626866,
+        "height": 0.02745995423340961
+      },
+      "normalizedTapPoint": { "x": 0.5, "y": 0.2608695652173913 },
+      "traits": ["staticText"],
+      "label": "Now · Choose 3–5 options in every category."
+    },
+    {
+      "frame": { "x": 12, "y": 260, "width": 81, "height": 41 },
+      "tapPoint": { "x": 52.5, "y": 280.5 },
+      "normalizedFrame": {
+        "x": 0.029850746268656716,
+        "y": 0.2974828375286041,
+        "width": 0.20149253731343283,
+        "height": 0.04691075514874142
+      },
+      "normalizedTapPoint": { "x": 0.13059701492537312, "y": 0.3209382151029748 },
+      "traits": ["button", "selected"],
+      "label": "Choose Eat",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": { "x": 33, "y": 342, "width": 336, "height": 28 },
+      "tapPoint": { "x": 201, "y": 356 },
+      "normalizedFrame": {
+        "x": 0.08208955223880597,
+        "y": 0.391304347826087,
+        "width": 0.835820895522388,
+        "height": 0.032036613272311214
+      },
+      "normalizedTapPoint": { "x": 0.5, "y": 0.4073226544622426 },
+      "traits": ["staticText"],
+      "label": "This shortlist is ready to send"
+    },
+    {
+      "frame": { "x": 33, "y": 378, "width": 336, "height": 48 },
+      "tapPoint": { "x": 201, "y": 402 },
+      "normalizedFrame": {
+        "x": 0.08208955223880597,
+        "y": 0.43249427917620137,
+        "width": 0.835820895522388,
+        "height": 0.05491990846681922
+      },
+      "normalizedTapPoint": { "x": 0.5, "y": 0.459954233409611 },
+      "traits": ["staticText"],
+      "label": "No more choices are available in this category. You can send when every selected category is ready."
+    },
+    {
+      "frame": { "x": 12, "y": 467, "width": 378, "height": 56 },
+      "tapPoint": { "x": 201, "y": 495 },
+      "normalizedFrame": {
+        "x": 0.029850746268656716,
+        "y": 0.534324942791762,
+        "width": 0.9402985074626866,
+        "height": 0.06407322654462243
+      },
+      "normalizedTapPoint": { "x": 0.5, "y": 0.5663615560640732 },
+      "traits": ["button"],
+      "label": "Send Quality Time request",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": { "x": 12, "y": 543, "width": 378, "height": 48 },
+      "tapPoint": { "x": 201, "y": 567 },
+      "normalizedFrame": {
+        "x": 0.029850746268656716,
+        "y": 0.6212814645308925,
+        "width": 0.9402985074626866,
+        "height": 0.05491990846681922
+      },
+      "normalizedTapPoint": { "x": 0.5, "y": 0.648741418764302 },
+      "traits": ["button"],
+      "label": "Cancel Quality Time request",
+      "viewClassName": "RCTViewComponentView"
+    }
+  ]
+}

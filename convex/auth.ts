@@ -34,7 +34,20 @@ export const createAuth = (ctx: any) =>
   });
 
 export async function getCurrentAppUser(ctx: QueryCtx | MutationCtx): Promise<Doc<"users"> | null> {
-  const authUser = await authComponent.safeGetAuthUser(ctx as never);
+  let authUser: Awaited<ReturnType<typeof authComponent.safeGetAuthUser>>;
+  try {
+    authUser = await authComponent.safeGetAuthUser(ctx as never);
+  } catch (error) {
+    if (!(error instanceof Error) || !error.message.includes('Component "betterAuth"')) {
+      throw error;
+    }
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity?.tokenIdentifier) return null;
+    return await ctx.db
+      .query("users")
+      .withIndex("by_auth_user_id", (q) => q.eq("authUserId", identity.tokenIdentifier))
+      .first();
+  }
   if (!authUser) return null;
 
   const byAuthUserId = await ctx.db

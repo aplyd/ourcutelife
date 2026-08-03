@@ -20,16 +20,9 @@ export default function MeTab(): JSX.Element {
   const betterAuthSession = useSession();
   const viewer = useAppQuery(api.auth.viewer, {});
   const leaveCouple = useAppMutation(api.pairing.leaveCouple);
-  const cleanupMySyntheticTestData = useAppMutation(api.testDataCleanup.cleanupMySyntheticTestData);
   const { preference: theme, setPreference: setTheme } = useAppTheme();
   const [isLeavingCouple, setIsLeavingCouple] = useState(false);
   const [leaveCoupleError, setLeaveCoupleError] = useState<string | null>(null);
-  const [cleanupPreview, setCleanupPreview] = useState<{
-    eligibleCouples: number;
-    preservedCouples: number;
-    records: number;
-  } | null>(null);
-  const [isCleaningTestData, setIsCleaningTestData] = useState(false);
 
   if (!betterAuthSession.data?.session) return <Redirect href="/auth" />;
   if (viewer === undefined)
@@ -76,24 +69,6 @@ export default function MeTab(): JSX.Element {
         },
       ],
     );
-  }
-
-  async function handleCleanupTestData() {
-    setLeaveCoupleError(null);
-    setIsCleaningTestData(true);
-    try {
-      const result = await cleanupMySyntheticTestData({ confirm: cleanupPreview !== null });
-      if (!result.deleted) {
-        setCleanupPreview(result);
-      } else {
-        setCleanupPreview(null);
-        setLeaveCoupleError(`Removed ${result.records} synthetic test records.`);
-      }
-    } catch (error) {
-      setLeaveCoupleError(error instanceof Error ? error.message : "Could not clean up test data.");
-    } finally {
-      setIsCleaningTestData(false);
-    }
   }
 
   return (
@@ -185,31 +160,6 @@ export default function MeTab(): JSX.Element {
           onPress={() => void authClient.signOut()}
         >
           <Text className="font-bold text-white">Sign out</Text>
-        </Pressable>
-        <Text className="text-sm text-muted">
-          Remove only your synthetic test partner and test-only couples. Real-partner couples and
-          shared history are preserved.
-        </Text>
-        {cleanupPreview ? (
-          <Text className="text-sm font-semibold text-ink">
-            Ready to remove {cleanupPreview.records} records across {cleanupPreview.eligibleCouples}{" "}
-            test-only couple(s). {cleanupPreview.preservedCouples} real-partner couple(s) will be
-            preserved.
-          </Text>
-        ) : null}
-        <Pressable
-          accessibilityLabel={
-            cleanupPreview ? "Confirm test data cleanup" : "Preview test data cleanup"
-          }
-          accessibilityRole="button"
-          accessibilityState={{ disabled: isCleaningTestData, busy: isCleaningTestData }}
-          className="h-12 rounded-full border border-accent items-center justify-center"
-          disabled={isCleaningTestData}
-          onPress={handleCleanupTestData}
-        >
-          <Text className="font-bold text-accent">
-            {cleanupPreview ? "Confirm test data cleanup" : "Preview test data cleanup"}
-          </Text>
         </Pressable>
         <Pressable
           accessibilityLabel="Leave couple"

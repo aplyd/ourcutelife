@@ -1,0 +1,4 @@
+{
+  "description": "Source: ax-service\nMode: flat\nCoordinates are normalized [0,1] fractions of the screen (x, y, width, height), not pixels.\nPass them straight to gesture-tap / gesture-swipe / gesture-pinch, which expect this same space.\nTo tap an element, use its centre: tap_x = frame.x + frame.width / 2, tap_y = frame.y + frame.height / 2.\n\nROOT  AXGroup (0.000, 0.000, 1.000, 1.000)\n\n  AXStaticText \"Quality Time request expired\"  (0.050, 0.379, 0.900, 0.092)\n  AXStaticText \"Nothing else was shared. Start again whenever the timing feels right.\"  (0.050, 0.493, 0.900, 0.055)\n  AXButton \"Back to Plans\"  (0.050, 0.571, 0.900, 0.050)",
+  "source": "ax-service"
+}

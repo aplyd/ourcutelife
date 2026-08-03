@@ -1,0 +1,144 @@
+{
+  "status": "ok",
+  "screenFrame": {
+    "x": 0,
+    "y": 0,
+    "width": 402,
+    "height": 874
+  },
+  "elements": [
+    {
+      "frame": {
+        "x": 20,
+        "y": 329,
+        "width": 362,
+        "height": 40
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 349
+      },
+      "normalizedFrame": {
+        "x": 0.04975124378109453,
+        "y": 0.37643020594965676,
+        "width": 0.900497512437811,
+        "height": 0.04576659038901602
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.39931350114416475
+      },
+      "traits": [
+        "staticText"
+      ],
+      "label": "Quality Time is ready"
+    },
+    {
+      "frame": {
+        "x": 20,
+        "y": 389,
+        "width": 362,
+        "height": 24
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 401
+      },
+      "normalizedFrame": {
+        "x": 0.04975124378109453,
+        "y": 0.4450800915331808,
+        "width": 0.900497512437811,
+        "height": 0.02745995423340961
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.4588100686498856
+      },
+      "traits": [
+        "staticText"
+      ],
+      "label": "Your shared result is ready."
+    },
+    {
+      "frame": {
+        "x": 20,
+        "y": 433,
+        "width": 362,
+        "height": 48
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 457
+      },
+      "normalizedFrame": {
+        "x": 0.04975124378109453,
+        "y": 0.4954233409610984,
+        "width": 0.900497512437811,
+        "height": 0.05491990846681922
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.522883295194508
+      },
+      "traits": [
+        "button"
+      ],
+      "label": "View Quality Time outcome",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 20,
+        "y": 501,
+        "width": 362,
+        "height": 44
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 523
+      },
+      "normalizedFrame": {
+        "x": 0.04975124378109453,
+        "y": 0.5732265446224256,
+        "width": 0.900497512437811,
+        "height": 0.05034324942791762
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.5983981693363845
+      },
+      "traits": [
+        "button"
+      ],
+      "label": "Back to Plans",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 10,
+        "y": -22.33333333333333,
+        "width": 382,
+        "height": 14.333333333333329
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": -15.166666666666664
+      },
+      "normalizedFrame": {
+        "x": 0.024875621890547265,
+        "y": -0.025553012967200604,
+        "width": 0.9502487562189055,
+        "height": 0.016399694889397402
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": -0.017353165522501903
+      },
+      "traits": [
+        "staticText"
+      ],
+      "label": "Refreshing...",
+      "viewClassName": "UILabel"
+    }
+  ]
+}

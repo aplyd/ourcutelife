@@ -1,0 +1,167 @@
+{
+  "status": "ok",
+  "screenFrame": {
+    "x": 0,
+    "y": 0,
+    "width": 402,
+    "height": 874
+  },
+  "elements": [
+    {
+      "frame": {
+        "x": 16,
+        "y": 64,
+        "width": 370,
+        "height": 80
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 104
+      },
+      "normalizedFrame": {
+        "x": 0.03980099502487562,
+        "y": 0.07322654462242563,
+        "width": 0.9203980099502488,
+        "height": 0.09153318077803203
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.11899313501144165
+      },
+      "traits": [
+        "staticText"
+      ],
+      "label": "Your Quality Time is ready"
+    },
+    {
+      "frame": {
+        "x": 16,
+        "y": 156,
+        "width": 370,
+        "height": 24
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 168
+      },
+      "normalizedFrame": {
+        "x": 0.03980099502487562,
+        "y": 0.17848970251716248,
+        "width": 0.9203980099502488,
+        "height": 0.02745995423340961
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.19221967963386727
+      },
+      "traits": [
+        "staticText"
+      ],
+      "label": "No shared Entertainment option this time. You both want Breakfast picnic for Eat."
+    },
+    {
+      "frame": {
+        "x": 16,
+        "y": 200,
+        "width": 370,
+        "height": 98
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 249
+      },
+      "normalizedFrame": {
+        "x": 0.03980099502487562,
+        "y": 0.2288329519450801,
+        "width": 0.9203980099502488,
+        "height": 0.11212814645308924
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.28489702517162474
+      },
+      "traits": [],
+      "label": "No shared Entertainment option this time",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 16,
+        "y": 318,
+        "width": 370,
+        "height": 198
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 417
+      },
+      "normalizedFrame": {
+        "x": 0.03980099502487562,
+        "y": 0.36384439359267734,
+        "width": 0.9203980099502488,
+        "height": 0.22654462242562928
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.477116704805492
+      },
+      "traits": [],
+      "label": "Mutual Eat option, Breakfast picnic",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 16,
+        "y": 536,
+        "width": 370,
+        "height": 44
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 558
+      },
+      "normalizedFrame": {
+        "x": 0.03980099502487562,
+        "y": 0.6132723112128147,
+        "width": 0.9203980099502488,
+        "height": 0.05034324942791762
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.6384439359267735
+      },
+      "traits": [
+        "button"
+      ],
+      "label": "Back to Plans",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 10,
+        "y": -22.33333333333333,
+        "width": 382,
+        "height": 14.333333333333329
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": -15.166666666666664
+      },
+      "normalizedFrame": {
+        "x": 0.024875621890547265,
+        "y": -0.025553012967200604,
+        "width": 0.9502487562189055,
+        "height": 0.016399694889397402
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": -0.017353165522501903
+      },
+      "traits": [
+        "staticText"
+      ],
+      "label": "Refreshing...",
+      "viewClassName": "UILabel"
+    }
+  ]
+}

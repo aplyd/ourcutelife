@@ -79,7 +79,16 @@ export default function TodayTab(): JSX.Element {
       </View>
     );
   }
-  if (!todayPrompt) return <Redirect href="/pairing" />;
+  if (!todayPrompt) {
+    return (
+      <View className="flex-1 bg-app-bg items-center justify-center px-6 gap-2">
+        <Text className="text-2xl font-bold text-ink text-center">Today is getting ready</Text>
+        <Text className="text-base text-muted text-center">
+          Your relationship is connected. Today’s activities will appear here shortly.
+        </Text>
+      </View>
+    );
+  }
 
   const partnerName = viewer.partner?.fullName ?? viewer.partner?.email ?? "your person";
   const promptData = todayPrompt;

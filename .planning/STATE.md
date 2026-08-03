@@ -1,6 +1,6 @@
 # State
 
-Updated: 2026-08-03T09:32:42-07:00
+Updated: 2026-08-03T13:26:19-07:00
 
 ## Current position
 
@@ -16,6 +16,12 @@ Our Cute Life is on `main`, with the independently approved daily-prompt product
 - Current app spine: Expo Router iOS app with Today, Chat, Plans, Me tabs; Convex-backed couples/moments/prompts/plans/date-plan flows; mock-auth simulator path for local walkthroughs.
 
 ## Latest work / verification
+
+- Closed one accepted Moments-history gap without touching the concurrent pairing/auth/notification/profile/Quality Time work. `/moments` now offers All, Good, Mixed, and Hard filters with named native button semantics, one selected state, and an honest empty result when a tone has no entries. The filter was captured RED before implementation; focused coverage passed 2/2, full unit coverage passed 163/163, typecheck passed, lint completed with 0 errors and the four preserved `convex/prompts.ts` warnings, targeted formatting passed, and whitespace checks passed. Argent on iPhone 17 Pro / iOS 26.5 opened the mock-auth `/moments` route, exposed all four filters as native buttons, selected Hard, verified the native selected trait and `No hard moments` state, and retained `.planning/artifacts/2026-08-03-moments-history-filter/hard-empty.png` (`7efd93ff28146b7be2fe92c7e31bc25b40ff83a9e6031e2de802ce2cf78e7815`). The debugger resolved this repository with 9 loaded scripts, ready source maps, and 0 log entries. The simulator accessibility overlay still showed the pre-existing Expo Notifications keychain-entitlement warning, so no fully clean native-runtime claim is made. No moment data, backend, live service, notification, deployment, migration, credential, commit, or push changed.
+
+- Completed and independently approved Phase 7 Slice 07-04 RED/GREEN 1–4. The additive responder route now supports immutable non-empty category selection, private server-projected option decisions using public `optionId` only, strict stale-version latching, deterministic match stopping, neutral exhaustion, cancellation confirmation, terminal fail-closed behavior, and a completed mutual-only outcome shared by both participants; the initiator waiting projection remains private and gains only the named completed-outcome action. Final gates passed unit 156/156, full Convex 292/292, typecheck, lint with 0 errors and four preserved `convex/prompts.ts` warnings, targeted formatting, and whitespace checks. The iPhone 17 Pro / iOS 26.5 mock-auth Argent walkthrough retained 114 checksum-verified artifacts under `.planning/artifacts/2026-08-03-quality-time-response/`, including legacy baselines, stale/newer-version recovery, mixed and all-no-match outcomes, terminal/cancellation states, zero-entry debugger logs, and actor-equivalent outcome screenshots with 0% pixel mismatch. The final strict no-edit GREEN 4 review returned APPROVE with zero findings and identical initial/final Git status and whole-worktree digest. No backend/generated file, notification/provider/discovery behavior, legacy route behavior, dependency, credential, live service/data, deployment, migration, commit, or push changed. Slice 07-04 is complete; later Quality Time discovery, notification, rescheduling, abandonment, migration, and legacy cutover remain separately bounded work.
+
+- Completed only Phase 7 Slice 07-04 RED 3/GREEN 3. A genuine RED failed because the exact responder route was absent. The exact request-keyed responder route now lets the recipient choose from the requested categories, privately pass or accept server-projected options by `optionId`, stop immediately when a category finds a shared option, handle neutral exhaustion, cancel with native destructive confirmation, disable all writes while stale or pending, and redirect completed requests to a combined mutual-only outcome. The initiator's completed state now has a named outcome action; canceled, expired, malformed, and unavailable states reveal no cached cards or private decision evidence. Source contracts cover roles, names, selected/disabled/busy states, stale latching, terminal fail-closed behavior, route identity, option-ID-only writes, and forbidden privacy claims. GREEN passed 154/154 unit tests, full typecheck, repository formatting, lint with zero errors and four preserved prompt-console warnings, targeted Quality Time 37/37, full Convex 292/292, and whitespace checks. No backend/generated file, legacy flow, notification/provider, credential, deployment, migration, live data/service, commit, or push changed. Simulator walkthrough and cumulative correction review remain intentionally deferred to RED 4/GREEN 4.
 
 - Integrated the independently approved membership-gating and pairing-recovery hotfix for release. Root navigation now distinguishes authentication from an exact real two-member pairing and fails closed to Pairing instead of rendering the tab shell for singleton, synthetic, dangling, duplicate, or otherwise invalid memberships. Pairing retains an explicit signed-in recovery action and Sign Out while production synthetic-partner controls remain unavailable. The hotfix's focused policy/backend coverage and prior no-edit review passed with no ranked findings; the merged release is being revalidated before the authorized `main` deployment.
 
@@ -287,9 +293,9 @@ No hard blocker for local code/planning slices. Do not deploy, run production mi
 
 ## Next safe actions
 
-1. Execute only Slice 07-04 RED 3/GREEN 3 for the responder/outcome routes and accessibility/privacy source contracts, preserving the approved RED 1–2 behavior.
-2. Keep request discovery/inbox/history and Quality Time notifications behind later bounded plans; do not broaden Slice 07-04.
-3. Keep existing date-plan behavior and the optional `itemKey` backfill preserved; do not run a live migration or legacy cutover while Phase 7's replacement UI is still being verified.
+1. Resolve or explicitly suppress the mock-auth simulator's Expo Notifications keychain-entitlement warning before using this dev build for another clean native walkthrough claim.
+2. Audit exactly one remaining accepted Phase 1 route/screen/component for a user-facing spec mismatch, preserving the concurrent pairing/auth/notification/profile and completed Quality Time work.
+3. Keep request discovery/inbox/history, Quality Time notifications, rescheduling, abandonment, migration, and legacy cutover behind later bounded plans.
 
 ## Blockers / questions
 

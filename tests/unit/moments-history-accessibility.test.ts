@@ -23,3 +23,14 @@ void test("Moments history creation and detail navigation expose named button se
   assert.match(momentRow[0], /accessibilityRole="button"/);
   assert.match(momentRow[0], /accessibilityLabel=\{`Open moment: \$\{moment\.summary\}`\}/);
 });
+
+void test("Moments history can be filtered by warm tone labels", () => {
+  assert.match(source, /const momentFilters = \[/);
+  assert.match(source, /\["all", "All"\]/);
+  assert.match(source, /\["good", "Good"\]/);
+  assert.match(source, /\["mixed", "Mixed"\]/);
+  assert.match(source, /\["bad", "Hard"\]/);
+  assert.match(source, /momentFilter === "all" \|\| moment\.tone === momentFilter/);
+  assert.match(source, /accessibilityLabel=\{`Show \$\{label\.toLowerCase\(\)\} moments`\}/);
+  assert.match(source, /accessibilityState=\{\{ selected: momentFilter === value \}\}/);
+});

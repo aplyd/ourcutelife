@@ -142,7 +142,7 @@ Required slices:
 
 ## Phase 7 — Quality Time
 
-**Status:** slice_07_04_in_progress_red_1_2_green_1_2_complete
+**Status:** slice_07_04_complete_independently_approved
 **Goal:** Replace draining back-and-forth planning with a private, mutual flow that turns each partner's current preferences into concrete shared options.
 
 Context: `phases/07-quality-time/CONTEXT.md`
@@ -153,7 +153,7 @@ Persistence/API plan: `phases/07-quality-time/07-02-PLAN.md`
 
 Initiator mobile plan: `phases/07-quality-time/07-03-PLAN.md`
 
-Responder mobile/outcome plan: `phases/07-quality-time/07-04-PLAN.md` (planned; unimplemented)
+Responder mobile/outcome plan: `phases/07-quality-time/07-04-PLAN.md` (complete; independently approved)
 
 Required slices:
 
@@ -163,7 +163,7 @@ Required slices:
 - [x] Finalize Slice 07-03: the additive initiator path, deterministic mock-auth Argent walkthrough, test-first production corrections, executable stale-latch/exhausted-count regressions, final independent no-edit approval, and repository-wide format/validation gate are complete.
 - Initiator chooses now/future time plus Eat, Drink, Explore/Adventure, Entertainment, and/or Romance.
 - Initiator accepts 3–5 private cards per selected category before the request can be sent.
-- [ ] Partner receives the completed request, chooses current-interest categories, and swipes only relevant inventory (Slice 07-04 planned; unimplemented).
-- [ ] Stop each agreed category when a mutual option is found and present the combined Quality Time outcome.
+- [x] Partner receives the completed request, chooses current-interest categories, and privately decides only against server-projected relevant inventory through the Slice 07-04 responder route.
+- [x] Stop each agreed category when a mutual option is found and present the combined mutual-only Quality Time outcome to both participants.
 - Preserve private rejections and authorship; cover no-match, insufficient inventory, abandonment, expiration, rescheduling, and cancellation.
 - Verify the complete server-side two-partner lifecycle with focused and full tests; carry Argent evidence forward to the first Quality Time mobile slice because Slice 07-02 changes no mobile surface.

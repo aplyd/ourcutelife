@@ -11,7 +11,10 @@ export default defineSchema({
     avatarStorageId: v.optional(v.id("_storage")),
     createdAt: v.number(),
     updatedAt: v.number(),
-  }).index("by_auth_user_id", ["authUserId"]),
+  })
+    .index("by_auth_user_id", ["authUserId"])
+    .index("by_email", ["email"])
+    .index("by_avatar_storage_id", ["avatarStorageId"]),
   couples: defineTable({
     name: v.string(),
     anniversaryDate: v.optional(v.number()),
@@ -25,11 +28,14 @@ export default defineSchema({
     coupleId: v.id("couples"),
     userId: v.id("users"),
     role: v.literal("partner"),
+    avatarUrl: v.optional(v.string()),
+    avatarStorageId: v.optional(v.id("_storage")),
     joinedAt: v.number(),
   })
     .index("by_user", ["userId"])
     .index("by_couple", ["coupleId"])
-    .index("by_couple_and_user", ["coupleId", "userId"]),
+    .index("by_couple_and_user", ["coupleId", "userId"])
+    .index("by_avatar_storage_id", ["avatarStorageId"]),
   pairingCodes: defineTable({
     coupleId: v.id("couples"),
     code: v.string(),
@@ -41,6 +47,33 @@ export default defineSchema({
   })
     .index("by_code", ["code"])
     .index("by_couple", ["coupleId"]),
+  pairingAcceptedNotifications: defineTable({
+    pairingCodeId: v.id("pairingCodes"),
+    coupleId: v.id("couples"),
+    recipientUserId: v.id("users"),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("awaiting_permission"),
+      v.literal("sending"),
+      v.literal("provider_accepted"),
+      v.literal("provider_rejected"),
+      v.literal("sending_unknown"),
+      v.literal("skipped"),
+    ),
+    deviceId: v.optional(v.string()),
+    schedulerJobId: v.optional(v.string()),
+    registrationRetryCount: v.optional(v.number()),
+    nextRegistrationRetryAt: v.optional(v.number()),
+    expoTicketId: v.optional(v.string()),
+    expoErrorCode: v.optional(v.string()),
+    skippedReason: v.optional(v.string()),
+    dispatchStartedAt: v.optional(v.number()),
+    outcomePersistedAt: v.optional(v.number()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_pairing_code_id", ["pairingCodeId"])
+    .index("by_status_and_created_at", ["status", "createdAt"]),
   moments: defineTable({
     coupleId: v.id("couples"),
     authorUserId: v.id("users"),

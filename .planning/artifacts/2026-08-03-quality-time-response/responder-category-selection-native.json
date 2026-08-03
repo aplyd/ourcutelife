@@ -1,0 +1,1079 @@
+{
+  "status": "ok",
+  "screenFrame": {
+    "x": 0,
+    "y": 0,
+    "width": 402,
+    "height": 874
+  },
+  "elements": [
+    {
+      "frame": {
+        "x": 12,
+        "y": 64,
+        "width": 68.33333587646484,
+        "height": 44
+      },
+      "tapPoint": {
+        "x": 46.16666793823242,
+        "y": 86
+      },
+      "normalizedFrame": {
+        "x": 0.029850746268656716,
+        "y": 0.07322654462242563,
+        "width": 0.16998342257827076,
+        "height": 0.05034324942791762
+      },
+      "normalizedTapPoint": {
+        "x": 0.1148424575577921,
+        "y": 0.09839816933638444
+      },
+      "traits": [
+        "button"
+      ],
+      "label": "Back to Plans",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 118.66666412353516,
+        "y": 72,
+        "width": 168.66668701171875,
+        "height": 28
+      },
+      "tapPoint": {
+        "x": 203.00000762939453,
+        "y": 86
+      },
+      "normalizedFrame": {
+        "x": 0.29519070677496306,
+        "y": 0.08237986270022883,
+        "width": 0.41956887316347946,
+        "height": 0.032036613272311214
+      },
+      "normalizedTapPoint": {
+        "x": 0.5049751433567028,
+        "y": 0.09839816933638444
+      },
+      "traits": [
+        "staticText"
+      ],
+      "label": "Matched plan items"
+    },
+    {
+      "frame": {
+        "x": 12,
+        "y": 124,
+        "width": 48.33333206176758,
+        "height": 35
+      },
+      "tapPoint": {
+        "x": 36.16666603088379,
+        "y": 141.5
+      },
+      "normalizedFrame": {
+        "x": 0.029850746268656716,
+        "y": 0.14187643020594964,
+        "width": 0.12023216930787954,
+        "height": 0.04004576659038902
+      },
+      "normalizedTapPoint": {
+        "x": 0.0899668309225965,
+        "y": 0.16189931350114417
+      },
+      "traits": [
+        "button",
+        "selected"
+      ],
+      "label": "Filter matched plan items by All",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 68.33333206176758,
+        "y": 124,
+        "width": 66.66666412353516,
+        "height": 35
+      },
+      "tapPoint": {
+        "x": 101.66666412353516,
+        "y": 141.5
+      },
+      "normalizedFrame": {
+        "x": 0.16998341308897408,
+        "y": 0.14187643020594964,
+        "width": 0.1658374729441173,
+        "height": 0.04004576659038902
+      },
+      "normalizedTapPoint": {
+        "x": 0.25290214956103274,
+        "y": 0.16189931350114417
+      },
+      "traits": [
+        "button"
+      ],
+      "label": "Filter matched plan items by Food",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 143,
+        "y": 124,
+        "width": 75,
+        "height": 35
+      },
+      "tapPoint": {
+        "x": 180.5,
+        "y": 141.5
+      },
+      "normalizedFrame": {
+        "x": 0.35572139303482586,
+        "y": 0.14187643020594964,
+        "width": 0.1865671641791045,
+        "height": 0.04004576659038902
+      },
+      "normalizedTapPoint": {
+        "x": 0.4490049751243781,
+        "y": 0.16189931350114417
+      },
+      "traits": [
+        "button"
+      ],
+      "label": "Filter matched plan items by Drinks",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 226,
+        "y": 124,
+        "width": 125,
+        "height": 35
+      },
+      "tapPoint": {
+        "x": 288.5,
+        "y": 141.5
+      },
+      "normalizedFrame": {
+        "x": 0.5621890547263682,
+        "y": 0.14187643020594964,
+        "width": 0.31094527363184077,
+        "height": 0.04004576659038902
+      },
+      "normalizedTapPoint": {
+        "x": 0.7176616915422885,
+        "y": 0.16189931350114417
+      },
+      "traits": [
+        "button"
+      ],
+      "label": "Filter matched plan items by Entertainment",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 12,
+        "y": 167,
+        "width": 82.33333587646484,
+        "height": 35
+      },
+      "tapPoint": {
+        "x": 53.16666793823242,
+        "y": 184.5
+      },
+      "normalizedFrame": {
+        "x": 0.029850746268656716,
+        "y": 0.19107551487414187,
+        "width": 0.20480929322503694,
+        "height": 0.04004576659038902
+      },
+      "normalizedTapPoint": {
+        "x": 0.1322553928811752,
+        "y": 0.21109839816933637
+      },
+      "traits": [
+        "button"
+      ],
+      "label": "Filter matched plan items by Activity",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 102.33333587646484,
+        "y": 167,
+        "width": 88.66666412353516,
+        "height": 35
+      },
+      "tapPoint": {
+        "x": 146.66666793823242,
+        "y": 184.5
+      },
+      "normalizedFrame": {
+        "x": 0.25456053700613146,
+        "y": 0.19107551487414187,
+        "width": 0.22056384110332128,
+        "height": 0.04004576659038902
+      },
+      "normalizedTapPoint": {
+        "x": 0.3648424575577921,
+        "y": 0.21109839816933637
+      },
+      "traits": [
+        "button"
+      ],
+      "label": "Filter matched plan items by Intimacy",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 29,
+        "y": 235,
+        "width": 344,
+        "height": 20
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 245
+      },
+      "normalizedFrame": {
+        "x": 0.07213930348258707,
+        "y": 0.26887871853546913,
+        "width": 0.8557213930348259,
+        "height": 0.02288329519450801
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.2803203661327231
+      },
+      "traits": [
+        "staticText"
+      ],
+      "label": "ACTIVITY · DATE"
+    },
+    {
+      "frame": {
+        "x": 29,
+        "y": 263,
+        "width": 344,
+        "height": 32
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 279
+      },
+      "normalizedFrame": {
+        "x": 0.07213930348258707,
+        "y": 0.3009153318077803,
+        "width": 0.8557213930348259,
+        "height": 0.036613272311212815
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.31922196796338675
+      },
+      "traits": [
+        "staticText"
+      ],
+      "label": "Sunset picnic QA date"
+    },
+    {
+      "frame": {
+        "x": 29,
+        "y": 303,
+        "width": 344,
+        "height": 48
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 327
+      },
+      "normalizedFrame": {
+        "x": 0.07213930348258707,
+        "y": 0.34668192219679633,
+        "width": 0.8557213930348259,
+        "height": 0.05491990846681922
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.37414187643020597
+      },
+      "traits": [
+        "staticText"
+      ],
+      "label": "A mock plan idea used for local simulator verification."
+    },
+    {
+      "frame": {
+        "x": 29,
+        "y": 359,
+        "width": 63.333335876464844,
+        "height": 28
+      },
+      "tapPoint": {
+        "x": 60.66666793823242,
+        "y": 373
+      },
+      "normalizedFrame": {
+        "x": 0.07213930348258707,
+        "y": 0.4107551487414188,
+        "width": 0.15754561163299713,
+        "height": 0.032036613272311214
+      },
+      "normalizedTapPoint": {
+        "x": 0.15091210929908563,
+        "y": 0.4267734553775744
+      },
+      "traits": [
+        "staticText"
+      ],
+      "label": "#cozy"
+    },
+    {
+      "frame": {
+        "x": 100.33333587646484,
+        "y": 359,
+        "width": 62.666664123535156,
+        "height": 28
+      },
+      "tapPoint": {
+        "x": 131.66666793823242,
+        "y": 373
+      },
+      "normalizedFrame": {
+        "x": 0.249585412628022,
+        "y": 0.4107551487414188,
+        "width": 0.1558872241878984,
+        "height": 0.032036613272311214
+      },
+      "normalizedTapPoint": {
+        "x": 0.3275290247219712,
+        "y": 0.4267734553775744
+      },
+      "traits": [
+        "staticText"
+      ],
+      "label": "#easy"
+    },
+    {
+      "frame": {
+        "x": 27.044776119402986,
+        "y": 130.90547263681592,
+        "width": 62.89386635396019,
+        "height": 40.49751243781094
+      },
+      "tapPoint": {
+        "x": 58.49170929638308,
+        "y": 151.15422885572139
+      },
+      "normalizedFrame": {
+        "x": 0.06727556248607708,
+        "y": 0.14977742864624247,
+        "width": 0.1564524038655726,
+        "height": 0.04633582658788437
+      },
+      "normalizedTapPoint": {
+        "x": 0.14550176441886337,
+        "y": 0.17294534194018465
+      },
+      "traits": [
+        "button"
+      ],
+      "label": "Back to Plans",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 153.13930348258708,
+        "y": 138.26865671641792,
+        "width": 99.70979377404967,
+        "height": 25.771144278606954
+      },
+      "tapPoint": {
+        "x": 202.99420036961192,
+        "y": 151.15422885572139
+      },
+      "normalizedFrame": {
+        "x": 0.3809435410014604,
+        "y": 0.1582021243894942,
+        "width": 0.24803431287077032,
+        "height": 0.029486435101380954
+      },
+      "normalizedTapPoint": {
+        "x": 0.5049606974368456,
+        "y": 0.17294534194018465
+      },
+      "traits": [
+        "staticText"
+      ],
+      "label": "Quality Time"
+    },
+    {
+      "frame": {
+        "x": 27.044776119402986,
+        "y": 189.81094527363183,
+        "width": 347.91044776119406,
+        "height": 73.6318407960199
+      },
+      "tapPoint": {
+        "x": 201.00000000000003,
+        "y": 226.62686567164178
+      },
+      "normalizedFrame": {
+        "x": 0.06727556248607708,
+        "y": 0.2171749945922561,
+        "width": 0.865448875027846,
+        "height": 0.08424695743251705
+      },
+      "normalizedTapPoint": {
+        "x": 0.5000000000000001,
+        "y": 0.25929847330851463
+      },
+      "traits": [
+        "staticText"
+      ],
+      "label": "What sounds good together?"
+    },
+    {
+      "frame": {
+        "x": 27.044776119402986,
+        "y": 270.80597014925377,
+        "width": 347.91044776119406,
+        "height": 44.17910447761193
+      },
+      "tapPoint": {
+        "x": 201.00000000000003,
+        "y": 292.8955223880597
+      },
+      "normalizedFrame": {
+        "x": 0.06727556248607708,
+        "y": 0.3098466477680249,
+        "width": 0.865448875027846,
+        "height": 0.050548174459510216
+      },
+      "normalizedTapPoint": {
+        "x": 0.5000000000000001,
+        "y": 0.33512073499778
+      },
+      "traits": [
+        "staticText"
+      ],
+      "label": "Pick when and what you’re open to. Your option choices stay private while you build a shortlist."
+    },
+    {
+      "frame": {
+        "x": 27.044776119402986,
+        "y": 333.39303482587064,
+        "width": 347.91044776119406,
+        "height": 18.407960199005004
+      },
+      "tapPoint": {
+        "x": 201.00000000000003,
+        "y": 342.5970149253732
+      },
+      "normalizedFrame": {
+        "x": 0.06727556248607708,
+        "y": 0.3814565615856644,
+        "width": 0.865448875027846,
+        "height": 0.021061739358129297
+      },
+      "normalizedTapPoint": {
+        "x": 0.5000000000000001,
+        "y": 0.391987431264729
+      },
+      "traits": [
+        "staticText"
+      ],
+      "label": "When?"
+    },
+    {
+      "frame": {
+        "x": 27.044776119402986,
+        "y": 362.8457711442786,
+        "width": 57.67827294952241,
+        "height": 39.57711442786069
+      },
+      "tapPoint": {
+        "x": 55.88391259416419,
+        "y": 382.63432835820896
+      },
+      "normalizedFrame": {
+        "x": 0.06727556248607708,
+        "y": 0.4151553445586712,
+        "width": 0.14347829091920997,
+        "height": 0.04528273961997791
+      },
+      "normalizedTapPoint": {
+        "x": 0.13901470794568205,
+        "y": 0.43779671436866013
+      },
+      "traits": [
+        "button",
+        "selected"
+      ],
+      "label": "Now",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 92.08623314852738,
+        "y": 362.8457711442786,
+        "width": 112.90215354653733,
+        "height": 39.57711442786069
+      },
+      "tapPoint": {
+        "x": 148.53730992179607,
+        "y": 382.63432835820896
+      },
+      "normalizedFrame": {
+        "x": 0.22907023171275467,
+        "y": 0.4151553445586712,
+        "width": 0.28085112822521724,
+        "height": 0.04528273961997791
+      },
+      "normalizedTapPoint": {
+        "x": 0.36949579582536335,
+        "y": 0.43779671436866013
+      },
+      "traits": [
+        "button"
+      ],
+      "label": "Plan for later",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 27.044776119402986,
+        "y": 420.8308457711443,
+        "width": 347.91044776119406,
+        "height": 18.407960199005004
+      },
+      "tapPoint": {
+        "x": 201.00000000000003,
+        "y": 430.03482587064684
+      },
+      "normalizedFrame": {
+        "x": 0.06727556248607708,
+        "y": 0.4814998235367784,
+        "width": 0.865448875027846,
+        "height": 0.021061739358129297
+      },
+      "normalizedTapPoint": {
+        "x": 0.5000000000000001,
+        "y": 0.4920306932158431
+      },
+      "traits": [
+        "staticText"
+      ],
+      "label": "What are you open to?"
+    },
+    {
+      "frame": {
+        "x": 27.044776119402986,
+        "y": 450.2835820895522,
+        "width": 51.849090234557195,
+        "height": 39.57711442786069
+      },
+      "tapPoint": {
+        "x": 52.96932123668158,
+        "y": 470.0721393034826
+      },
+      "normalizedFrame": {
+        "x": 0.06727556248607708,
+        "y": 0.5151986065097851,
+        "width": 0.12897783640437113,
+        "height": 0.04528273961997791
+      },
+      "normalizedTapPoint": {
+        "x": 0.13176448068826263,
+        "y": 0.5378399763197741
+      },
+      "traits": [
+        "button"
+      ],
+      "label": "Eat",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 86.25705043356217,
+        "y": 450.2835820895522,
+        "width": 65.65506038381093,
+        "height": 39.57711442786069
+      },
+      "tapPoint": {
+        "x": 119.08458062546764,
+        "y": 470.0721393034826
+      },
+      "normalizedFrame": {
+        "x": 0.21456977719791584,
+        "y": 0.5151986065097851,
+        "width": 0.16332104573087297,
+        "height": 0.04528273961997791
+      },
+      "normalizedTapPoint": {
+        "x": 0.2962303000633523,
+        "y": 0.5378399763197741
+      },
+      "traits": [
+        "button"
+      ],
+      "label": "Drink",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 159.27529489697508,
+        "y": 450.2835820895522,
+        "width": 149.10446356778124,
+        "height": 39.57711442786069
+      },
+      "tapPoint": {
+        "x": 233.8275266808657,
+        "y": 470.0721393034826
+      },
+      "normalizedFrame": {
+        "x": 0.3962072012362564,
+        "y": 0.5151986065097851,
+        "width": 0.3709066257905006,
+        "height": 0.04528273961997791
+      },
+      "normalizedTapPoint": {
+        "x": 0.5816605141315068,
+        "y": 0.5378399763197741
+      },
+      "traits": [
+        "button"
+      ],
+      "label": "Explore/Adventure",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 27.044776119402986,
+        "y": 497.22388059701495,
+        "width": 122.41293532338308,
+        "height": 39.57711442786069
+      },
+      "tapPoint": {
+        "x": 88.25124378109453,
+        "y": 517.0124378109454
+      },
+      "normalizedFrame": {
+        "x": 0.06727556248607708,
+        "y": 0.5689060418730149,
+        "width": 0.30450978936164946,
+        "height": 0.04528273961997791
+      },
+      "normalizedTapPoint": {
+        "x": 0.2195304571669018,
+        "y": 0.5915474116830038
+      },
+      "traits": [
+        "button"
+      ],
+      "label": "Entertainment",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 156.82089552238807,
+        "y": 497.22388059701495,
+        "width": 90.19900497512438,
+        "height": 39.57711442786069
+      },
+      "tapPoint": {
+        "x": 201.92039800995025,
+        "y": 517.0124378109454
+      },
+      "normalizedFrame": {
+        "x": 0.3901017301551942,
+        "y": 0.5689060418730149,
+        "width": 0.22437563426647855,
+        "height": 0.04528273961997791
+      },
+      "normalizedTapPoint": {
+        "x": 0.5022895472884334,
+        "y": 0.5915474116830038
+      },
+      "traits": [
+        "button"
+      ],
+      "label": "Romance",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 27.044776119402986,
+        "y": 547.8457711442786,
+        "width": 347.91044776119406,
+        "height": 18.407960199004947
+      },
+      "tapPoint": {
+        "x": 201.00000000000003,
+        "y": 557.0497512437811
+      },
+      "normalizedFrame": {
+        "x": 0.06727556248607708,
+        "y": 0.6268258251078702,
+        "width": 0.865448875027846,
+        "height": 0.02106173935812923
+      },
+      "normalizedTapPoint": {
+        "x": 0.5000000000000001,
+        "y": 0.6373566947869349
+      },
+      "traits": [
+        "staticText"
+      ],
+      "label": "Choose at least one category to continue."
+    },
+    {
+      "frame": {
+        "x": 27.044776119402986,
+        "y": 584.6616915422886,
+        "width": 347.91044776119406,
+        "height": 51.542288557213965
+      },
+      "tapPoint": {
+        "x": 201.00000000000003,
+        "y": 610.4328358208957
+      },
+      "normalizedFrame": {
+        "x": 0.06727556248607708,
+        "y": 0.6689493038241289,
+        "width": 0.865448875027846,
+        "height": 0.05897287020276197
+      },
+      "normalizedTapPoint": {
+        "x": 0.5000000000000001,
+        "y": 0.6984357389255099
+      },
+      "traits": [
+        "button",
+        "notEnabled"
+      ],
+      "label": "Choose private options",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 34.407960199004975,
+        "y": 302.22388059701495,
+        "width": 333.1840796019901,
+        "height": 73.6318407960199
+      },
+      "tapPoint": {
+        "x": 201.00000000000003,
+        "y": 339.0398009950249
+      },
+      "normalizedFrame": {
+        "x": 0.08559194079354472,
+        "y": 0.3457939137265617,
+        "width": 0.8288161184129107,
+        "height": 0.08424695743251705
+      },
+      "normalizedTapPoint": {
+        "x": 0.5000000000000001,
+        "y": 0.38791739244282025
+      },
+      "traits": [
+        "staticText"
+      ],
+      "label": "Waiting for your partner"
+    },
+    {
+      "frame": {
+        "x": 34.407960199004975,
+        "y": 394.2636815920398,
+        "width": 333.1840796019901,
+        "height": 44.17910447761193
+      },
+      "tapPoint": {
+        "x": 201.00000000000003,
+        "y": 416.35323383084574
+      },
+      "normalizedFrame": {
+        "x": 0.08559194079354472,
+        "y": 0.451102610517208,
+        "width": 0.8288161184129107,
+        "height": 0.050548174459510216
+      },
+      "normalizedTapPoint": {
+        "x": 0.5000000000000001,
+        "y": 0.47637669774696306
+      },
+      "traits": [
+        "staticText"
+      ],
+      "label": "Your private shortlist is saved. You can leave this screen and come back later."
+    },
+    {
+      "frame": {
+        "x": 34.407960199004975,
+        "y": 456.85074626865674,
+        "width": 333.1840796019901,
+        "height": 44.17910447761193
+      },
+      "tapPoint": {
+        "x": 201.00000000000003,
+        "y": 478.94029850746267
+      },
+      "normalizedFrame": {
+        "x": 0.08559194079354472,
+        "y": 0.5227125243348475,
+        "width": 0.8288161184129107,
+        "height": 0.050548174459510216
+      },
+      "normalizedTapPoint": {
+        "x": 0.5000000000000001,
+        "y": 0.5479866115646026
+      },
+      "traits": [
+        "button"
+      ],
+      "label": "Cancel Quality Time request",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 34.407960199004975,
+        "y": 519.4378109452737,
+        "width": 333.1840796019901,
+        "height": 40.497512437811
+      },
+      "tapPoint": {
+        "x": 201.00000000000003,
+        "y": 539.6865671641792
+      },
+      "normalizedFrame": {
+        "x": 0.08559194079354472,
+        "y": 0.5943224381524871,
+        "width": 0.8288161184129107,
+        "height": 0.04633582658788443
+      },
+      "normalizedTapPoint": {
+        "x": 0.5000000000000001,
+        "y": 0.6174903514464293
+      },
+      "traits": [
+        "button"
+      ],
+      "label": "Back to Plans",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 16,
+        "y": 136,
+        "width": 370,
+        "height": 80
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 176
+      },
+      "normalizedFrame": {
+        "x": 0.03980099502487562,
+        "y": 0.15560640732265446,
+        "width": 0.9203980099502488,
+        "height": 0.09153318077803203
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.20137299771167047
+      },
+      "traits": [
+        "staticText"
+      ],
+      "label": "Choose what sounds good now"
+    },
+    {
+      "frame": {
+        "x": 16,
+        "y": 224,
+        "width": 370,
+        "height": 24
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 236
+      },
+      "normalizedFrame": {
+        "x": 0.03980099502487562,
+        "y": 0.2562929061784897,
+        "width": 0.9203980099502488,
+        "height": 0.02745995423340961
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.2700228832951945
+      },
+      "traits": [
+        "staticText"
+      ],
+      "label": "Now · Pick at least one requested category."
+    },
+    {
+      "frame": {
+        "x": 16,
+        "y": 272,
+        "width": 370,
+        "height": 51
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 297.5
+      },
+      "normalizedFrame": {
+        "x": 0.03980099502487562,
+        "y": 0.3112128146453089,
+        "width": 0.9203980099502488,
+        "height": 0.05835240274599542
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.3403890160183066
+      },
+      "traits": [
+        "button"
+      ],
+      "label": "Choose Eat for this Quality Time",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 16,
+        "y": 335,
+        "width": 370,
+        "height": 51
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 360.5
+      },
+      "normalizedFrame": {
+        "x": 0.03980099502487562,
+        "y": 0.38329519450800914,
+        "width": 0.9203980099502488,
+        "height": 0.05835240274599542
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.41247139588100684
+      },
+      "traits": [
+        "button"
+      ],
+      "label": "Choose Entertainment for this Quality Time",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 16,
+        "y": 410,
+        "width": 370,
+        "height": 56
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 438
+      },
+      "normalizedFrame": {
+        "x": 0.03980099502487562,
+        "y": 0.4691075514874142,
+        "width": 0.9203980099502488,
+        "height": 0.06407322654462243
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.5011441647597255
+      },
+      "traits": [
+        "button",
+        "notEnabled"
+      ],
+      "label": "Start choosing together",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 16,
+        "y": 490,
+        "width": 370,
+        "height": 48
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 514
+      },
+      "normalizedFrame": {
+        "x": 0.03980099502487562,
+        "y": 0.5606407322654462,
+        "width": 0.9203980099502488,
+        "height": 0.05491990846681922
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.5881006864988558
+      },
+      "traits": [
+        "button"
+      ],
+      "label": "Cancel Quality Time request",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 16,
+        "y": 562,
+        "width": 370,
+        "height": 44
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 584
+      },
+      "normalizedFrame": {
+        "x": 0.03980099502487562,
+        "y": 0.6430205949656751,
+        "width": 0.9203980099502488,
+        "height": 0.05034324942791762
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.6681922196796338
+      },
+      "traits": [
+        "button"
+      ],
+      "label": "Back to Plans",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 10,
+        "y": -22.33333333333333,
+        "width": 382,
+        "height": 14.333333333333329
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": -15.166666666666664
+      },
+      "normalizedFrame": {
+        "x": 0.024875621890547265,
+        "y": -0.025553012967200604,
+        "width": 0.9502487562189055,
+        "height": 0.016399694889397402
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": -0.017353165522501903
+      },
+      "traits": [
+        "staticText"
+      ],
+      "label": "Refreshing...",
+      "viewClassName": "UILabel"
+    }
+  ]
+}

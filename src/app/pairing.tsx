@@ -16,6 +16,7 @@ import {
 import { api } from "../../convex/_generated/api";
 import { authClient, useSession } from "@/lib/betterAuth";
 import { resolveMembershipAccess } from "@/lib/membershipAccess";
+import { requestServerPushRegistration } from "@/lib/notifications";
 
 function formatExpiry(expiresAt: number | null | undefined): string | null {
   if (!expiresAt) return null;
@@ -38,6 +39,10 @@ export default function PairingScreen(): JSX.Element {
   const createCoupleAndCode = useAppMutation(api.pairing.createCoupleAndCode);
   const joinWithCode = useAppMutation(api.pairing.joinWithCode);
   const leaveCouple = useAppMutation(api.pairing.leaveCouple);
+  const reportPermissionObservation = useAppMutation(
+    api.notificationDevices.reportPermissionObservation,
+  );
+  const registerGrantedDevice = useAppMutation(api.notificationDevices.registerGrantedDevice);
   const membershipAccess = resolveMembershipAccess({
     sessionPending: betterAuthSession.isPending,
     hasSession: Boolean(betterAuthSession.data?.session),
@@ -69,6 +74,16 @@ export default function PairingScreen(): JSX.Element {
   }
   if (membershipAccess === "paired") return <Redirect href="/(tabs)" />;
 
+  async function registerForNotificationsAfterPairing() {
+    try {
+      const result = await requestServerPushRegistration();
+      await reportPermissionObservation(result.observation);
+      if (result.registration) await registerGrantedDevice(result.registration);
+    } catch {
+      // Pairing must still succeed when push permission or token registration is unavailable.
+    }
+  }
+
   async function handleCreateCode() {
     const anniversaryTime = new Date(`${anniversaryDateText}T00:00:00`).getTime();
     if (!Number.isFinite(anniversaryTime)) {
@@ -83,6 +98,7 @@ export default function PairingScreen(): JSX.Element {
       });
       setGeneratedCode(result.code);
       setGeneratedCodeExpiresAt(result.expiresAt);
+      await registerForNotificationsAfterPairing();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not create a pairing code.");
     } finally {
@@ -97,6 +113,7 @@ export default function PairingScreen(): JSX.Element {
       await joinWithCode({
         code,
       });
+      await registerForNotificationsAfterPairing();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not join with that code.");
     } finally {

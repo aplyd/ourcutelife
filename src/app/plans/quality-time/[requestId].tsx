@@ -285,8 +285,16 @@ export default function QualityTimeRequestScreen(): JSX.Element {
       <View className="flex-1 justify-center gap-5 bg-app-bg px-5">
         <Text className="text-center text-4xl font-bold text-ink">Quality Time is ready</Text>
         <Text className="text-center text-base leading-6 text-muted">
-          Your shared result is ready to view from the completed request flow.
+          Your shared result is ready.
         </Text>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="View Quality Time outcome"
+          className="h-12 items-center justify-center rounded-full bg-ink"
+          onPress={() => router.replace(`/plans/quality-time/${request.requestId}/outcome`)}
+        >
+          <Text className="font-bold text-app-bg">View Quality Time outcome</Text>
+        </Pressable>
         <BackToPlansButton />
       </View>
     );

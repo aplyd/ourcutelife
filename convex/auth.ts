@@ -4,7 +4,7 @@ import { convex as convexPlugin } from "@convex-dev/better-auth/plugins";
 import { expo } from "@better-auth/expo";
 import { betterAuth } from "better-auth";
 import { components } from "./_generated/api";
-import type { Doc } from "./_generated/dataModel";
+import type { Doc, Id } from "./_generated/dataModel";
 import type { MutationCtx, QueryCtx } from "./_generated/server";
 import { mutation, query } from "./_generated/server";
 import authConfig from "./auth.config";
@@ -43,37 +43,98 @@ export async function getCurrentAppUser(ctx: QueryCtx | MutationCtx): Promise<Do
     }
     const identity = await ctx.auth.getUserIdentity();
     if (!identity?.tokenIdentifier) return null;
-    return await ctx.db
+    const users = await ctx.db
       .query("users")
       .withIndex("by_auth_user_id", (q) => q.eq("authUserId", identity.tokenIdentifier))
-      .first();
+      .take(2);
+    if (users.length > 1) throw new Error("Ambiguous authenticated user.");
+    return users[0] ?? null;
   }
   if (!authUser) return null;
 
   const byAuthUserId = await ctx.db
     .query("users")
     .withIndex("by_auth_user_id", (q) => q.eq("authUserId", authUser._id))
-    .first();
-  if (byAuthUserId) return byAuthUserId;
-  if (authUser.email) {
-    const users = await ctx.db.query("users").take(100);
-    return users.find((user) => user.email === authUser.email) ?? null;
-  }
-  return null;
+    .take(2);
+  if (byAuthUserId.length > 1) throw new Error("Ambiguous authenticated user.");
+  return byAuthUserId[0] ?? null;
 }
+
+async function getSingleMembership(ctx: QueryCtx | MutationCtx, userId: Doc<"users">["_id"]) {
+  const memberships = await ctx.db
+    .query("coupleMembers")
+    .withIndex("by_user", (q) => q.eq("userId", userId))
+    .take(2);
+  if (memberships.length > 1) throw new Error("Ambiguous couple membership.");
+  return memberships[0] ?? null;
+}
+
+export async function avatarStorageIsReferenced(
+  ctx: MutationCtx,
+  storageId: Id<"_storage">,
+  excludingUserId?: Id<"users">,
+): Promise<boolean> {
+  const membershipReference = await ctx.db
+    .query("coupleMembers")
+    .withIndex("by_avatar_storage_id", (q) => q.eq("avatarStorageId", storageId))
+    .first();
+  if (membershipReference) return true;
+  const userReferences = await ctx.db
+    .query("users")
+    .withIndex("by_avatar_storage_id", (q) => q.eq("avatarStorageId", storageId))
+    .take(excludingUserId ? 2 : 1);
+  return excludingUserId
+    ? userReferences.some((reference) => reference._id !== excludingUserId)
+    : userReferences.length > 0;
+}
+
+export async function cleanupLegacyGlobalAvatar(
+  ctx: MutationCtx,
+  user: Doc<"users">,
+): Promise<boolean> {
+  if (!user.avatarUrl && !user.avatarStorageId) return false;
+
+  if (
+    user.avatarStorageId &&
+    !(await avatarStorageIsReferenced(ctx, user.avatarStorageId, user._id))
+  ) {
+    await ctx.storage.delete(user.avatarStorageId);
+  }
+
+  await ctx.db.patch(user._id, {
+    avatarUrl: undefined,
+    avatarStorageId: undefined,
+    updatedAt: Date.now(),
+  });
+  return true;
+}
+
+export const cleanupMyLegacyGlobalAvatar = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const user = await getCurrentAppUser(ctx);
+    if (!user) throw new Error("Not signed in.");
+    return { cleaned: await cleanupLegacyGlobalAvatar(ctx, user) };
+  },
+});
 
 export const syncBetterAuthUser = mutation({
   args: {},
   handler: async (ctx) => {
     const authUser = await authComponent.getAuthUser(ctx as never);
-    const existing =
-      (await ctx.db
-        .query("users")
-        .withIndex("by_auth_user_id", (q) => q.eq("authUserId", authUser._id))
-        .first()) ??
-      (authUser.email
-        ? (await ctx.db.query("users").take(100)).find((user) => user.email === authUser.email)
-        : null);
+    const byAuthUserId = await ctx.db
+      .query("users")
+      .withIndex("by_auth_user_id", (q) => q.eq("authUserId", authUser._id))
+      .take(2);
+    if (byAuthUserId.length > 1) throw new Error("Ambiguous authenticated user.");
+    const byEmail = authUser.email
+      ? await ctx.db
+          .query("users")
+          .withIndex("by_email", (q) => q.eq("email", authUser.email!))
+          .take(2)
+      : [];
+    if (byEmail.length > 1) throw new Error("Ambiguous authenticated email.");
+    const existing = byAuthUserId[0] ?? byEmail[0] ?? null;
     const now = Date.now();
     if (existing) {
       await ctx.db.patch(existing._id, {
@@ -105,11 +166,19 @@ export const updateProfile = mutation({
     if (!user) throw new Error("Not signed in.");
     const fullName = args.fullName.trim();
     if (!fullName) throw new Error("Add a name before saving.");
+    await cleanupLegacyGlobalAvatar(ctx, user);
+    const now = Date.now();
     await ctx.db.patch(user._id, {
       fullName,
-      avatarUrl: args.avatarUrl?.trim() || user.avatarUrl,
-      updatedAt: Date.now(),
+      updatedAt: now,
     });
+    if (args.avatarUrl?.trim()) {
+      const membership = await getSingleMembership(ctx, user._id);
+      if (!membership) throw new Error("Pair with your partner first.");
+      await ctx.db.patch(membership._id, {
+        avatarUrl: args.avatarUrl.trim(),
+      });
+    }
     return user._id;
   },
 });
@@ -130,19 +199,27 @@ export const saveProfilePhoto = mutation({
   handler: async (ctx, args) => {
     const user = await getCurrentAppUser(ctx);
     if (!user) throw new Error("Not signed in.");
-    const oldStorageId = user.avatarStorageId;
+    await cleanupLegacyGlobalAvatar(ctx, user);
+    const membership = await getSingleMembership(ctx, user._id);
+    if (!membership) throw new Error("Pair with your partner first.");
+    const oldStorageId = membership.avatarStorageId;
     const metadata = await ctx.db.system.get("_storage", args.storageId);
     if (!metadata) throw new Error("Uploaded image is unavailable.");
     if (!metadata.contentType?.startsWith("image/")) throw new Error("Upload an image file.");
     if (metadata.size > 5_000_000) throw new Error("Keep profile photos under 5 MB.");
     const avatarUrl = await ctx.storage.getUrl(args.storageId);
     if (!avatarUrl) throw new Error("Uploaded image is unavailable.");
-    await ctx.db.patch(user._id, {
+    await ctx.db.patch(membership._id, {
       avatarStorageId: args.storageId,
       avatarUrl,
-      updatedAt: Date.now(),
     });
-    if (oldStorageId && oldStorageId !== args.storageId) await ctx.storage.delete(oldStorageId);
+    if (
+      oldStorageId &&
+      oldStorageId !== args.storageId &&
+      !(await avatarStorageIsReferenced(ctx, oldStorageId))
+    ) {
+      await ctx.storage.delete(oldStorageId);
+    }
     return { storageId: args.storageId, avatarUrl };
   },
 });
@@ -154,10 +231,8 @@ export const updateAnniversary = mutation({
   handler: async (ctx, args) => {
     const user = await getCurrentAppUser(ctx);
     if (!user) throw new Error("Not signed in.");
-    const membership = await ctx.db
-      .query("coupleMembers")
-      .withIndex("by_user", (q) => q.eq("userId", user._id))
-      .first();
+    await cleanupLegacyGlobalAvatar(ctx, user);
+    const membership = await getSingleMembership(ctx, user._id);
     if (!membership) throw new Error("Pair with your partner first.");
     if (!Number.isFinite(args.anniversaryDate)) throw new Error("Anniversary date is invalid.");
     await ctx.db.patch(membership.coupleId, {
@@ -174,10 +249,7 @@ export const viewer = query({
     const user = await getCurrentAppUser(ctx);
     if (!user) return null;
 
-    const membership = await ctx.db
-      .query("coupleMembers")
-      .withIndex("by_user", (q) => q.eq("userId", user._id))
-      .first();
+    const membership = await getSingleMembership(ctx, user._id);
 
     const couple = membership ? await ctx.db.get(membership.coupleId) : null;
     const members = membership
@@ -201,17 +273,38 @@ export const viewer = query({
 
     const partnerMembership = members.find((member) => member.userId !== user._id);
     const partner = partnerMembership ? await ctx.db.get(partnerMembership.userId) : null;
-    const userAvatarUrl = user.avatarStorageId
-      ? ((await ctx.storage.getUrl(user.avatarStorageId)) ?? user.avatarUrl)
-      : user.avatarUrl;
-    const partnerAvatarUrl = partner?.avatarStorageId
-      ? ((await ctx.storage.getUrl(partner.avatarStorageId)) ?? partner.avatarUrl)
-      : partner?.avatarUrl;
+    const userAvatarUrl = membership?.avatarStorageId
+      ? ((await ctx.storage.getUrl(membership.avatarStorageId)) ?? membership.avatarUrl)
+      : membership?.avatarUrl;
+    const partnerAvatarUrl = partnerMembership?.avatarStorageId
+      ? ((await ctx.storage.getUrl(partnerMembership.avatarStorageId)) ??
+        partnerMembership.avatarUrl)
+      : partnerMembership?.avatarUrl;
 
     return {
-      user: { ...user, avatarUrl: userAvatarUrl },
-      partner: partner ? { ...partner, avatarUrl: partnerAvatarUrl } : null,
-      membership,
+      user: {
+        _id: user._id,
+        email: user.email,
+        fullName: user.fullName,
+        avatarUrl: userAvatarUrl,
+      },
+      partner: partner
+        ? {
+            _id: partner._id,
+            email: partner.email,
+            fullName: partner.fullName,
+            avatarUrl: partnerAvatarUrl,
+          }
+        : null,
+      membership: membership
+        ? {
+            _id: membership._id,
+            coupleId: membership.coupleId,
+            userId: membership.userId,
+            role: membership.role,
+            joinedAt: membership.joinedAt,
+          }
+        : null,
       couple,
       memberCount: members.length,
       activePairingCode: activePairingCode

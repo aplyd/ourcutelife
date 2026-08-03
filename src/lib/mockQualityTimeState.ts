@@ -39,7 +39,10 @@ export type MockQualityTimeCard = {
   vibeTags: string[];
 };
 
-type MockResponderOption = Omit<MockQualityTimeCard, "planIdeaId"> & { optionId: string };
+type MockResponderOption = Omit<MockQualityTimeCard, "planIdeaId" | "kind"> & {
+  optionId: string;
+  kind: "activity" | "place";
+};
 
 type MockQualityTimeRequest = {
   requestId: string;
@@ -148,8 +151,12 @@ function copyCard(card: MockQualityTimeCard): MockQualityTimeCard {
 }
 
 function toResponderOption(optionId: string, card: MockQualityTimeCard): MockResponderOption {
-  const { planIdeaId: _privatePlanIdeaId, ...neutralCard } = copyCard(card);
-  return { optionId, ...neutralCard };
+  const { planIdeaId: _privatePlanIdeaId, kind, ...neutralCard } = copyCard(card);
+  return {
+    optionId,
+    ...neutralCard,
+    kind: kind === "food" || kind === "drinks" ? "place" : "activity",
+  };
 }
 
 function validateCategories(value: unknown): asserts value is MockQualityTimeCategory[] {
@@ -217,14 +224,14 @@ export function createMockQualityTimeState(clock: Clock = Date.now) {
 
   function requireExactVersion(current: MockQualityTimeRequest, expectedVersion: unknown) {
     if (!Number.isSafeInteger(expectedVersion) || expectedVersion !== current.version) {
-      throw new Error("Quality Time request changed. Refresh and try again.");
+      throw new Error("Stale request version.");
     }
   }
 
   function requireWritableVersion(current: MockQualityTimeRequest, expectedVersion: unknown) {
     requireExactVersion(current, expectedVersion);
     if (current.staleProjectionArmed) {
-      throw new Error("Quality Time request changed. Refresh and try again.");
+      throw new Error("Stale request version.");
     }
   }
 

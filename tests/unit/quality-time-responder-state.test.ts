@@ -209,20 +209,23 @@ void test("responder derivation fails closed for throwing projection evidence", 
   });
 
   assert.equal(deriveQualityTimeResponderProgress(["eat"], [throwingResult]), null);
-  assert.equal(buildQualityTimeOutcomeSummary([throwingResult]), null);
+  assert.equal(buildQualityTimeOutcomeSummary(["eat"], [throwingResult]), null);
   assert.equal(qualityTimeResponderStaleVersionFromError(throwingError, 4), null);
 });
 
 void test("completed summary keeps server category order, mutual titles, and neutral no-match copy", () => {
-  const summary = buildQualityTimeOutcomeSummary([
-    { category: "eat", status: "matched", option: responderCard("eat-match", "Pasta night") },
-    { category: "entertainment", status: "no_match" },
-    {
-      category: "romance",
-      status: "matched",
-      option: responderCard("romance-match", "Sunset walk"),
-    },
-  ]);
+  const summary = buildQualityTimeOutcomeSummary(
+    ["eat", "entertainment", "romance"],
+    [
+      { category: "eat", status: "matched", option: responderCard("eat-match", "Pasta night") },
+      { category: "entertainment", status: "no_match" },
+      {
+        category: "romance",
+        status: "matched",
+        option: responderCard("romance-match", "Sunset walk"),
+      },
+    ],
+  );
 
   assert.ok(summary);
   assert.equal(
@@ -262,8 +265,16 @@ void test("completed summary rejects malformed, duplicate, unknown, or private r
     ],
     [{ category: "eat", status: "no_match", rejectedIds: ["private"] }],
   ]) {
-    assert.equal(buildQualityTimeOutcomeSummary(results), null);
+    assert.equal(
+      buildQualityTimeOutcomeSummary(["eat", "entertainment", "romance"], results),
+      null,
+    );
   }
+
+  assert.equal(
+    buildQualityTimeOutcomeSummary(["eat"], [{ category: "entertainment", status: "no_match" }]),
+    null,
+  );
 });
 
 function responderCard(optionId: string, title: string) {

@@ -1,12 +1,18 @@
+import { makeFunctionReference } from "convex/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
 import type { MutationCtx } from "./_generated/server";
 import { internalMutation, mutation } from "./_generated/server";
-import { getCurrentAppUser } from "./auth";
+import { avatarStorageIsReferenced, cleanupLegacyGlobalAvatar, getCurrentAppUser } from "./auth";
 import { createDatePlanItemKey } from "./datePlanDedupe";
 
 const PAIRING_CODE_TTL_MS = 1000 * 60 * 60 * 24 * 7;
+const dispatchPairingAcceptedNotification = makeFunctionReference<
+  "action",
+  { notificationId: Id<"pairingAcceptedNotifications"> },
+  unknown
+>("pairingAcceptedDispatch:dispatchPairingAcceptedNotification");
 
 function normalizeCode(code: string): string {
   return code.replace(/[^0-9]/g, "").slice(0, 6);
@@ -149,6 +155,7 @@ export const leaveCouple = mutation({
       .take(17);
     if (memberships.length === 0) throw new Error("Pair with your partner first.");
     if (memberships.length > 16) throw new Error("Too many relationship links to reset safely.");
+    await cleanupLegacyGlobalAvatar(ctx, user);
 
     const coupleIds = new Map<string, Id<"couples">>();
     for (const membership of memberships) {
@@ -168,7 +175,15 @@ export const leaveCouple = mutation({
       });
     }
 
+    const avatarStorageIds = new Set(
+      memberships
+        .map((membership) => membership.avatarStorageId)
+        .filter((storageId): storageId is NonNullable<typeof storageId> => Boolean(storageId)),
+    );
     for (const membership of memberships) await ctx.db.delete(membership._id);
+    for (const storageId of avatarStorageIds) {
+      if (!(await avatarStorageIsReferenced(ctx, storageId))) await ctx.storage.delete(storageId);
+    }
     return { left: true as const };
   },
 });
@@ -320,6 +335,19 @@ export const joinWithCode = mutation({
     });
 
     await ctx.db.patch(pairingCode.coupleId, { updatedAt: now });
+
+    const notificationId = await ctx.db.insert("pairingAcceptedNotifications", {
+      pairingCodeId: pairingCode._id,
+      coupleId: pairingCode.coupleId,
+      recipientUserId: pairingCode.createdByUserId,
+      status: "pending",
+      createdAt: now,
+      updatedAt: now,
+    });
+    const schedulerJobId = await ctx.scheduler.runAfter(0, dispatchPairingAcceptedNotification, {
+      notificationId,
+    });
+    await ctx.db.patch(notificationId, { schedulerJobId: String(schedulerJobId), updatedAt: now });
 
     return { coupleId: pairingCode.coupleId };
   },

@@ -1,0 +1,4 @@
+{
+  "description": "Source: native-devtools\nMode: flat\nCoordinates are normalized [0,1] fractions of the screen (x, y, width, height), not pixels.\nPass them straight to gesture-tap / gesture-swipe / gesture-pinch, which expect this same space.\nTo tap an element, use its centre: tap_x = frame.x + frame.width / 2, tap_y = frame.y + frame.height / 2.\n\nROOT  AXGroup (0.000, 0.000, 1.000, 1.000)\n",
+  "source": "native-devtools"
+}

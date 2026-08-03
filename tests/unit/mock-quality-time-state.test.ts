@@ -12,6 +12,10 @@ import {
   QUALITY_TIME_CATEGORIES,
   type MockQualityTimeCategory,
 } from "../../src/lib/mockQualityTimeState";
+import {
+  deriveQualityTimeResponderProgress,
+  qualityTimeResponderStaleVersionFromError,
+} from "../../src/lib/qualityTimeResponderState";
 
 const NOW = Date.parse("2026-08-02T20:00:00.000Z");
 
@@ -307,6 +311,14 @@ void test("responder chooses one immutable subset and receives optionId-only neu
   }
   assert.deepEqual(projection.responderCategories, ["eat", "entertainment"]);
   assert.deepEqual(
+    deriveQualityTimeResponderProgress(projection.responderCategories, projection.categoryResults),
+    {
+      nextPendingCategory: "eat",
+      exhaustedCategories: [],
+      resolvedCategories: [],
+    },
+  );
+  assert.deepEqual(
     projection.categoryResults.map((result) => [result.category, result.status]),
     [
       ["eat", "pending"],
@@ -403,7 +415,7 @@ void test("mixed responder lifecycle stops a match, exhausts privately, and comp
         optionId: "mock_quality_time_option_eat_2",
         title: "Breakfast picnic",
         description: "Eat together with a simple, low-pressure plan.",
-        kind: "food",
+        kind: "place",
         costLevel: 1,
         durationMinutes: 60,
         vibeTags: ["playful", "local"],
@@ -548,13 +560,17 @@ void test("fixed scenarios, stale projection advance, cancellation, and listener
   const stale = state.seed("stale");
   state.setActor("responder");
   const beforeFailure = state.getRevision();
-  assert.throws(() =>
+  let staleError: unknown;
+  try {
     state.beginResponse({
       requestId: stale.requestId,
       expectedVersion: stale.version,
       categories: ["eat"],
-    }),
-  );
+    });
+  } catch (error) {
+    staleError = error;
+  }
+  assert.equal(qualityTimeResponderStaleVersionFromError(staleError, stale.version), stale.version);
   assert.equal(state.getRevision(), beforeFailure);
   const advanced = state.advanceStaleProjection();
   assert.equal(advanced.version, stale.version + 1);

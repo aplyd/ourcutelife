@@ -37,6 +37,9 @@ import type * as http from "../http.js";
 import type * as moments from "../moments.js";
 import type * as notificationDevices from "../notificationDevices.js";
 import type * as pairing from "../pairing.js";
+import type * as pairingAcceptedDispatch from "../pairingAcceptedDispatch.js";
+import type * as pairingAcceptedNotification from "../pairingAcceptedNotification.js";
+import type * as pairingAcceptedNotificationState from "../pairingAcceptedNotificationState.js";
 import type * as planPrivacy from "../planPrivacy.js";
 import type * as plans from "../plans.js";
 import type * as prompts from "../prompts.js";
@@ -47,7 +50,11 @@ import type * as reviews from "../reviews.js";
 import type * as stats from "../stats.js";
 import type * as testDataCleanup from "../testDataCleanup.js";
 
-import type { ApiFromModules, FilterApi, FunctionReference } from "convex/server";
+import type {
+  ApiFromModules,
+  FilterApi,
+  FunctionReference,
+} from "convex/server";
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
@@ -79,6 +86,9 @@ declare const fullApi: ApiFromModules<{
   moments: typeof moments;
   notificationDevices: typeof notificationDevices;
   pairing: typeof pairing;
+  pairingAcceptedDispatch: typeof pairingAcceptedDispatch;
+  pairingAcceptedNotification: typeof pairingAcceptedNotification;
+  pairingAcceptedNotificationState: typeof pairingAcceptedNotificationState;
   planPrivacy: typeof planPrivacy;
   plans: typeof plans;
   prompts: typeof prompts;
@@ -98,7 +108,10 @@ declare const fullApi: ApiFromModules<{
  * const myFunctionReference = api.myModule.myFunction;
  * ```
  */
-export declare const api: FilterApi<typeof fullApi, FunctionReference<any, "public">>;
+export declare const api: FilterApi<
+  typeof fullApi,
+  FunctionReference<any, "public">
+>;
 
 /**
  * A utility for referencing Convex functions in your app's internal API.
@@ -108,7 +121,10 @@ export declare const api: FilterApi<typeof fullApi, FunctionReference<any, "publ
  * const myFunctionReference = internal.myModule.myFunction;
  * ```
  */
-export declare const internal: FilterApi<typeof fullApi, FunctionReference<any, "internal">>;
+export declare const internal: FilterApi<
+  typeof fullApi,
+  FunctionReference<any, "internal">
+>;
 
 export declare const components: {
   betterAuth: import("@convex-dev/better-auth/_generated/component.js").ComponentApi<"betterAuth">;

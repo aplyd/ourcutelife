@@ -36,13 +36,47 @@ void test("non-prompting notification reconciliation never depends on requestPer
   assert.match(reconcileMatch.groups.body, /\.catch\(\(\) => null\)/);
 });
 
-void test("app start reports observation first and registers only after granted reconciliation", () => {
+void test("app start and membership creation report observation before granted registration", () => {
   const layout = readProjectFile("src/app/_layout.tsx");
 
   assert.match(layout, /reportPermissionObservation\(result\.observation\)/);
   assert.match(layout, /if \(result\.registration\)/);
   assert.match(layout, /registerGrantedDevice\(result\.registration\)/);
+  assert.match(
+    layout,
+    /betterAuthSession\.data\?\.session,[\s\S]*viewer\?\.membership\?\.coupleId,[\s\S]*registerGrantedDevice/,
+  );
   assert.doesNotMatch(layout, /requestServerPushRegistration/);
+});
+
+void test("both pairing paths register after membership mutation and backend defers their race", () => {
+  const pairing = readProjectFile("src/app/pairing.tsx");
+  const notificationState = readProjectFile("convex/pairingAcceptedNotificationState.ts");
+  const createHandler = pairing.slice(
+    pairing.indexOf("async function handleCreateCode"),
+    pairing.indexOf("async function handleJoin"),
+  );
+  const joinHandler = pairing.slice(
+    pairing.indexOf("async function handleJoin"),
+    pairing.indexOf("async function handleLeaveCouple"),
+  );
+
+  assert.match(pairing, /requestServerPushRegistration/);
+  assert.match(pairing, /reportPermissionObservation\(result\.observation\)/);
+  assert.match(pairing, /registerGrantedDevice\(result\.registration\)/);
+  assert.match(
+    createHandler,
+    /await createCoupleAndCode\([\s\S]*?await registerForNotificationsAfterPairing\(\)/,
+  );
+  assert.match(
+    joinHandler,
+    /await joinWithCode\([\s\S]*?await registerForNotificationsAfterPairing\(\)/,
+  );
+  assert.match(notificationState, /status: "awaiting_permission"/);
+  assert.match(
+    notificationState,
+    /ctx\.scheduler\.runAfter\([\s\S]*?dispatchPairingAcceptedNotification/,
+  );
 });
 
 void test("legacy push token registration requires canonical tokenIdentifier identity", () => {

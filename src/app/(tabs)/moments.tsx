@@ -1,6 +1,7 @@
 import { useAppQuery } from "@/lib/devMock";
 import { router } from "expo-router";
 import type { JSX } from "react";
+import { useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 
 import { api } from "../../../convex/_generated/api";
@@ -17,6 +18,15 @@ const toneLabels = {
   bad: "HARD",
 } as const;
 
+const momentFilters = [
+  ["all", "All"],
+  ["good", "Good"],
+  ["mixed", "Mixed"],
+  ["bad", "Hard"],
+] as const;
+
+type MomentFilter = (typeof momentFilters)[number][0];
+
 function formatDate(timestamp: number): string {
   return new Intl.DateTimeFormat("en", {
     month: "short",
@@ -27,6 +37,10 @@ function formatDate(timestamp: number): string {
 
 export default function MomentsTab(): JSX.Element {
   const moments = useAppQuery(api.moments.listMine, {});
+  const [momentFilter, setMomentFilter] = useState<MomentFilter>("all");
+  const filteredMoments = moments?.filter(
+    (moment) => momentFilter === "all" || moment.tone === momentFilter,
+  );
 
   return (
     <ScrollView className="flex-1 bg-[#fff8f1]" contentContainerClassName="px-3 pt-16 pb-28 gap-4">
@@ -50,6 +64,29 @@ export default function MomentsTab(): JSX.Element {
         <Text className="font-semibold text-white">Log a moment</Text>
       </Pressable>
 
+      <View className="flex-row flex-wrap gap-2">
+        {momentFilters.map(([value, label]) => (
+          <Pressable
+            key={value}
+            accessibilityLabel={`Show ${label.toLowerCase()} moments`}
+            accessibilityRole="button"
+            accessibilityState={{ selected: momentFilter === value }}
+            className={`rounded-full border px-4 py-2 ${
+              momentFilter === value
+                ? "border-[#7c3aed] bg-[#7c3aed]"
+                : "border-[#f1dfd2] bg-white/85"
+            }`}
+            onPress={() => setMomentFilter(value)}
+          >
+            <Text
+              className={`font-semibold ${momentFilter === value ? "text-white" : "text-[#6f5a50]"}`}
+            >
+              {label}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+
       {moments === undefined ? (
         <View className="py-10 items-center">
           <ActivityIndicator />
@@ -61,9 +98,18 @@ export default function MomentsTab(): JSX.Element {
             Start with one small thing that happened recently. Good, hard, or mixed all counts.
           </Text>
         </View>
+      ) : filteredMoments?.length === 0 ? (
+        <View className="rounded-3xl bg-white/80 p-4 border border-[#f1dfd2] gap-2">
+          <Text className="text-xl font-semibold text-[#2f211c]">
+            No {momentFilters.find(([value]) => value === momentFilter)?.[1].toLowerCase()} moments
+          </Text>
+          <Text className="text-base leading-6 text-[#6f5a50]">
+            Try another filter to look back on a different kind of day.
+          </Text>
+        </View>
       ) : (
         <View className="gap-3">
-          {moments.map((moment) => (
+          {filteredMoments?.map((moment) => (
             <Pressable
               key={moment._id}
               accessibilityLabel={`Open moment: ${moment.summary}`}

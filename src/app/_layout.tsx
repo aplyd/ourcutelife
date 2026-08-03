@@ -91,10 +91,18 @@ function RootStack(): JSX.Element {
   const registerGrantedDevice = useAppMutation(
     notificationDevicesApi.notificationDevices.registerGrantedDevice,
   );
+  const cleanupMyLegacyGlobalAvatar = useAppMutation(api.auth.cleanupMyLegacyGlobalAvatar);
 
   useEffect(() => {
     if (!betterAuthSession.isPending) void SplashScreen.hideAsync();
   }, [betterAuthSession.isPending]);
+
+  useEffect(() => {
+    if (!betterAuthSession.data?.session) return;
+    void cleanupMyLegacyGlobalAvatar().catch(() => {
+      // Legacy media cleanup is retried on the next authenticated app launch.
+    });
+  }, [betterAuthSession.data?.session, cleanupMyLegacyGlobalAvatar]);
 
   useEffect(() => {
     if (!betterAuthSession.data?.session) return;
@@ -124,7 +132,12 @@ function RootStack(): JSX.Element {
       cancelled = true;
       subscription.remove();
     };
-  }, [betterAuthSession.data?.session, registerGrantedDevice, reportPermissionObservation]);
+  }, [
+    betterAuthSession.data?.session,
+    viewer?.membership?.coupleId,
+    registerGrantedDevice,
+    reportPermissionObservation,
+  ]);
 
   return (
     <>

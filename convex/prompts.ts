@@ -5,6 +5,7 @@ import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
 import type { MutationCtx, QueryCtx } from "./_generated/server";
 import { internalMutation, mutation, query } from "./_generated/server";
+import { getCurrentAppUser } from "./auth";
 import {
   createDailyPromptDeliveryKey,
   getPromptDateInTimezone,
@@ -611,7 +612,7 @@ function isRecoverableTodayReadError(error: unknown): error is Error {
 export const today = query({
   args: {},
   handler: async (ctx) => {
-    const user = await getAuthenticatedUser(ctx);
+    const user = await getCurrentAppUser(ctx);
     if (!user) return null;
     let phase = "membership";
     let fallbackPromptDate = todayKey();

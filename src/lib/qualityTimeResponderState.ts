@@ -132,28 +132,34 @@ function deriveQualityTimeResponderProgressUnchecked(
 }
 
 export function buildQualityTimeOutcomeSummary(
+  selectedCategories: readonly unknown[],
   categoryResults: readonly unknown[],
 ): QualityTimeOutcomeSummary | null {
   try {
-    return buildQualityTimeOutcomeSummaryUnchecked(categoryResults);
+    return buildQualityTimeOutcomeSummaryUnchecked(selectedCategories, categoryResults);
   } catch {
     return null;
   }
 }
 
 function buildQualityTimeOutcomeSummaryUnchecked(
+  selectedCategories: readonly unknown[],
   categoryResults: readonly unknown[],
 ): QualityTimeOutcomeSummary | null {
+  const allowedCategories = parseUniqueCategories(selectedCategories);
+  if (!allowedCategories) return null;
   if (categoryResults.length < 1 || categoryResults.length > QUALITY_TIME_CATEGORIES.size)
     return null;
 
+  const allowedCategorySet = new Set(allowedCategories);
   const seenCategories = new Set<QualityTimeCategory>();
   const results: QualityTimeOutcomeSummaryResult[] = [];
   const summaryParts: string[] = [];
 
   for (const rawResult of categoryResults) {
     const result = parseCompletedCategoryResult(rawResult);
-    if (!result || seenCategories.has(result.category)) return null;
+    if (!result || !allowedCategorySet.has(result.category) || seenCategories.has(result.category))
+      return null;
     seenCategories.add(result.category);
     const categoryLabel = QUALITY_TIME_CATEGORY_LABELS[result.category];
 

@@ -11,7 +11,8 @@ import { runSingleInFlight } from "@/lib/runSingleInFlight";
 export default function TodayPromptSheet(): JSX.Element {
   const betterAuthSession = useSession();
   const viewer = useAppQuery(api.auth.viewer, {});
-  const todayPrompt = useAppQuery(api.prompts.today, {});
+  const hasCouple = Boolean(viewer?.couple);
+  const todayPrompt = useAppQuery(api.prompts.today, hasCouple ? {} : "skip");
   const reconcileLifecycle = useAppMutation(api.dailyPromptLifecycles.reconcileToday);
   const startAnswering = useAppMutation(api.prompts.startAnswering);
   const saveAnswer = useAppMutation(api.prompts.answer);
@@ -42,7 +43,7 @@ export default function TodayPromptSheet(): JSX.Element {
   }, [todayPrompt?.response]);
 
   if (!betterAuthSession.data?.session) return <Redirect href="/auth" />;
-  if (viewer === undefined || todayPrompt === undefined) {
+  if (viewer === undefined) {
     return (
       <View className="flex-1 bg-[#fff8f1] items-center justify-center">
         <ActivityIndicator />
@@ -50,6 +51,14 @@ export default function TodayPromptSheet(): JSX.Element {
     );
   }
   if (!viewer?.couple || viewer.memberCount < 2) return <Redirect href="/pairing" />;
+  if (todayPrompt === undefined) {
+    return (
+      <View className="flex-1 bg-[#fff8f1] items-center justify-center">
+        <ActivityIndicator />
+      </View>
+    );
+  }
+  if (!todayPrompt) return <Redirect href="/pairing" />;
 
   const promptData = todayPrompt;
 

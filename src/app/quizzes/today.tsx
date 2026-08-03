@@ -12,18 +12,26 @@ const choices = ["space", "touch", "humor", "clarity", "reassurance"];
 export default function TodayQuizScreen(): JSX.Element {
   const betterAuthSession = useSession();
   const viewer = useAppQuery(api.auth.viewer, {});
-  const todayPrompt = useAppQuery(api.prompts.today, {});
+  const hasCouple = Boolean(viewer?.couple);
+  const todayPrompt = useAppQuery(api.prompts.today, hasCouple ? {} : "skip");
   const [guess, setGuess] = useState<string | null>(null);
   const [revealed, setRevealed] = useState(false);
 
   if (!betterAuthSession.data?.session) return <Redirect href="/auth" />;
-  if (viewer === undefined || todayPrompt === undefined)
+  if (viewer === undefined)
     return (
       <View className="flex-1 bg-app-bg items-center justify-center">
         <ActivityIndicator />
       </View>
     );
   if (!viewer?.couple || viewer.memberCount < 2) return <Redirect href="/pairing" />;
+  if (todayPrompt === undefined)
+    return (
+      <View className="flex-1 bg-app-bg items-center justify-center">
+        <ActivityIndicator />
+      </View>
+    );
+  if (!todayPrompt) return <Redirect href="/pairing" />;
 
   const quiz = todayPrompt.quiz;
 

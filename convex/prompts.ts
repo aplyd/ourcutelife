@@ -577,7 +577,15 @@ export function getDailyPromptQuestions(promptDate: string) {
 export const today = query({
   args: {},
   handler: async (ctx) => {
-    const { user, membership } = await requireSession(ctx);
+    const user = await getAuthenticatedUser(ctx);
+    if (!user) throw new Error("Not signed in.");
+    const memberships = await ctx.db
+      .query("coupleMembers")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .take(2);
+    if (memberships.length === 0) return null;
+    if (memberships.length > 1) throw new Error("Ambiguous couple membership.");
+    const membership = memberships[0];
     const recent = await ctx.db
       .query("moments")
       .withIndex("by_couple_and_author_and_happened_at", (q) =>

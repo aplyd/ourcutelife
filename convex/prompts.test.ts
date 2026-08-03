@@ -28,6 +28,10 @@ const today = makeFunctionReference<
   }
 >("prompts:today");
 
+const todayForUnpairedUser = makeFunctionReference<"query", Record<string, never>, unknown>(
+  "prompts:today",
+);
+
 const getTodayStateForTesting = makeFunctionReference<
   "query",
   { nowMs: number; promptContentForTesting?: string },
@@ -194,6 +198,22 @@ async function answerAs(
     response,
   });
 }
+
+test("today returns no couple content for an authenticated user who has left their couple", async () => {
+  const t = convexTest(schema, modules);
+  await t.run(async (ctx) => {
+    await ctx.db.insert("users", {
+      authUserId: "unpaired-auth",
+      email: "unpaired@example.com",
+      createdAt: 1,
+      updatedAt: 1,
+    });
+  });
+
+  await expect(
+    t.withIdentity({ tokenIdentifier: "unpaired-auth" }).query(todayForUnpairedUser, {}),
+  ).resolves.toBe(null);
+});
 
 test("canonical reads and writes use the immutable assignment while tags and forged text cannot alter it", async () => {
   vi.useFakeTimers();

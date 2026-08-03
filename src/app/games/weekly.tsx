@@ -18,18 +18,26 @@ const prompts = [
 export default function WeeklyGameScreen(): JSX.Element {
   const betterAuthSession = useSession();
   const viewer = useAppQuery(api.auth.viewer, {});
-  const todayPrompt = useAppQuery(api.prompts.today, {});
+  const hasCouple = Boolean(viewer?.couple);
+  const todayPrompt = useAppQuery(api.prompts.today, hasCouple ? {} : "skip");
   const [checked, setChecked] = useState<number[]>([]);
   const [turn, setTurn] = useState(0);
 
   if (!betterAuthSession.data?.session) return <Redirect href="/auth" />;
-  if (viewer === undefined || todayPrompt === undefined)
+  if (viewer === undefined)
     return (
       <View className="flex-1 bg-app-bg items-center justify-center">
         <ActivityIndicator />
       </View>
     );
   if (!viewer?.couple || viewer.memberCount < 2) return <Redirect href="/pairing" />;
+  if (todayPrompt === undefined)
+    return (
+      <View className="flex-1 bg-app-bg items-center justify-center">
+        <ActivityIndicator />
+      </View>
+    );
+  if (!todayPrompt) return <Redirect href="/pairing" />;
 
   const game = todayPrompt.weeklyGame;
   const cards = [game.description, ...prompts].map((text, index) => ({ index, text }));

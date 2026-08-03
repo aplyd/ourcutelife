@@ -48,8 +48,9 @@ function formatDate(timestamp: number): string {
 export default function TodayTab(): JSX.Element {
   const betterAuthSession = useSession();
   const viewer = useAppQuery(api.auth.viewer, {});
-  const todayPrompt = useAppQuery(api.prompts.today, {});
-  const moments = useAppQuery(api.moments.listMine, {});
+  const hasCouple = Boolean(viewer?.couple);
+  const todayPrompt = useAppQuery(api.prompts.today, hasCouple ? {} : "skip");
+  const moments = useAppQuery(api.moments.listMine, hasCouple ? {} : "skip");
   const [nowTick, setNowTick] = useState(0);
 
   useEffect(() => {
@@ -63,7 +64,7 @@ export default function TodayTab(): JSX.Element {
   );
 
   if (!betterAuthSession.data?.session) return <Redirect href="/auth" />;
-  if (viewer === undefined || todayPrompt === undefined || moments === undefined) {
+  if (viewer === undefined) {
     return (
       <View className="flex-1 bg-app-bg items-center justify-center">
         <ActivityIndicator />
@@ -71,6 +72,14 @@ export default function TodayTab(): JSX.Element {
     );
   }
   if (!viewer?.couple) return <Redirect href="/pairing" />;
+  if (todayPrompt === undefined || moments === undefined) {
+    return (
+      <View className="flex-1 bg-app-bg items-center justify-center">
+        <ActivityIndicator />
+      </View>
+    );
+  }
+  if (!todayPrompt) return <Redirect href="/pairing" />;
 
   const partnerName = viewer.partner?.fullName ?? viewer.partner?.email ?? "your person";
   const promptData = todayPrompt;

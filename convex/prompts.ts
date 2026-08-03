@@ -628,19 +628,20 @@ export const today = query({
     }
     const members = await getExactCoupleMembers(ctx, membership.coupleId);
     const memberUserIds = new Set(members.map((member) => member.userId));
-    if (
-      responses.some(
-        (row) =>
-          !memberUserIds.has(row.userId) ||
-          !lifecycle?.promptId ||
-          row.prompt !== prompt.text ||
-          !row.response.trim(),
-      )
-    ) {
-      throw new Error("Daily prompt response mismatch.");
+    const hasIncompatibleResponses = responses.some(
+      (row) =>
+        !memberUserIds.has(row.userId) ||
+        !lifecycle?.promptId ||
+        row.prompt !== prompt.text ||
+        !row.response.trim(),
+    );
+    const readableResponses = hasIncompatibleResponses ? [] : responses;
+    if (hasIncompatibleResponses) {
+      console.error("prompts:today ignored incompatible legacy responses");
     }
-    const ownResponse = responses.find((response) => response.userId === user._id) ?? null;
-    const partnerResponse = responses.find((response) => response.userId !== user._id) ?? null;
+    const ownResponse = readableResponses.find((response) => response.userId === user._id) ?? null;
+    const partnerResponse =
+      readableResponses.find((response) => response.userId !== user._id) ?? null;
     return {
       promptDate,
       prompt: prompt.text,

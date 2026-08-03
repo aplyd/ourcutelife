@@ -326,9 +326,13 @@ test("today fails closed before revealing responses whose compatibility prompt m
     }
   });
 
-  await expect(
-    t.withIdentity({ tokenIdentifier: "creator-auth" }).query(today, {}),
-  ).rejects.toThrow("Daily prompt response mismatch.");
+  const result = await t.withIdentity({ tokenIdentifier: "creator-auth" }).query(today, {});
+  expect(result).toMatchObject({
+    response: null,
+    partnerHasAnswered: false,
+    partnerResponse: null,
+    isRevealed: false,
+  });
 });
 
 test("rollout reads use the shared deterministic seed fallback before a blocked planner creates a lifecycle", async () => {

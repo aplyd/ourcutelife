@@ -612,7 +612,7 @@ export const today = query({
   args: {},
   handler: async (ctx) => {
     const user = await getAuthenticatedUser(ctx);
-    if (!user) throw new Error("Not signed in.");
+    if (!user) return null;
     let phase = "membership";
     let fallbackPromptDate = todayKey();
     try {

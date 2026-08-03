@@ -215,9 +215,13 @@ test("today returns no couple content for an authenticated user who has left the
   ).resolves.toBe(null);
 });
 
-test("startup read rejects unauthenticated and ambiguous authenticated users", async () => {
+test("startup read returns no couple content while authentication is unavailable", async () => {
   const t = convexTest(schema, modules);
-  await expect(t.query(todayForUnpairedUser, {})).rejects.toThrow("Not signed in.");
+  await expect(t.query(todayForUnpairedUser, {})).resolves.toBe(null);
+});
+
+test("startup read rejects ambiguous authenticated users", async () => {
+  const t = convexTest(schema, modules);
   await t.run(async (ctx) => {
     for (const email of ["first@example.com", "second@example.com"]) {
       await ctx.db.insert("users", {

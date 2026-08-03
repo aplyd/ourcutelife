@@ -574,6 +574,40 @@ export function getDailyPromptQuestions(promptDate: string) {
   };
 }
 
+function buildPrivateTodayFallback(promptDate = todayKey()) {
+  const generated = chooseGeneratedContent(promptDate, []);
+  const prompt = getDeterministicDailyPromptFallback(promptDate);
+  return {
+    promptDate,
+    prompt: prompt.text,
+    promptPrinciple: prompt.principle,
+    weeklyTopic: generated.weeklyGame.description,
+    weeklyGame: generated.weeklyGame,
+    quiz: generated.quiz,
+    response: null,
+    answeredAt: null,
+    partnerHasAnswered: false,
+    partnerResponse: null,
+    partnerCount: 0,
+    isRevealed: false,
+  };
+}
+
+const recoverableTodayReadErrors = new Set([
+  "Duplicate daily prompt lifecycle.",
+  "Incompatible daily prompt state.",
+  "Assigned daily prompt was not found.",
+  "Assigned daily prompt is not approved.",
+  "Duplicate daily prompt fingerprint.",
+  "Duplicate daily prompt response.",
+  "Invalid daily prompt membership.",
+  "Malformed daily prompt lifecycle recipients.",
+]);
+
+function isRecoverableTodayReadError(error: unknown): error is Error {
+  return error instanceof Error && recoverableTodayReadErrors.has(error.message);
+}
+
 export const today = query({
   args: {},
   handler: async (ctx) => {
@@ -584,7 +618,10 @@ export const today = query({
       .withIndex("by_user", (q) => q.eq("userId", user._id))
       .take(2);
     if (memberships.length === 0) return null;
-    if (memberships.length > 1) throw new Error("Ambiguous couple membership.");
+    if (memberships.length > 1) {
+      console.error("prompts:today ignored ambiguous couple membership");
+      return null;
+    }
     const membership = memberships[0];
     const recent = await ctx.db
       .query("moments")
@@ -596,72 +633,78 @@ export const today = query({
       .then((items) => items.filter((item) => !item.deletedAt));
     const tags = Array.from(new Set(recent.flatMap((moment) => moment.tags)));
     const couple = await ctx.db.get(membership.coupleId);
-    const resolved = couple?.promptTimezone
-      ? await getAuthoritativePromptDate(
-          ctx,
-          membership.coupleId,
-          Date.now(),
-          couple.promptTimezone,
+    const now = Date.now();
+    const fallbackPromptDate = couple?.promptTimezone
+      ? getPromptDateInTimezone(now, couple.promptTimezone)
+      : todayKey();
+    try {
+      const resolved = couple?.promptTimezone
+        ? await getAuthoritativePromptDate(ctx, membership.coupleId, now, couple.promptTimezone)
+        : {
+            promptDate: todayKey(),
+            existing: await existingLifecycleForDate(ctx, membership.coupleId, todayKey()),
+          };
+      const { promptDate } = resolved;
+      const generated = chooseGeneratedContent(promptDate, tags);
+      const lifecycle = resolved.existing;
+      if (lifecycle) await validateLifecycleRecipients(ctx, lifecycle, user._id);
+      const prompt = lifecycle?.promptId
+        ? await getAssignedDailyPrompt(ctx, lifecycle)
+        : getDeterministicDailyPromptFallback(promptDate);
+      const responses = await ctx.db
+        .query("promptResponses")
+        .withIndex("by_couple_and_date", (q) =>
+          q.eq("coupleId", membership.coupleId).eq("promptDate", promptDate),
         )
-      : {
-          promptDate: todayKey(),
-          existing: await existingLifecycleForDate(ctx, membership.coupleId, todayKey()),
-        };
-    const { promptDate } = resolved;
-    const generated = chooseGeneratedContent(promptDate, tags);
-    const lifecycle = resolved.existing;
-    if (lifecycle) await validateLifecycleRecipients(ctx, lifecycle, user._id);
-    const prompt = lifecycle?.promptId
-      ? await getAssignedDailyPrompt(ctx, lifecycle)
-      : getDeterministicDailyPromptFallback(promptDate);
-    const responses = await ctx.db
-      .query("promptResponses")
-      .withIndex("by_couple_and_date", (q) =>
-        q.eq("coupleId", membership.coupleId).eq("promptDate", promptDate),
-      )
-      .take(3);
-    if (
-      responses.length > 2 ||
-      new Set(responses.map((row) => row.userId)).size !== responses.length
-    ) {
-      throw new Error("Duplicate daily prompt response.");
+        .take(3);
+      if (
+        responses.length > 2 ||
+        new Set(responses.map((row) => row.userId)).size !== responses.length
+      ) {
+        throw new Error("Duplicate daily prompt response.");
+      }
+      const members = await getExactCoupleMembers(ctx, membership.coupleId);
+      const memberUserIds = new Set(members.map((member) => member.userId));
+      const hasIncompatibleResponses = responses.some(
+        (row) =>
+          !memberUserIds.has(row.userId) ||
+          !lifecycle?.promptId ||
+          row.prompt !== prompt.text ||
+          !row.response.trim(),
+      );
+      const readableResponses = hasIncompatibleResponses ? [] : responses;
+      if (hasIncompatibleResponses) {
+        console.error("prompts:today ignored incompatible legacy responses");
+      }
+      const ownResponse =
+        readableResponses.find((response) => response.userId === user._id) ?? null;
+      const partnerResponse =
+        readableResponses.find((response) => response.userId !== user._id) ?? null;
+      return {
+        promptDate,
+        prompt: prompt.text,
+        promptPrinciple: prompt.principle,
+        weeklyTopic: generated.weeklyGame.description,
+        weeklyGame: generated.weeklyGame,
+        quiz: generated.quiz,
+        response: ownResponse?.response ?? null,
+        answeredAt: ownResponse?.createdAt ?? null,
+        partnerHasAnswered: Boolean(partnerResponse),
+        partnerResponse:
+          ownResponse && partnerResponse
+            ? {
+                response: partnerResponse.response,
+                answeredAt: partnerResponse.createdAt,
+              }
+            : null,
+        partnerCount: Math.max(0, members.length - 1),
+        isRevealed: Boolean(ownResponse && partnerResponse),
+      };
+    } catch (error) {
+      if (!isRecoverableTodayReadError(error)) throw error;
+      console.error("prompts:today returned a private fallback", error.message);
+      return buildPrivateTodayFallback(fallbackPromptDate);
     }
-    const members = await getExactCoupleMembers(ctx, membership.coupleId);
-    const memberUserIds = new Set(members.map((member) => member.userId));
-    const hasIncompatibleResponses = responses.some(
-      (row) =>
-        !memberUserIds.has(row.userId) ||
-        !lifecycle?.promptId ||
-        row.prompt !== prompt.text ||
-        !row.response.trim(),
-    );
-    const readableResponses = hasIncompatibleResponses ? [] : responses;
-    if (hasIncompatibleResponses) {
-      console.error("prompts:today ignored incompatible legacy responses");
-    }
-    const ownResponse = readableResponses.find((response) => response.userId === user._id) ?? null;
-    const partnerResponse =
-      readableResponses.find((response) => response.userId !== user._id) ?? null;
-    return {
-      promptDate,
-      prompt: prompt.text,
-      promptPrinciple: prompt.principle,
-      weeklyTopic: generated.weeklyGame.description,
-      weeklyGame: generated.weeklyGame,
-      quiz: generated.quiz,
-      response: ownResponse?.response ?? null,
-      answeredAt: ownResponse?.createdAt ?? null,
-      partnerHasAnswered: Boolean(partnerResponse),
-      partnerResponse:
-        ownResponse && partnerResponse
-          ? {
-              response: partnerResponse.response,
-              answeredAt: partnerResponse.createdAt,
-            }
-          : null,
-      partnerCount: Math.max(0, members.length - 1),
-      isRevealed: Boolean(ownResponse && partnerResponse),
-    };
   },
 });
 

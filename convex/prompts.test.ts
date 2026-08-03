@@ -215,6 +215,60 @@ test("today returns no couple content for an authenticated user who has left the
   ).resolves.toBe(null);
 });
 
+test("startup read rejects unauthenticated and ambiguous authenticated users", async () => {
+  const t = convexTest(schema, modules);
+  await expect(t.query(todayForUnpairedUser, {})).rejects.toThrow("Not signed in.");
+  await t.run(async (ctx) => {
+    for (const email of ["first@example.com", "second@example.com"]) {
+      await ctx.db.insert("users", {
+        authUserId: "duplicate-auth",
+        email,
+        createdAt: 1,
+        updatedAt: 1,
+      });
+    }
+  });
+
+  await expect(
+    t.withIdentity({ tokenIdentifier: "duplicate-auth" }).query(todayForUnpairedUser, {}),
+  ).rejects.toThrow("Ambiguous authenticated user.");
+});
+
+test("startup read returns no couple content for ambiguous membership while writes reject", async () => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date("2026-07-22T21:15:00.000Z"));
+  const t = convexTest(schema, modules);
+  const seeded = await seedCoupleWithLifecycle(t);
+  const other = await seedOtherCouple(t);
+  await t.run(async (ctx) => {
+    await ctx.db.insert("coupleMembers", {
+      coupleId: other.coupleId,
+      userId: seeded.creatorUserId,
+      role: "partner",
+      joinedAt: 30,
+    });
+  });
+
+  await expect(
+    t.withIdentity({ tokenIdentifier: "creator-auth" }).query(todayForUnpairedUser, {}),
+  ).resolves.toBe(null);
+  await expect(answerAs(t, "creator-auth")).rejects.toThrow("Ambiguous couple membership.");
+});
+
+test("startup read rethrows unexpected timezone failures", async () => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date("2026-07-22T21:15:00.000Z"));
+  const t = convexTest(schema, modules);
+  const seeded = await seedCoupleWithLifecycle(t);
+  await t.run(async (ctx) => {
+    await ctx.db.patch(seeded.coupleId, { promptTimezone: "not-a-timezone" });
+  });
+
+  await expect(
+    t.withIdentity({ tokenIdentifier: "creator-auth" }).query(today, {}),
+  ).rejects.toThrow("Invalid timezone: not-a-timezone");
+});
+
 test("canonical reads and writes use the immutable assignment while tags and forged text cannot alter it", async () => {
   vi.useFakeTimers();
   vi.setSystemTime(new Date("2026-07-22T21:15:00.000Z"));
@@ -389,9 +443,9 @@ test("rollout reads fall back for a legacy unassigned lifecycle while answer rem
   await expect(answerAs(t, "creator-auth")).rejects.toThrow("Daily prompt assignment is missing.");
 });
 
-test("rollout reads reject duplicate lifecycle state instead of selecting a fallback", async () => {
+test("startup read returns a private fallback while duplicate lifecycle writes remain fail-closed", async () => {
   vi.useFakeTimers();
-  vi.setSystemTime(new Date("2026-07-22T21:15:00.000Z"));
+  vi.setSystemTime(new Date("2026-07-23T01:15:00.000Z"));
   const t = convexTest(schema, modules);
   const seeded = await seedCoupleWithLifecycle(t);
   await t.run(async (ctx) => {
@@ -403,7 +457,14 @@ test("rollout reads reject duplicate lifecycle state instead of selecting a fall
 
   await expect(
     t.withIdentity({ tokenIdentifier: "creator-auth" }).query(today, {}),
-  ).rejects.toThrow("Duplicate daily prompt lifecycle.");
+  ).resolves.toMatchObject({
+    promptDate: "2026-07-22",
+    response: null,
+    partnerHasAnswered: false,
+    partnerResponse: null,
+    partnerCount: 0,
+    isRevealed: false,
+  });
   await expect(
     t.withIdentity({ tokenIdentifier: "creator-auth" }).query(getTodayStateForTesting, {
       nowMs: Date.now(),
@@ -445,7 +506,13 @@ test.each([
 
     await expect(
       t.withIdentity({ tokenIdentifier: "creator-auth" }).query(today, {}),
-    ).rejects.toThrow(/assignment|assigned daily prompt/i);
+    ).resolves.toMatchObject({
+      response: null,
+      partnerHasAnswered: false,
+      partnerResponse: null,
+      partnerCount: 0,
+      isRevealed: false,
+    });
     await expect(
       t.withIdentity({ tokenIdentifier: "creator-auth" }).query(getTodayStateForTesting, {
         nowMs: Date.now(),
@@ -470,7 +537,13 @@ test("a lifecycle referencing a missing assignment fails closed for both reads a
 
   await expect(
     t.withIdentity({ tokenIdentifier: "creator-auth" }).query(today, {}),
-  ).rejects.toThrow("Assigned daily prompt was not found.");
+  ).resolves.toMatchObject({
+    response: null,
+    partnerHasAnswered: false,
+    partnerResponse: null,
+    partnerCount: 0,
+    isRevealed: false,
+  });
   await expect(
     t.withIdentity({ tokenIdentifier: "creator-auth" }).query(getTodayStateForTesting, {
       nowMs: Date.now(),
@@ -504,7 +577,13 @@ test("duplicate assigned prompt fingerprint fails closed before reading or savin
 
   await expect(
     t.withIdentity({ tokenIdentifier: "creator-auth" }).query(today, {}),
-  ).rejects.toThrow("Duplicate daily prompt fingerprint.");
+  ).resolves.toMatchObject({
+    response: null,
+    partnerHasAnswered: false,
+    partnerResponse: null,
+    partnerCount: 0,
+    isRevealed: false,
+  });
   await expect(
     t.withIdentity({ tokenIdentifier: "creator-auth" }).query(getTodayStateForTesting, {
       nowMs: Date.now(),

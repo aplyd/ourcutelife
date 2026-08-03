@@ -2,12 +2,13 @@ import { useAppMutation } from "@/lib/devMock";
 import type { JSX } from "react";
 import { useEffect } from "react";
 import type { FunctionReference } from "convex/server";
+import type { ErrorBoundaryProps } from "expo-router";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
 import { HeroUINativeProvider } from "heroui-native";
-import { AppState } from "react-native";
+import { AppState, Pressable, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { api } from "../../convex/_generated/api";
@@ -19,6 +20,25 @@ import { UpdateProvider } from "@/providers/update-provider";
 import "../global.css";
 
 void SplashScreen.preventAutoHideAsync();
+
+export function ErrorBoundary({ error, retry }: ErrorBoundaryProps): JSX.Element {
+  return (
+    <View className="flex-1 items-center justify-center gap-4 bg-app-bg px-8">
+      <Text className="text-center text-3xl font-bold text-ink">We hit a snag</Text>
+      <Text className="text-center text-base leading-6 text-muted">
+        {__DEV__ ? error.message : "Your data is safe. Try loading this screen again."}
+      </Text>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Try again"
+        className="rounded-2xl bg-accent px-6 py-4"
+        onPress={retry}
+      >
+        <Text className="text-base font-bold text-white">Try again</Text>
+      </Pressable>
+    </View>
+  );
+}
 
 type ReportPermissionObservationArgs = {
   deviceId: string;

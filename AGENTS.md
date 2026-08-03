@@ -14,12 +14,12 @@ Agent hook: before committing or pushing code changes, run `pnpm format:fix` so 
 
 <!-- convex-ai-end -->
 
-# GSD / loop-engineering conventions
+# Lightweight engineering workflow
 
-- Read `AGENT_WORKFLOW.md` after this router for the standard execution loop, validation/review expectations, and definition of done.
-- Use `.planning/` as canonical project roadmap and agent state.
-- Treat Apple Notes/Reminders as intake only; normalize useful items into `.planning/INBOX.md`, roadmap, phase context, or task plans before acting.
-- Read `.planning/STATE.md`, `.planning/ROADMAP.md`, and `.planning/DECISIONS.md` before deciding next work.
-- Update `.planning/STATE.md` after meaningful work sessions.
-- For mobile/React Native/Expo/UI work, use Argent simulator/device tooling for inspection and verification when available. Include screenshots, route names, or concrete walkthrough evidence in summaries.
-- Specialist agents delegated from the main Hermes profile should work from a bounded plan, run verification commands, and report evidence back for main-agent review.
+- Read `AGENT_WORKFLOW.md` for the default execution loop.
+- Start with a short objective and acceptance criteria. Inspect only the code and project documents relevant to that objective.
+- Existing `.planning/` files remain useful roadmap/history, but they are not mandatory reading or per-session bookkeeping.
+- Use full GSD phase planning only for multi-week initiatives, major migrations, sensitive data/billing work, or several dependent workstreams.
+- Apple Notes and Reminders are optional intake surfaces, not state mirrors. Do not duplicate routine progress across them and `.planning/`.
+- For mobile/React Native/Expo/UI work, use Argent simulator/device tooling for inspection and verification when available. Include concrete route, accessibility-tree, gesture, or screenshot evidence.
+- Run relevant automated checks and runtime verification. Use an independent review before shipping meaningful or high-risk changes, not after every trivial slice.

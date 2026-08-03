@@ -3,7 +3,7 @@ import * as AppleAuthentication from "expo-apple-authentication";
 import type { JSX } from "react";
 import { useState } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
-import { Redirect, router } from "expo-router";
+import { Redirect } from "expo-router";
 
 import { api } from "../../convex/_generated/api";
 import { authClient, useSession } from "@/lib/betterAuth";
@@ -49,7 +49,6 @@ export default function AuthLanding(): JSX.Element {
 
       if (result.error) throw new Error(result.error.message ?? "Apple sign in failed.");
       await syncBetterAuthUser();
-      router.replace("/");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Apple sign in failed.");
     } finally {
@@ -79,7 +78,8 @@ export default function AuthLanding(): JSX.Element {
           )}
         </Pressable>
         <Text className="text-center text-sm text-[#8c766b]">
-          Sign in is handled by Better Auth and Convex. No device-owned session tokens.
+          Your session is stored securely in iOS Keychain and may survive an app reinstall. Sign out
+          in the app to clear it from this device.
         </Text>
         {error ? <Text className="text-center text-sm text-red-700">{error}</Text> : null}
       </View>

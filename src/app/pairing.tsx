@@ -1,9 +1,10 @@
 import { useAppMutation, useAppQuery } from "@/lib/devMock";
-import { Redirect, router } from "expo-router";
+import { Redirect } from "expo-router";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Pressable,
   ScrollView,
   Share,
@@ -14,6 +15,7 @@ import {
 
 import { api } from "../../convex/_generated/api";
 import { authClient, useSession } from "@/lib/betterAuth";
+import { resolveMembershipAccess } from "@/lib/membershipAccess";
 
 function formatExpiry(expiresAt: number | null | undefined): string | null {
   if (!expiresAt) return null;
@@ -35,7 +37,12 @@ export default function PairingScreen(): JSX.Element {
   const viewer = useAppQuery(api.auth.viewer, {});
   const createCoupleAndCode = useAppMutation(api.pairing.createCoupleAndCode);
   const joinWithCode = useAppMutation(api.pairing.joinWithCode);
-  const pairWithTestPartner = useAppMutation(api.pairing.pairWithTestPartner);
+  const leaveCouple = useAppMutation(api.pairing.leaveCouple);
+  const membershipAccess = resolveMembershipAccess({
+    sessionPending: betterAuthSession.isPending,
+    hasSession: Boolean(betterAuthSession.data?.session),
+    viewer,
+  });
 
   const [anniversaryDateText, setAnniversaryDateText] = useState(() =>
     new Date().toISOString().slice(0, 10),
@@ -52,15 +59,15 @@ export default function PairingScreen(): JSX.Element {
     return Math.max(0, Math.floor(diff / 86_400_000));
   }, [anniversaryDateText]);
 
-  if (!betterAuthSession.data?.session) return <Redirect href="/auth" />;
-  if (viewer === undefined) {
+  if (membershipAccess === "signed-out") return <Redirect href="/auth" />;
+  if (membershipAccess === "loading") {
     return (
       <View className="flex-1 bg-[#fff8f1] items-center justify-center">
         <ActivityIndicator />
       </View>
     );
   }
-  if (viewer?.couple && viewer.memberCount >= 2) return <Redirect href="/(tabs)" />;
+  if (membershipAccess === "paired") return <Redirect href="/(tabs)" />;
 
   async function handleCreateCode() {
     const anniversaryTime = new Date(`${anniversaryDateText}T00:00:00`).getTime();
@@ -90,7 +97,6 @@ export default function PairingScreen(): JSX.Element {
       await joinWithCode({
         code,
       });
-      router.replace("/(tabs)");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not join with that code.");
     } finally {
@@ -98,22 +104,27 @@ export default function PairingScreen(): JSX.Element {
     }
   }
 
-  async function handlePairWithTestPartner() {
-    const anniversaryTime = new Date(`${anniversaryDateText}T00:00:00`).getTime();
-    if (!Number.isFinite(anniversaryTime)) {
-      setError("Enter the anniversary date as YYYY-MM-DD.");
-      return;
-    }
-    setError(null);
-    setIsWorking(true);
-    try {
-      await pairWithTestPartner({ anniversaryDate: anniversaryTime });
-      router.replace("/(tabs)");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not create the test pairing.");
-    } finally {
-      setIsWorking(false);
-    }
+  function handleResetPairing() {
+    Alert.alert(
+      "Reset pairing setup?",
+      "This removes your account from every current relationship link so you can pair again. Your partner, shared memories, and relationship data are not deleted.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Reset pairing setup",
+          style: "destructive",
+          onPress: () => {
+            setError(null);
+            setIsWorking(true);
+            void leaveCouple({})
+              .catch((err: unknown) => {
+                setError(err instanceof Error ? err.message : "Could not reset pairing setup.");
+              })
+              .finally(() => setIsWorking(false));
+          },
+        },
+      ],
+    );
   }
 
   const displayedCode = generatedCode ?? viewer?.activePairingCode ?? null;
@@ -197,20 +208,22 @@ export default function PairingScreen(): JSX.Element {
         </Pressable>
       </View>
 
-      <View className="rounded-3xl bg-[#f4ecff] p-4 gap-3 border border-[#ded0ff]">
-        <Text className="text-xl font-semibold text-[#2f211c]">TestFlight shortcut</Text>
-        <Text className="text-sm leading-5 text-[#6f5a50]">
-          Pair this account with a temporary test partner and reserve code 000-000 so you can
-          inspect the rest of the app in production.
-        </Text>
-        <Pressable
-          className="h-12 rounded-full bg-[#7c3aed] items-center justify-center"
-          disabled={isWorking}
-          onPress={handlePairWithTestPartner}
-        >
-          <Text className="font-semibold text-white">Use test partner</Text>
-        </Pressable>
-      </View>
+      {viewer?.membership ? (
+        <View className="rounded-3xl bg-white/80 p-4 gap-3 border border-[#f1dfd2]">
+          <Text className="text-lg font-semibold text-[#2f211c]">Pairing not working?</Text>
+          <Text className="text-sm leading-5 text-[#6f5a50]">
+            Clear this account’s current relationship links, then create or join a fresh pairing.
+          </Text>
+          <Pressable
+            accessibilityRole="button"
+            className="h-11 rounded-full border border-red-300 items-center justify-center"
+            disabled={isWorking}
+            onPress={handleResetPairing}
+          >
+            <Text className="font-semibold text-red-700">Reset pairing setup</Text>
+          </Pressable>
+        </View>
+      ) : null}
 
       {error ? <Text className="text-center text-sm text-red-700">{error}</Text> : null}
       <Pressable className="items-center" onPress={() => void authClient.signOut()}>

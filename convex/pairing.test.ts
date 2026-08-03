@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 import { convexTest } from "convex-test";
 import { makeFunctionReference } from "convex/server";
-import { expect, test } from "vitest";
+import { expect, test, vi } from "vitest";
 
 import schema from "./schema";
 
@@ -100,13 +100,50 @@ async function seedCouple(t: ReturnType<typeof convexTest>) {
 test("authenticated user leaves without deleting their partner or shared couple data", async () => {
   const t = convexTest(schema, modules);
   const seeded = await seedCouple(t);
+  await t.run(async (ctx) => {
+    for (let index = 0; index < 64; index += 1) {
+      await ctx.db.insert("pairingCodes", {
+        coupleId: seeded.coupleId,
+        createdByUserId: seeded.departingUserId,
+        code: String(200000 + index),
+        expiresAt: Date.now() + 60_000,
+        createdAt: index + 2,
+      });
+      await ctx.db.insert("notificationDevices", {
+        coupleId: seeded.coupleId,
+        userId: seeded.departingUserId,
+        deviceId: `departing-extra-${index}`,
+        platform: "ios",
+        permissionStatus: "granted",
+        enabled: true,
+        createdAt: index + 2,
+        updatedAt: index + 2,
+      });
+    }
+  });
 
-  await expect(
-    t.withIdentity({ tokenIdentifier: "departing-auth" }).mutation(leaveCouple, {}),
-  ).resolves.toEqual({ left: true });
+  vi.useFakeTimers();
+  try {
+    await expect(
+      t.withIdentity({ tokenIdentifier: "departing-auth" }).mutation(leaveCouple, {}),
+    ).resolves.toEqual({ left: true });
+    await t.finishAllScheduledFunctions(vi.runAllTimers);
+  } finally {
+    vi.useRealTimers();
+  }
 
   const state = await t.run(async (ctx) => ({
     activeCode: await ctx.db.get(seeded.activeCodeId),
+    allCodes: await ctx.db
+      .query("pairingCodes")
+      .withIndex("by_couple", (q) => q.eq("coupleId", seeded.coupleId))
+      .collect(),
+    allDepartingDevices: await ctx.db
+      .query("notificationDevices")
+      .withIndex("by_couple_id_and_user_id", (q) =>
+        q.eq("coupleId", seeded.coupleId).eq("userId", seeded.departingUserId),
+      )
+      .collect(),
     couple: await ctx.db.get(seeded.coupleId),
     departingDevice: await ctx.db.get(seeded.departingDeviceId),
     departingMembership: await ctx.db.get(seeded.departingMembershipId),
@@ -124,6 +161,10 @@ test("authenticated user leaves without deleting their partner or shared couple 
   expect(state.couple).not.toBeNull();
   expect(state.moment).toMatchObject({ summary: "Shared memory", coupleId: seeded.coupleId });
   expect(state.activeCode?.usedAt).toEqual(expect.any(Number));
+  expect(state.allCodes).toHaveLength(65);
+  expect(state.allCodes.every((code) => typeof code.usedAt === "number")).toBe(true);
+  expect(state.allDepartingDevices).toHaveLength(65);
+  expect(state.allDepartingDevices.every((device) => !device.enabled)).toBe(true);
   expect(state.departingDevice).toMatchObject({ enabled: false, coupleId: seeded.coupleId });
   expect(state.partnerDevice).toMatchObject({ enabled: true, coupleId: seeded.coupleId });
 
@@ -135,7 +176,7 @@ test("authenticated user leaves without deleting their partner or shared couple 
   ).resolves.not.toBeNull();
 });
 
-test("leave couple fails closed for ambiguous membership without changing either couple", async () => {
+test("leave couple removes every caller membership so ambiguous pairing can recover", async () => {
   const t = convexTest(schema, modules);
   const seeded = await seedCouple(t);
   const secondCoupleId = await t.run(async (ctx) => {
@@ -153,10 +194,32 @@ test("leave couple fails closed for ambiguous membership without changing either
     });
     return coupleId;
   });
+  const danglingCoupleId = await t.run(async (ctx) => {
+    const coupleId = await ctx.db.insert("couples", {
+      name: "Deleted",
+      createdByUserId: seeded.departingUserId,
+      createdAt: 3,
+      updatedAt: 3,
+    });
+    await ctx.db.insert("coupleMembers", {
+      coupleId,
+      userId: seeded.departingUserId,
+      role: "partner",
+      joinedAt: 3,
+    });
+    await ctx.db.delete(coupleId);
+    return coupleId;
+  });
 
-  await expect(
-    t.withIdentity({ tokenIdentifier: "departing-auth" }).mutation(leaveCouple, {}),
-  ).rejects.toThrow("Ambiguous couple membership.");
+  vi.useFakeTimers();
+  try {
+    await expect(
+      t.withIdentity({ tokenIdentifier: "departing-auth" }).mutation(leaveCouple, {}),
+    ).resolves.toEqual({ left: true });
+    await t.finishAllScheduledFunctions(vi.runAllTimers);
+  } finally {
+    vi.useRealTimers();
+  }
 
   const memberships = await t.run(async (ctx) =>
     ctx.db
@@ -164,8 +227,11 @@ test("leave couple fails closed for ambiguous membership without changing either
       .withIndex("by_user", (q) => q.eq("userId", seeded.departingUserId))
       .take(3),
   );
-  expect(memberships.map((membership) => membership.coupleId)).toEqual([
-    seeded.coupleId,
-    secondCoupleId,
-  ]);
+  expect(memberships).toEqual([]);
+  await expect(
+    t.run(async (ctx) => ctx.db.get(seeded.partnerMembershipId)),
+  ).resolves.not.toBeNull();
+  await expect(t.run(async (ctx) => ctx.db.get(seeded.coupleId))).resolves.not.toBeNull();
+  await expect(t.run(async (ctx) => ctx.db.get(secondCoupleId))).resolves.not.toBeNull();
+  await expect(t.run(async (ctx) => ctx.db.get(danglingCoupleId))).resolves.toBeNull();
 });

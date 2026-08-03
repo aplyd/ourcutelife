@@ -1,4 +1,4 @@
-import { useAppMutation } from "@/lib/devMock";
+import { useAppMutation, useAppQuery } from "@/lib/devMock";
 import type { JSX } from "react";
 import { useEffect } from "react";
 import type { FunctionReference } from "convex/server";
@@ -15,6 +15,7 @@ import { api } from "../../convex/_generated/api";
 import { authClient, useSession } from "@/lib/betterAuth";
 import { convex } from "@/lib/convex";
 import { getErrorSupportCode } from "@/lib/errorSupportCode";
+import { resolveMembershipAccess } from "@/lib/membershipAccess";
 import { ThemeProvider, useAppTheme } from "@/lib/theme";
 import { reconcileServerPushRegistration } from "@/lib/notifications";
 import { UpdateProvider } from "@/providers/update-provider";
@@ -75,6 +76,15 @@ const notificationDevicesApi = api as typeof api & {
 function RootStack(): JSX.Element {
   const { resolvedTheme } = useAppTheme();
   const betterAuthSession = useSession();
+  const viewer = useAppQuery(
+    api.auth.viewer,
+    betterAuthSession.data?.session && !betterAuthSession.isPending ? {} : "skip",
+  );
+  const membershipAccess = resolveMembershipAccess({
+    sessionPending: betterAuthSession.isPending,
+    hasSession: Boolean(betterAuthSession.data?.session),
+    viewer,
+  });
   const reportPermissionObservation = useAppMutation(
     notificationDevicesApi.notificationDevices.reportPermissionObservation,
   );
@@ -119,31 +129,44 @@ function RootStack(): JSX.Element {
   return (
     <>
       <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="index" />
-        <Stack.Screen name="auth" />
-        <Stack.Screen name="pairing" />
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen
-          name="(sheet)"
-          options={{
-            contentStyle: {
-              backgroundColor: "transparent",
-            },
-            presentation: "formSheet",
-            headerShown: false,
-            gestureDirection: "vertical",
-            gestureResponseDistance: {
-              top: 50,
-              bottom: 50,
-            },
-            animation: "slide_from_bottom",
-            sheetGrabberVisible: false,
-            sheetInitialDetentIndex: 1,
-            sheetAllowedDetents: [0.3, 0.8],
-            sheetExpandsWhenScrolledToEdge: true,
-            sheetCornerRadius: 48,
-          }}
-        />
+        <Stack.Protected guard={membershipAccess === "loading"}>
+          <Stack.Screen name="index" />
+        </Stack.Protected>
+        <Stack.Protected guard={membershipAccess === "signed-out"}>
+          <Stack.Screen name="auth" />
+        </Stack.Protected>
+        <Stack.Protected guard={membershipAccess === "pairing"}>
+          <Stack.Screen name="pairing" />
+        </Stack.Protected>
+        <Stack.Protected guard={membershipAccess === "paired"}>
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen
+            name="(sheet)"
+            options={{
+              contentStyle: {
+                backgroundColor: "transparent",
+              },
+              presentation: "formSheet",
+              headerShown: false,
+              gestureDirection: "vertical",
+              gestureResponseDistance: {
+                top: 50,
+                bottom: 50,
+              },
+              animation: "slide_from_bottom",
+              sheetGrabberVisible: false,
+              sheetInitialDetentIndex: 1,
+              sheetAllowedDetents: [0.3, 0.8],
+              sheetExpandsWhenScrolledToEdge: true,
+              sheetCornerRadius: 48,
+            }}
+          />
+          <Stack.Screen name="account" />
+          <Stack.Screen name="moments" />
+          <Stack.Screen name="plans" />
+          <Stack.Screen name="games" />
+          <Stack.Screen name="quizzes" />
+        </Stack.Protected>
       </Stack>
       <StatusBar style={resolvedTheme === "dark" ? "light" : "dark"} />
     </>

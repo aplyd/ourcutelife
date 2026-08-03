@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import type { Doc, Id } from "./_generated/dataModel";
 import type { MutationCtx } from "./_generated/server";
-import { mutation } from "./_generated/server";
+import { internalMutation, mutation } from "./_generated/server";
 import { getCurrentAppUser } from "./auth";
 import { createDatePlanItemKey } from "./datePlanDedupe";
 
@@ -234,7 +234,7 @@ export const joinWithCode = mutation({
   },
 });
 
-export const pairWithTestPartner = mutation({
+export const pairWithTestPartner = internalMutation({
   args: {
     anniversaryDate: v.number(),
   },

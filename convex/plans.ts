@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import type { Doc, Id } from "./_generated/dataModel";
 import type { MutationCtx, QueryCtx } from "./_generated/server";
-import { mutation, query } from "./_generated/server";
+import { internalMutation, mutation, query } from "./_generated/server";
 import { getCurrentAppUser } from "./auth";
 import { createDatePlanItemKey, shouldCreateDatePlanForItems } from "./datePlanDedupe";
 import {
@@ -116,7 +116,7 @@ async function requireSession(ctx: QueryCtx | MutationCtx) {
   return { user, membership };
 }
 
-export const seedDemoPartnerData = mutation({
+export const seedDemoPartnerData = internalMutation({
   args: {},
   handler: async (ctx) => {
     const { user, membership } = await requireSession(ctx);

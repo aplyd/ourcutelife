@@ -1,4 +1,4 @@
-import { useAppMutation, useAppQuery } from "@/lib/devMock";
+import { isDevMockAuthEnabled, useAppMutation, useAppQuery } from "@/lib/devMock";
 import type { JSX } from "react";
 import { useEffect } from "react";
 import type { FunctionReference } from "convex/server";
@@ -17,7 +17,6 @@ import { convex } from "@/lib/convex";
 import { getErrorSupportCode } from "@/lib/errorSupportCode";
 import { resolveMembershipAccess } from "@/lib/membershipAccess";
 import { ThemeProvider, useAppTheme } from "@/lib/theme";
-import { reconcileServerPushRegistration } from "@/lib/notifications";
 import { UpdateProvider } from "@/providers/update-provider";
 import "../global.css";
 
@@ -105,11 +104,12 @@ function RootStack(): JSX.Element {
   }, [betterAuthSession.data?.session, cleanupMyLegacyGlobalAvatar]);
 
   useEffect(() => {
-    if (!betterAuthSession.data?.session) return;
+    if (isDevMockAuthEnabled || !betterAuthSession.data?.session) return;
 
     let cancelled = false;
     const reconcile = () => {
-      void reconcileServerPushRegistration()
+      void import("@/lib/notifications")
+        .then(({ reconcileServerPushRegistration }) => reconcileServerPushRegistration())
         .then(async (result) => {
           if (cancelled) return;
           await reportPermissionObservation(result.observation);
@@ -176,9 +176,14 @@ function RootStack(): JSX.Element {
           />
           <Stack.Screen name="account" />
           <Stack.Screen name="moments" />
-          <Stack.Screen name="plans" />
-          <Stack.Screen name="games" />
-          <Stack.Screen name="quizzes" />
+          <Stack.Screen name="plans/history" />
+          <Stack.Screen name="plans/match/[category]" />
+          <Stack.Screen name="plans/quality-time/new" />
+          <Stack.Screen name="plans/quality-time/[requestId]" />
+          <Stack.Screen name="plans/quality-time/[requestId]/respond" />
+          <Stack.Screen name="plans/quality-time/[requestId]/outcome" />
+          <Stack.Screen name="games/weekly" />
+          <Stack.Screen name="quizzes/today" />
         </Stack.Protected>
       </Stack>
       <StatusBar style={resolvedTheme === "dark" ? "light" : "dark"} />

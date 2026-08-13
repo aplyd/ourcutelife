@@ -1,0 +1,825 @@
+{
+  "status": "ok",
+  "screenFrame": {
+    "x": 0,
+    "y": 0,
+    "width": 402,
+    "height": 874
+  },
+  "elements": [
+    {
+      "frame": {
+        "x": 12,
+        "y": 64,
+        "width": 378,
+        "height": 20
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 74
+      },
+      "normalizedFrame": {
+        "x": 0.029850746268656716,
+        "y": 0.07322654462242563,
+        "width": 0.9402985074626866,
+        "height": 0.02288329519450801
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.08466819221967964
+      },
+      "traits": ["staticText"],
+      "label": "TODAY"
+    },
+    {
+      "frame": {
+        "x": 12,
+        "y": 92,
+        "width": 378,
+        "height": 80
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 132
+      },
+      "normalizedFrame": {
+        "x": 0.029850746268656716,
+        "y": 0.10526315789473684,
+        "width": 0.9402985074626866,
+        "height": 0.09153318077803203
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.15102974828375287
+      },
+      "traits": ["staticText"],
+      "label": "Your cute little daily reset"
+    },
+    {
+      "frame": {
+        "x": 12,
+        "y": 180,
+        "width": 378,
+        "height": 48
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 204
+      },
+      "normalizedFrame": {
+        "x": 0.029850746268656716,
+        "y": 0.20594965675057209,
+        "width": 0.9402985074626866,
+        "height": 0.05491990846681922
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.2334096109839817
+      },
+      "traits": ["staticText"],
+      "label": "Check in, answer the tiny prompt, and keep the good/hard stuff from disappearing."
+    },
+    {
+      "frame": {
+        "x": 45.66666603088379,
+        "y": 282.3333330154419,
+        "width": 10.333332061767578,
+        "height": 17
+      },
+      "tapPoint": {
+        "x": 50.83333206176758,
+        "y": 290.8333330154419
+      },
+      "normalizedFrame": {
+        "x": 0.11359867171861639,
+        "y": 0.3230358501320845,
+        "width": 0.025704806123799946,
+        "height": 0.019450800915331808
+      },
+      "normalizedTapPoint": {
+        "x": 0.12645107478051637,
+        "y": 0.3327612505897505
+      },
+      "traits": ["staticText"],
+      "label": "A"
+    },
+    {
+      "frame": {
+        "x": 70.33333396911621,
+        "y": 282.3333330154419,
+        "width": 9.333328247070312,
+        "height": 17
+      },
+      "tapPoint": {
+        "x": 74.99999809265137,
+        "y": 290.8333330154419
+      },
+      "normalizedFrame": {
+        "x": 0.17495854221173188,
+        "y": 0.3230358501320845,
+        "width": 0.02321723444544854,
+        "height": 0.019450800915331808
+      },
+      "normalizedTapPoint": {
+        "x": 0.18656715943445615,
+        "y": 0.3327612505897505
+      },
+      "traits": ["staticText"],
+      "label": "T"
+    },
+    {
+      "frame": {
+        "x": 105,
+        "y": 257,
+        "width": 268,
+        "height": 20
+      },
+      "tapPoint": {
+        "x": 239,
+        "y": 267
+      },
+      "normalizedFrame": {
+        "x": 0.26119402985074625,
+        "y": 0.2940503432494279,
+        "width": 0.6666666666666666,
+        "height": 0.02288329519450801
+      },
+      "normalizedTapPoint": {
+        "x": 0.5945273631840796,
+        "y": 0.30549199084668194
+      },
+      "traits": ["staticText"],
+      "label": "TOGETHER FOR"
+    },
+    {
+      "frame": {
+        "x": 105,
+        "y": 277,
+        "width": 268,
+        "height": 48
+      },
+      "tapPoint": {
+        "x": 239,
+        "y": 301
+      },
+      "normalizedFrame": {
+        "x": 0.26119402985074625,
+        "y": 0.3169336384439359,
+        "width": 0.6666666666666666,
+        "height": 0.05491990846681922
+      },
+      "normalizedTapPoint": {
+        "x": 0.5945273631840796,
+        "y": 0.34439359267734554
+      },
+      "traits": ["staticText"],
+      "label": "You and Test Partner have been together for…"
+    },
+    {
+      "frame": {
+        "x": 29,
+        "y": 341,
+        "width": 86,
+        "height": 75.66665649414062
+      },
+      "tapPoint": {
+        "x": 72,
+        "y": 378.8333282470703
+      },
+      "normalizedFrame": {
+        "x": 0.07213930348258707,
+        "y": 0.3901601830663616,
+        "width": 0.21393034825870647,
+        "height": 0.08657512184684282
+      },
+      "normalizedTapPoint": {
+        "x": 0.1791044776119403,
+        "y": 0.433447743989783
+      },
+      "traits": [],
+      "label": "4 years",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 123,
+        "y": 341,
+        "width": 86,
+        "height": 75.66665649414062
+      },
+      "tapPoint": {
+        "x": 166,
+        "y": 378.8333282470703
+      },
+      "normalizedFrame": {
+        "x": 0.30597014925373134,
+        "y": 0.3901601830663616,
+        "width": 0.21393034825870647,
+        "height": 0.08657512184684282
+      },
+      "normalizedTapPoint": {
+        "x": 0.4129353233830846,
+        "y": 0.433447743989783
+      },
+      "traits": [],
+      "label": "6 months",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 217,
+        "y": 341,
+        "width": 86,
+        "height": 75.66665649414062
+      },
+      "tapPoint": {
+        "x": 260,
+        "y": 378.8333282470703
+      },
+      "normalizedFrame": {
+        "x": 0.5398009950248757,
+        "y": 0.3901601830663616,
+        "width": 0.21393034825870647,
+        "height": 0.08657512184684282
+      },
+      "normalizedTapPoint": {
+        "x": 0.6467661691542289,
+        "y": 0.433447743989783
+      },
+      "traits": [],
+      "label": "3 weeks",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 29,
+        "y": 424.66666412353516,
+        "width": 86,
+        "height": 75.66668701171875
+      },
+      "tapPoint": {
+        "x": 72,
+        "y": 462.50000762939453
+      },
+      "normalizedFrame": {
+        "x": 0.07213930348258707,
+        "y": 0.48588863172029195,
+        "width": 0.21393034825870647,
+        "height": 0.08657515676398027
+      },
+      "normalizedTapPoint": {
+        "x": 0.1791044776119403,
+        "y": 0.5291762101022821
+      },
+      "traits": [],
+      "label": "3 days",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 123,
+        "y": 424.66666412353516,
+        "width": 86,
+        "height": 75.66668701171875
+      },
+      "tapPoint": {
+        "x": 166,
+        "y": 462.50000762939453
+      },
+      "normalizedFrame": {
+        "x": 0.30597014925373134,
+        "y": 0.48588863172029195,
+        "width": 0.21393034825870647,
+        "height": 0.08657515676398027
+      },
+      "normalizedTapPoint": {
+        "x": 0.4129353233830846,
+        "y": 0.5291762101022821
+      },
+      "traits": [],
+      "label": "6 hours",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 217,
+        "y": 424.66666412353516,
+        "width": 86,
+        "height": 75.66668701171875
+      },
+      "tapPoint": {
+        "x": 260,
+        "y": 462.50000762939453
+      },
+      "normalizedFrame": {
+        "x": 0.5398009950248757,
+        "y": 0.48588863172029195,
+        "width": 0.21393034825870647,
+        "height": 0.08657515676398027
+      },
+      "normalizedTapPoint": {
+        "x": 0.6467661691542289,
+        "y": 0.5291762101022821
+      },
+      "traits": [],
+      "label": "7 minutes",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 29,
+        "y": 508.3333282470703,
+        "width": 86,
+        "height": 75.66665649414062
+      },
+      "tapPoint": {
+        "x": 72,
+        "y": 546.1666564941406
+      },
+      "normalizedFrame": {
+        "x": 0.07213930348258707,
+        "y": 0.5816170803742223,
+        "width": 0.21393034825870647,
+        "height": 0.08657512184684282
+      },
+      "normalizedTapPoint": {
+        "x": 0.1791044776119403,
+        "y": 0.6249046412976438
+      },
+      "traits": [],
+      "label": "28 seconds",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 28,
+        "y": 629,
+        "width": 346,
+        "height": 20
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 639
+      },
+      "normalizedFrame": {
+        "x": 0.06965174129353234,
+        "y": 0.7196796338672768,
+        "width": 0.8606965174129353,
+        "height": 0.02288329519450801
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.7311212814645309
+      },
+      "traits": ["staticText"],
+      "label": "DAILY PROMPT"
+    },
+    {
+      "frame": {
+        "x": 28,
+        "y": 665,
+        "width": 346,
+        "height": 64
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 697
+      },
+      "normalizedFrame": {
+        "x": 0.06965174129353234,
+        "y": 0.7608695652173914,
+        "width": 0.8606965174129353,
+        "height": 0.07322654462242563
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.7974828375286042
+      },
+      "traits": ["staticText"],
+      "label": "What small thing made you feel loved today?"
+    },
+    {
+      "frame": {
+        "x": 28,
+        "y": 745,
+        "width": 346,
+        "height": 24
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 757
+      },
+      "normalizedFrame": {
+        "x": 0.06965174129353234,
+        "y": 0.8524027459954233,
+        "width": 0.8606965174129353,
+        "height": 0.02745995423340961
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.8661327231121282
+      },
+      "traits": ["staticText"],
+      "label": "Test Partner answered. Submit yours to see."
+    },
+    {
+      "frame": {
+        "x": 28,
+        "y": 785,
+        "width": 346,
+        "height": 44
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 807
+      },
+      "normalizedFrame": {
+        "x": 0.06965174129353234,
+        "y": 0.8981693363844394,
+        "width": 0.8606965174129353,
+        "height": 0.05034324942791762
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 0.9233409610983981
+      },
+      "traits": ["button"],
+      "label": "Answer today's daily prompt",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 12,
+        "y": 857,
+        "width": 183,
+        "height": 183
+      },
+      "tapPoint": {
+        "x": 103.5,
+        "y": 948.5
+      },
+      "normalizedFrame": {
+        "x": 0.029850746268656716,
+        "y": 0.9805491990846682,
+        "width": 0.4552238805970149,
+        "height": 0.20938215102974828
+      },
+      "normalizedTapPoint": {
+        "x": 0.2574626865671642,
+        "y": 1.0852402745995424
+      },
+      "traits": ["button"],
+      "label": "Open weekly game",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 207,
+        "y": 857,
+        "width": 183,
+        "height": 183
+      },
+      "tapPoint": {
+        "x": 298.5,
+        "y": 948.5
+      },
+      "normalizedFrame": {
+        "x": 0.5149253731343284,
+        "y": 0.9805491990846682,
+        "width": 0.4552238805970149,
+        "height": 0.20938215102974828
+      },
+      "normalizedTapPoint": {
+        "x": 0.7425373134328358,
+        "y": 1.0852402745995424
+      },
+      "traits": ["button"],
+      "label": "Open today's tiny quiz",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 29,
+        "y": 1069,
+        "width": 189.6666717529297,
+        "height": 32
+      },
+      "tapPoint": {
+        "x": 123.83333587646484,
+        "y": 1085
+      },
+      "normalizedFrame": {
+        "x": 0.07213930348258707,
+        "y": 1.223112128146453,
+        "width": 0.471807641176442,
+        "height": 0.036613272311212815
+      },
+      "normalizedTapPoint": {
+        "x": 0.3080431240708081,
+        "y": 1.2414187643020596
+      },
+      "traits": ["staticText"],
+      "label": "Recent moments"
+    },
+    {
+      "frame": {
+        "x": 328.3333435058594,
+        "y": 1076.666666507721,
+        "width": 44.666656494140625,
+        "height": 17
+      },
+      "tapPoint": {
+        "x": 350.6666717529297,
+        "y": 1085.166666507721
+      },
+      "normalizedFrame": {
+        "x": 0.816749610711093,
+        "y": 1.2318840577891543,
+        "width": 0.11111108580631997,
+        "height": 0.019450800915331808
+      },
+      "normalizedTapPoint": {
+        "x": 0.872305153614253,
+        "y": 1.2416094582468202
+      },
+      "traits": ["button"],
+      "label": "See all moments",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 29,
+        "y": 1117,
+        "width": 344,
+        "height": 40
+      },
+      "tapPoint": {
+        "x": 201,
+        "y": 1137
+      },
+      "normalizedFrame": {
+        "x": 0.07213930348258707,
+        "y": 1.2780320366132722,
+        "width": 0.8557213930348259,
+        "height": 0.04576659038901602
+      },
+      "normalizedTapPoint": {
+        "x": 0.5,
+        "y": 1.3009153318077804
+      },
+      "traits": ["button"],
+      "label": "Open moment: Mocked a sweet product moment so agents can verify the timeline.",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 326,
+        "y": 698,
+        "width": 64,
+        "height": 64
+      },
+      "tapPoint": {
+        "x": 358,
+        "y": 730
+      },
+      "normalizedFrame": {
+        "x": 0.8109452736318408,
+        "y": 0.7986270022883295,
+        "width": 0.15920398009950248,
+        "height": 0.07322654462242563
+      },
+      "normalizedTapPoint": {
+        "x": 0.8905472636815921,
+        "y": 0.8352402745995423
+      },
+      "traits": ["button"],
+      "label": "Add a moment",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 314,
+        "y": 56,
+        "width": 64,
+        "height": 44
+      },
+      "tapPoint": {
+        "x": 346,
+        "y": 78
+      },
+      "normalizedFrame": {
+        "x": 0.7810945273631841,
+        "y": 0.06407322654462243,
+        "width": 0.15920398009950248,
+        "height": 0.05034324942791762
+      },
+      "normalizedTapPoint": {
+        "x": 0.8606965174129353,
+        "y": 0.08924485125858124
+      },
+      "traits": [],
+      "label": "A, T",
+      "viewClassName": "RCTViewComponentView"
+    },
+    {
+      "frame": {
+        "x": 25,
+        "y": 795,
+        "width": 95,
+        "height": 54
+      },
+      "tapPoint": {
+        "x": 72.5,
+        "y": 822
+      },
+      "normalizedFrame": {
+        "x": 0.06218905472636816,
+        "y": 0.9096109839816934,
+        "width": 0.236318407960199,
+        "height": 0.06178489702517163
+      },
+      "normalizedTapPoint": {
+        "x": 0.18034825870646767,
+        "y": 0.9405034324942791
+      },
+      "traits": ["button", "selected"],
+      "label": "Today",
+      "viewClassName": "_UITabButton"
+    },
+    {
+      "frame": {
+        "x": 110.66666666666669,
+        "y": 795,
+        "width": 95,
+        "height": 54
+      },
+      "tapPoint": {
+        "x": 158.16666666666669,
+        "y": 822
+      },
+      "normalizedFrame": {
+        "x": 0.2752902155887231,
+        "y": 0.9096109839816934,
+        "width": 0.236318407960199,
+        "height": 0.06178489702517163
+      },
+      "normalizedTapPoint": {
+        "x": 0.3934494195688226,
+        "y": 0.9405034324942791
+      },
+      "traits": ["button"],
+      "label": "Chat",
+      "viewClassName": "_UITabButton"
+    },
+    {
+      "frame": {
+        "x": 196.33333333333334,
+        "y": 795,
+        "width": 95.00000000000003,
+        "height": 54
+      },
+      "tapPoint": {
+        "x": 243.83333333333337,
+        "y": 822
+      },
+      "normalizedFrame": {
+        "x": 0.48839137645107794,
+        "y": 0.9096109839816934,
+        "width": 0.23631840796019907,
+        "height": 0.06178489702517163
+      },
+      "normalizedTapPoint": {
+        "x": 0.6065505804311775,
+        "y": 0.9405034324942791
+      },
+      "traits": ["button"],
+      "label": "Plans",
+      "viewClassName": "_UITabButton"
+    },
+    {
+      "frame": {
+        "x": 282,
+        "y": 795,
+        "width": 95,
+        "height": 54
+      },
+      "tapPoint": {
+        "x": 329.5,
+        "y": 822
+      },
+      "normalizedFrame": {
+        "x": 0.7014925373134329,
+        "y": 0.9096109839816934,
+        "width": 0.236318407960199,
+        "height": 0.06178489702517163
+      },
+      "normalizedTapPoint": {
+        "x": 0.8196517412935324,
+        "y": 0.9405034324942791
+      },
+      "traits": ["button"],
+      "label": "Me",
+      "viewClassName": "_UITabButton"
+    },
+    {
+      "frame": {
+        "x": 25,
+        "y": 795,
+        "width": 95,
+        "height": 54
+      },
+      "tapPoint": {
+        "x": 72.5,
+        "y": 822
+      },
+      "normalizedFrame": {
+        "x": 0.06218905472636816,
+        "y": 0.9096109839816934,
+        "width": 0.236318407960199,
+        "height": 0.06178489702517163
+      },
+      "normalizedTapPoint": {
+        "x": 0.18034825870646767,
+        "y": 0.9405034324942791
+      },
+      "traits": ["button", "selected"],
+      "label": "Today",
+      "viewClassName": "_UITabButton"
+    },
+    {
+      "frame": {
+        "x": 110.66666666666669,
+        "y": 795,
+        "width": 95,
+        "height": 54
+      },
+      "tapPoint": {
+        "x": 158.16666666666669,
+        "y": 822
+      },
+      "normalizedFrame": {
+        "x": 0.2752902155887231,
+        "y": 0.9096109839816934,
+        "width": 0.236318407960199,
+        "height": 0.06178489702517163
+      },
+      "normalizedTapPoint": {
+        "x": 0.3934494195688226,
+        "y": 0.9405034324942791
+      },
+      "traits": ["button"],
+      "label": "Chat",
+      "viewClassName": "_UITabButton"
+    },
+    {
+      "frame": {
+        "x": 196.33333333333334,
+        "y": 795,
+        "width": 95.00000000000003,
+        "height": 54
+      },
+      "tapPoint": {
+        "x": 243.83333333333337,
+        "y": 822
+      },
+      "normalizedFrame": {
+        "x": 0.48839137645107794,
+        "y": 0.9096109839816934,
+        "width": 0.23631840796019907,
+        "height": 0.06178489702517163
+      },
+      "normalizedTapPoint": {
+        "x": 0.6065505804311775,
+        "y": 0.9405034324942791
+      },
+      "traits": ["button"],
+      "label": "Plans",
+      "viewClassName": "_UITabButton"
+    },
+    {
+      "frame": {
+        "x": 282,
+        "y": 795,
+        "width": 95,
+        "height": 54
+      },
+      "tapPoint": {
+        "x": 329.5,
+        "y": 822
+      },
+      "normalizedFrame": {
+        "x": 0.7014925373134329,
+        "y": 0.9096109839816934,
+        "width": 0.236318407960199,
+        "height": 0.06178489702517163
+      },
+      "normalizedTapPoint": {
+        "x": 0.8196517412935324,
+        "y": 0.9405034324942791
+      },
+      "traits": ["button"],
+      "label": "Me",
+      "viewClassName": "_UITabButton"
+    }
+  ]
+}

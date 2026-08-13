@@ -31,25 +31,38 @@ export default function TabsLayout(): JSX.Element {
       <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Label>Today</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
-          sf={{ default: "heart.text.square", selected: "heart.text.square.fill" }}
+          src={{
+            default: require("../../../assets/tab-icons/today.png"),
+            selected: require("../../../assets/tab-icons/today-selected.png"),
+          }}
         />
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="chat">
         <NativeTabs.Trigger.Label>Chat</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
-          sf={{
-            default: "bubble.left.and.bubble.right",
-            selected: "bubble.left.and.bubble.right.fill",
+          src={{
+            default: require("../../../assets/tab-icons/chat.png"),
+            selected: require("../../../assets/tab-icons/chat-selected.png"),
           }}
         />
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="plans">
         <NativeTabs.Trigger.Label>Plans</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf={{ default: "checklist", selected: "checklist" }} />
+        <NativeTabs.Trigger.Icon
+          src={{
+            default: require("../../../assets/tab-icons/plans.png"),
+            selected: require("../../../assets/tab-icons/plans-selected.png"),
+          }}
+        />
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="me">
         <NativeTabs.Trigger.Label>Me</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf={{ default: "person", selected: "person.fill" }} />
+        <NativeTabs.Trigger.Icon
+          src={{
+            default: require("../../../assets/tab-icons/me.png"),
+            selected: require("../../../assets/tab-icons/me-selected.png"),
+          }}
+        />
       </NativeTabs.Trigger>
     </NativeTabs>
   );

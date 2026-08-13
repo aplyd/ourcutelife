@@ -67,6 +67,22 @@ function pressables(): OpeningControl[] {
   return controls;
 }
 
+function textInputs(): OpeningControl[] {
+  const controls: OpeningControl[] = [];
+  function visit(node: ts.Node): void {
+    if (
+      (ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) &&
+      ts.isIdentifier(node.tagName) &&
+      node.tagName.text === "TextInput"
+    ) {
+      controls.push(node);
+    }
+    ts.forEachChild(node, visit);
+  }
+  visit(sourceFile);
+  return controls;
+}
+
 function exactlyOne<T>(values: T[], message: string): T {
   assert.equal(values.length, 1, message);
   return values[0];
@@ -139,4 +155,20 @@ void test("Edit Moment Save is a named button whose state mirrors the existing s
   const busyState = fields.get("busy");
   assert.ok(disabledState && isNegatedIdentifier(disabledState, "canSave"));
   assert.ok(busyState && isIdentifier(busyState, "isSaving"));
+});
+
+void test("Edit Moment fields expose stable native accessibility names", () => {
+  const labels = textInputs().map((control) => {
+    const attribute = exactlyOne(
+      directAttributes(control, "accessibilityLabel"),
+      "expected each Edit Moment field to have exactly one direct accessibilityLabel",
+    );
+    assert.ok(
+      attribute.initializer && ts.isStringLiteral(attribute.initializer),
+      "expected each Edit Moment accessibilityLabel to be a string literal",
+    );
+    return attribute.initializer.text;
+  });
+
+  assert.deepEqual(labels, ["Moment date", "What happened", "How the moment felt"]);
 });

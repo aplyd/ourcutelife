@@ -81,11 +81,13 @@ export default function EditMomentScreen(): JSX.Element {
       </View>
       <Text className="text-3xl font-bold text-[#2f211c]">Edit moment</Text>
       <TextInput
+        accessibilityLabel="Moment date"
         className="h-12 rounded-2xl border border-[#e6d2c2] bg-white px-4 text-base text-[#2f211c]"
         value={dateText}
         onChangeText={setDateText}
       />
       <TextInput
+        accessibilityLabel="What happened"
         multiline
         className="min-h-28 rounded-2xl border border-[#e6d2c2] bg-white px-4 py-3 text-base text-[#2f211c]"
         value={summary}
@@ -93,6 +95,7 @@ export default function EditMomentScreen(): JSX.Element {
         textAlignVertical="top"
       />
       <TextInput
+        accessibilityLabel="How the moment felt"
         multiline
         className="min-h-24 rounded-2xl border border-[#e6d2c2] bg-white px-4 py-3 text-base text-[#2f211c]"
         value={feeling}

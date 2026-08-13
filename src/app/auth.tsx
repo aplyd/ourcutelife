@@ -67,6 +67,12 @@ export default function AuthLanding(): JSX.Element {
 
       <View className="gap-3">
         <Pressable
+          accessibilityLabel="Continue with Apple"
+          accessibilityRole="button"
+          accessibilityState={{
+            disabled: isSigningIn || betterAuthSession.isPending,
+            busy: isSigningIn || betterAuthSession.isPending,
+          }}
           className="h-14 rounded-full bg-[#2f211c] items-center justify-center"
           disabled={isSigningIn || betterAuthSession.isPending}
           onPress={handleSignIn}

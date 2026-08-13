@@ -168,6 +168,7 @@ export default function NewMomentScreen(): JSX.Element {
               What could your partner have done differently?
             </Text>
             <TextInput
+              accessibilityLabel="What your partner could have done differently"
               multiline
               className="min-h-20 rounded-2xl border border-[#fecdd3] bg-white/90 px-4 py-3 text-base leading-6 text-[#2f211c]"
               textAlignVertical="top"
@@ -180,6 +181,7 @@ export default function NewMomentScreen(): JSX.Element {
               What could you have done differently?
             </Text>
             <TextInput
+              accessibilityLabel="What you could have done differently"
               multiline
               className="min-h-20 rounded-2xl border border-[#fecdd3] bg-white/90 px-4 py-3 text-base leading-6 text-[#2f211c]"
               textAlignVertical="top"
@@ -198,6 +200,9 @@ export default function NewMomentScreen(): JSX.Element {
             return (
               <Pressable
                 key={tag}
+                accessibilityRole="button"
+                accessibilityLabel={`Toggle ${tag} moment tag`}
+                accessibilityState={{ selected }}
                 className={`rounded-full px-3 py-2 ${selected ? "bg-[#7c3aed]" : "bg-white/80 border border-[#e6d2c2]"}`}
                 onPress={() => toggleTag(tag)}
               >

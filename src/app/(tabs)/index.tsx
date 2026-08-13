@@ -2,7 +2,7 @@ import { useAppQuery } from "@/lib/devMock";
 import { Redirect, router } from "expo-router";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, Image, Pressable, ScrollView, Text, View } from "react-native";
 import AnimatedRollingNumber from "react-native-animated-rolling-numbers";
 
 import { api } from "../../../convex/_generated/api";
@@ -43,6 +43,14 @@ function formatDate(timestamp: number): string {
   return new Intl.DateTimeFormat("en", { month: "short", day: "numeric" }).format(
     new Date(timestamp),
   );
+}
+
+function formatDurationSegmentLabel(label: string, value: number): string {
+  return `${value} ${value === 1 ? label.slice(0, -1) : label}`;
+}
+
+function profileInitial(value: string | null | undefined, fallback: string): string {
+  return (value?.trim() || fallback).slice(0, 1).toUpperCase();
 }
 
 export default function TodayTab(): JSX.Element {
@@ -116,12 +124,28 @@ export default function TodayTab(): JSX.Element {
 
         <View className="rounded-3xl bg-card/90 p-4 border border-soft gap-4">
           <View className="flex-row items-center gap-3">
-            <View className="flex-row w-16">
-              <View className="h-11 w-11 rounded-full bg-accent border-2 border-white items-center justify-center">
-                <Text className="font-bold text-white">You</Text>
+            <View
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+              className="flex-row w-16"
+            >
+              <View className="h-11 w-11 overflow-hidden rounded-full bg-accent border-2 border-white items-center justify-center">
+                {viewer.user.avatarUrl ? (
+                  <Image source={{ uri: viewer.user.avatarUrl }} className="h-11 w-11" />
+                ) : (
+                  <Text className="font-bold text-white">
+                    {profileInitial(viewer.user.fullName ?? viewer.user.email, "Y")}
+                  </Text>
+                )}
               </View>
-              <View className="h-11 w-11 -ml-5 rounded-full bg-[#f97316] border-2 border-white items-center justify-center">
-                <Text className="font-bold text-white">♥</Text>
+              <View className="h-11 w-11 -ml-5 overflow-hidden rounded-full bg-[#f97316] border-2 border-white items-center justify-center">
+                {viewer.partner?.avatarUrl ? (
+                  <Image source={{ uri: viewer.partner.avatarUrl }} className="h-11 w-11" />
+                ) : (
+                  <Text className="font-bold text-white">
+                    {profileInitial(viewer.partner?.fullName ?? viewer.partner?.email, "P")}
+                  </Text>
+                )}
               </View>
             </View>
             <View className="flex-1">
@@ -137,13 +161,17 @@ export default function TodayTab(): JSX.Element {
             {Object.entries(duration).map(([label, value]) => (
               <View
                 key={label}
+                accessible
+                accessibilityLabel={formatDurationSegmentLabel(label, value)}
                 className="min-w-[86px] rounded-2xl bg-app-bg p-3 border border-soft"
               >
-                <AnimatedRollingNumber
-                  value={value}
-                  textStyle={{ fontSize: 28, fontWeight: "800", color: "#2f211c" }}
-                />
-                <Text className="text-xs font-semibold uppercase text-muted">{label}</Text>
+                <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+                  <AnimatedRollingNumber
+                    value={value}
+                    textStyle={{ fontSize: 28, fontWeight: "800", color: "#2f211c" }}
+                  />
+                  <Text className="text-xs font-semibold uppercase text-muted">{label}</Text>
+                </View>
               </View>
             ))}
           </View>

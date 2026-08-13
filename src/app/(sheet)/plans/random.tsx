@@ -1,7 +1,7 @@
 import { useAppQuery } from "@/lib/devMock";
 import { Redirect, router } from "expo-router";
 import type { JSX } from "react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 
 import { api } from "../../../../convex/_generated/api";
@@ -20,10 +20,17 @@ export default function RandomPlansScreen(): JSX.Element {
   const betterAuthSession = useSession();
   const viewer = useAppQuery(api.auth.viewer, {});
   const [selected, setSelected] = useState<Category[]>(["food", "activity"]);
-  const picks = useAppQuery(api.plans.randomByCategories, { categories: selected });
+  const [rollRequest, setRollRequest] = useState<Category[] | null>(null);
+  const [hasRolled, setHasRolled] = useState(false);
+  const rollSequenceRef = useRef(0);
+  const picks = useAppQuery(
+    api.plans.randomByCategories,
+    rollRequest ? { categories: rollRequest } : "skip",
+  );
+  const isRolling = rollRequest !== null && picks === undefined;
 
   if (!betterAuthSession.data?.session) return <Redirect href="/auth" />;
-  if (viewer === undefined || picks === undefined)
+  if (viewer === undefined)
     return (
       <View className="flex-1 bg-[#fff8f1] items-center justify-center">
         <ActivityIndicator />
@@ -37,6 +44,19 @@ export default function RandomPlansScreen(): JSX.Element {
         ? current.filter((item) => item !== category)
         : [...current, category],
     );
+    setRollRequest(null);
+    setHasRolled(false);
+  }
+
+  function handleRoll() {
+    if (!selected.length || isRolling) return;
+    rollSequenceRef.current += 1;
+    const nextRequest = [...selected];
+    for (let index = 0; index < rollSequenceRef.current; index += 1) {
+      nextRequest.push(selected[index % selected.length]);
+    }
+    setHasRolled(true);
+    setRollRequest(nextRequest);
   }
 
   return (
@@ -71,7 +91,25 @@ export default function RandomPlansScreen(): JSX.Element {
           );
         })}
       </View>
-      {picks.map((pick) => (
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={hasRolled ? "Reroll surprise picks" : "Roll surprise picks"}
+        accessibilityState={{
+          disabled: selected.length === 0 || isRolling,
+          busy: isRolling,
+        }}
+        disabled={selected.length === 0 || isRolling}
+        className={`min-h-12 rounded-full items-center justify-center px-5 ${
+          selected.length === 0 || isRolling ? "bg-[#c8b8ad]" : "bg-[#f06f5f]"
+        }`}
+        onPress={handleRoll}
+      >
+        <Text className="text-base font-bold text-white">
+          {isRolling ? "Rolling…" : hasRolled ? "Reroll" : "Roll surprise picks"}
+        </Text>
+      </Pressable>
+      {isRolling ? <ActivityIndicator accessibilityLabel="Rolling surprise picks" /> : null}
+      {picks?.map((pick) => (
         <View key={pick._id} className="rounded-3xl bg-white/90 p-4 border border-[#f1dfd2] gap-2">
           <Text className="text-sm font-bold uppercase tracking-widest text-[#8c766b]">
             {pick.category}
@@ -80,7 +118,7 @@ export default function RandomPlansScreen(): JSX.Element {
           <Text className="text-base leading-6 text-[#6f5a50]">{pick.description}</Text>
         </View>
       ))}
-      {!picks.length ? (
+      {hasRolled && !isRolling && picks && !picks.length ? (
         <Text className="text-base text-[#6f5a50]">No picks in those categories yet.</Text>
       ) : null}
     </ScrollView>

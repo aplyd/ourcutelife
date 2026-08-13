@@ -1,4 +1,4 @@
-import { useAppMutation, useAppQuery } from "@/lib/devMock";
+import { isDevMockAuthEnabled, useAppMutation, useAppQuery } from "@/lib/devMock";
 import { Redirect } from "expo-router";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
@@ -16,7 +16,6 @@ import {
 import { api } from "../../convex/_generated/api";
 import { authClient, useSession } from "@/lib/betterAuth";
 import { resolveMembershipAccess } from "@/lib/membershipAccess";
-import { requestServerPushRegistration } from "@/lib/notifications";
 
 function formatExpiry(expiresAt: number | null | undefined): string | null {
   if (!expiresAt) return null;
@@ -57,6 +56,7 @@ export default function PairingScreen(): JSX.Element {
   const [generatedCodeExpiresAt, setGeneratedCodeExpiresAt] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isWorking, setIsWorking] = useState(false);
+  const canJoin = !isWorking && code.replace(/[^0-9]/g, "").length === 6;
 
   const daysTogether = useMemo(() => {
     const anniversaryTime = new Date(`${anniversaryDateText}T00:00:00`).getTime();
@@ -75,7 +75,10 @@ export default function PairingScreen(): JSX.Element {
   if (membershipAccess === "paired") return <Redirect href="/(tabs)" />;
 
   async function registerForNotificationsAfterPairing() {
+    if (isDevMockAuthEnabled) return;
+
     try {
+      const { requestServerPushRegistration } = await import("@/lib/notifications");
       const result = await requestServerPushRegistration();
       await reportPermissionObservation(result.observation);
       if (result.registration) await registerGrantedDevice(result.registration);
@@ -169,6 +172,7 @@ export default function PairingScreen(): JSX.Element {
         <Text className="text-xl font-semibold text-[#2f211c]">Create a code</Text>
         <Text className="text-sm text-[#6f5a50]">Anniversary / started dating date</Text>
         <TextInput
+          accessibilityLabel="Anniversary date"
           className="h-12 rounded-2xl border border-[#e6d2c2] px-4 text-base text-[#2f211c]"
           placeholder="YYYY-MM-DD"
           value={anniversaryDateText}
@@ -178,6 +182,9 @@ export default function PairingScreen(): JSX.Element {
           This unlocks the “{daysTogether} days together” stat.
         </Text>
         <Pressable
+          accessibilityLabel={displayedCode ? "Generate a fresh code" : "Generate pairing code"}
+          accessibilityRole="button"
+          accessibilityState={{ disabled: isWorking, busy: isWorking }}
           className="h-12 rounded-full bg-[#7c3aed] items-center justify-center"
           disabled={isWorking}
           onPress={handleCreateCode}
@@ -208,6 +215,7 @@ export default function PairingScreen(): JSX.Element {
       <View className="rounded-3xl bg-white/80 p-4 gap-4 border border-[#f1dfd2]">
         <Text className="text-xl font-semibold text-[#2f211c]">I have a code</Text>
         <TextInput
+          accessibilityLabel="Partner pairing code"
           autoCapitalize="none"
           keyboardType="number-pad"
           maxLength={7}
@@ -217,8 +225,11 @@ export default function PairingScreen(): JSX.Element {
           onChangeText={(value) => setCode(formatPairingInput(value))}
         />
         <Pressable
+          accessibilityLabel="Join partner"
+          accessibilityRole="button"
+          accessibilityState={{ disabled: !canJoin, busy: isWorking }}
           className="h-12 rounded-full bg-[#2f211c] items-center justify-center"
-          disabled={isWorking || code.replace(/[^0-9]/g, "").length !== 6}
+          disabled={!canJoin}
           onPress={handleJoin}
         >
           <Text className="font-semibold text-[#fff8f1]">Join partner</Text>
@@ -243,7 +254,12 @@ export default function PairingScreen(): JSX.Element {
       ) : null}
 
       {error ? <Text className="text-center text-sm text-red-700">{error}</Text> : null}
-      <Pressable className="items-center" onPress={() => void authClient.signOut()}>
+      <Pressable
+        accessibilityLabel="Sign out"
+        accessibilityRole="button"
+        className="items-center"
+        onPress={() => void authClient.signOut()}
+      >
         <Text className="text-sm text-[#8c766b]">Sign out</Text>
       </Pressable>
     </ScrollView>

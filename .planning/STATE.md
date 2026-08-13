@@ -1,6 +1,6 @@
 # State
 
-Updated: 2026-08-13T08:25:06-07:00
+Updated: 2026-08-13T14:39:20-07:00
 
 ## Current position
 
@@ -16,6 +16,10 @@ Our Cute Life is on `main`, with the independently approved daily-prompt product
 - Current app spine: Expo Router iOS app with Today, Chat, Plans, Me tabs; Convex-backed couples/moments/prompts/plans/date-plan flows; mock-auth simulator path for local walkthroughs.
 
 ## Latest work / verification
+
+- Closed the bounded Me profile-name accessibility mismatch without changing profile persistence, edit routing, uploads, auth, or account behavior. The existing edit-name control now includes the currently displayed name, so VoiceOver users can review their identity before deciding to edit it, while the visual field remains unchanged and no duplicate name node is exposed. The source contract was captured RED at 176/177 and passed GREEN at 177/177; TypeScript, targeted formatting, and whitespace checks passed. On exact mock-auth `/me`, Argent public AX exposed one `AXButton "Edit name, Agent User"` followed directly by Relationship. No control or mutation was activated. Visual evidence is `.planning/artifacts/2026-08-13-me-profile-name-accessibility/me.png` (`f5c1173c73f76eb6be0b379925b1e92cae0aebdc5408b1aeba5c928897367c82`). Next safe action: audit exactly one different remaining accepted Phase 1 route, screen, or component.
+
+- Audited exactly one different accepted Phase 1 component without changing runtime code: the profile name in Me. The visual card shows the current name inside a non-editable field nested under an explicitly labeled `Edit name` button, but VoiceOver receives only the action and cannot review the current profile name. Argent on exact mock-auth `/me` exposed `AXButton "Edit name"` and then moved directly to Relationship, with no `Agent User` value. No control or mutation was activated. Evidence is under `.planning/artifacts/2026-08-13-me-profile-card-audit/`; screenshot SHA-256 is `b7b8d59abec1a32d6b958722beb7390c7f902ffc54c7bc0acd01b2bc00443b79`. Next safe action: include the current name in the existing edit control's accessible name while retaining the visual name, route, and profile behavior.
 
 - Audited exactly one different accepted Phase 1 component without changing runtime code: the two overlapping circles in Today’s `Together For` card. The accepted avatar pair is still rendered as the text `You` plus a generic heart rather than viewer/partner profile images or distinct warm fallbacks, and VoiceOver separately announces both redundant nodes before the already complete couple sentence. Argent on exact mock-auth `/` reproduced `AXStaticText "You"` and `AXStaticText "♥"` alongside `You and Test Partner have been together for…`; the seven duration values remained coherent. No control or mutation was activated. Evidence is under `.planning/artifacts/2026-08-13-together-for-avatar-audit/`; screenshot SHA-256 is `8e908e75e2671cac27f03d3cbf634238af14e4f0979a851c197fb672b1dc48d8`. Next safe action: replace only this pair with profile images plus initial fallbacks and hide the decorative avatar descendants from accessibility, preserving the couple sentence and duration behavior.
 
@@ -339,7 +343,7 @@ No hard blocker for local code/planning slices. Do not deploy, run production mi
 
 ## Next safe actions
 
-1. Replace only the Today `Together For` placeholder avatar pair with viewer/partner images plus warm initial fallbacks, and hide those decorative descendants from accessibility while retaining the complete couple sentence.
+1. Include the current profile name in the Me card's existing edit control accessible name while retaining the visual name, route, and profile behavior.
 2. Keep request discovery/inbox/history, Quality Time notifications, rescheduling, abandonment, migration, and legacy cutover behind later bounded plans.
 
 ## Blockers / questions

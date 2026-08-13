@@ -12,7 +12,7 @@ void test("Me profile and relationship edit actions are explicitly named buttons
     /<Pressable\b(?:(?!<Pressable\b|<\/Pressable>).)*router\.push\("\/me\/profile"\)(?:(?!<Pressable\b|<\/Pressable>).)*<\/Pressable>/s,
   );
   const editName = source.match(
-    /<Pressable\b(?:(?!<Pressable\b|<\/Pressable>).)*accessibilityLabel="Edit name"(?:(?!<Pressable\b|<\/Pressable>).)*<\/Pressable>/s,
+    /<Pressable\b(?:(?!<Pressable\b|<\/Pressable>).)*accessibilityLabel=\{`Edit name, \$\{name\}`\}(?:(?!<Pressable\b|<\/Pressable>).)*<\/Pressable>/s,
   );
   const anniversary = source.match(
     /<Pressable\b(?:(?!<Pressable\b|<\/Pressable>).)*router\.push\("\/me\/anniversary"\)(?:(?!<Pressable\b|<\/Pressable>).)*<\/Pressable>/s,

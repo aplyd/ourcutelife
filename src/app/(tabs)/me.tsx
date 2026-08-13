@@ -98,7 +98,7 @@ export default function MeTab(): JSX.Element {
         </View>
         <View className="gap-2">
           <Pressable
-            accessibilityLabel="Edit name"
+            accessibilityLabel={`Edit name, ${name}`}
             accessibilityRole="button"
             onPress={() => router.push("/me/profile")}
           >

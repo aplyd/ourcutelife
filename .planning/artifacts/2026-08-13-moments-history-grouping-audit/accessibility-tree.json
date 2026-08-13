@@ -1,0 +1,12 @@
+{
+  "device": {
+    "name": "iPhone 17 Pro",
+    "udid": "F736E64F-ED8F-475C-BD05-7C156B568F74",
+    "runtime": "iOS 26.5"
+  },
+  "bundleId": "com.ourcutelife.app",
+  "route": "ourcutelife:///moments",
+  "opened": true,
+  "source": "ax-service",
+  "description": "ROOT AXGroup\n  AXGroup Vertical scroll bar, 1 page value=0%\n  AXStaticText MOMENTS\n  AXStaticText Your private relationship journal\n  AXStaticText Raw notes stay private. Later, AI will turn selected themes into relationship-safe weekly briefs and monthly review conversations.\n  AXButton Log a moment\n  AXButton Show all moments\n  AXButton Show good moments\n  AXButton Show mixed moments\n  AXButton Show hard moments\n  AXButton Open moment: Mocked a sweet product moment so agents can verify the timeline.\n  AXGroup Horizontal scroll bar, 1 page value=0%"
+}

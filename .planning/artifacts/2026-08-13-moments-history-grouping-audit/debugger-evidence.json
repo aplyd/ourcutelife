@@ -1,0 +1,20 @@
+{
+  "port": 8081,
+  "deviceId": "F736E64F-ED8F-475C-BD05-7C156B568F74",
+  "debuggerStatus": {
+    "ok": false,
+    "error": "Metro at port 8081 has no CDP targets — is a React Native app connected?"
+  },
+  "debuggerLogRegistry": {
+    "ok": false,
+    "error": "Metro at port 8081 has no CDP targets — is a React Native app connected?"
+  },
+  "nativeDevtoolsStatus": {
+    "envSetup": true,
+    "appRunning": true,
+    "connected": false,
+    "requiresRestart": true,
+    "nextLaunchWillBeInjected": true
+  },
+  "claim": "No clean debugger-log or native-hierarchy claim is made."
+}

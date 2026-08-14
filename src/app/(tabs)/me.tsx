@@ -119,7 +119,7 @@ export default function MeTab(): JSX.Element {
           <Text className="text-lg font-bold text-ink">{partnerName}</Text>
         </View>
         <Pressable
-          accessibilityLabel="Edit anniversary"
+          accessibilityLabel={`Edit anniversary, ${anniversary}`}
           accessibilityRole="button"
           className="gap-1"
           onPress={() => router.push("/me/anniversary")}

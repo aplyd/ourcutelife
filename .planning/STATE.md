@@ -1,6 +1,6 @@
 # State
 
-Updated: 2026-08-13T14:39:20-07:00
+Updated: 2026-08-13T19:14:58-07:00
 
 ## Current position
 
@@ -16,6 +16,10 @@ Our Cute Life is on `main`, with the independently approved daily-prompt product
 - Current app spine: Expo Router iOS app with Today, Chat, Plans, Me tabs; Convex-backed couples/moments/prompts/plans/date-plan flows; mock-auth simulator path for local walkthroughs.
 
 ## Latest work / verification
+
+- Closed the bounded Me anniversary accessibility mismatch without changing the displayed date, layout, edit route, persistence, parsing, or save behavior. The existing edit control now includes the formatted current anniversary in its accessible name, with no duplicate date node. Focused RED failed 0/1 on the missing dynamic label, then GREEN passed 1/1; the full unit gate passed 177/177, along with TypeScript, targeted formatting, and whitespace checks. On exact mock-auth `/me`, Argent public AX exposed one `AXButton "Edit anniversary, February 14, 2022"` between `Test Partner` and Settings. No control or mutation was activated. Evidence is under `.planning/artifacts/2026-08-13-me-anniversary-accessibility/`; screenshot SHA-256 is `8efff8299e3b6519487fdb8f353640b64fa24953efbb34c9c2d3bc0694e448f1`. Metro had no CDP target, so no source-map or clean debugger-log claim is made.
+
+- Audited exactly one different accepted Phase 1 component without changing runtime code: the anniversary row on Me. The visual card shows `February 14, 2022`, but VoiceOver receives only `Edit anniversary`, so a user cannot review the current relationship date before deciding whether to edit it. Argent on exact mock-auth `/me` exposed `AXButton "Edit anniversary"` after `Test Partner` and then moved directly to Settings, with no anniversary value. No control or mutation was activated. Evidence is under `.planning/artifacts/2026-08-13-me-anniversary-card-audit/`; screenshot SHA-256 is `ccebe5156b7984cebfa79769f11e17b8a15f4e9c366cae59eb9fcfd5066ec7ae`. Metro had no CDP target, so no source-map or clean debugger-log claim is made. Next safe action: include the formatted anniversary in the existing edit control's accessible name while retaining the visual date, route, and persistence behavior.
 
 - Closed the bounded Me profile-name accessibility mismatch without changing profile persistence, edit routing, uploads, auth, or account behavior. The existing edit-name control now includes the currently displayed name, so VoiceOver users can review their identity before deciding to edit it, while the visual field remains unchanged and no duplicate name node is exposed. The source contract was captured RED at 176/177 and passed GREEN at 177/177; TypeScript, targeted formatting, and whitespace checks passed. On exact mock-auth `/me`, Argent public AX exposed one `AXButton "Edit name, Agent User"` followed directly by Relationship. No control or mutation was activated. Visual evidence is `.planning/artifacts/2026-08-13-me-profile-name-accessibility/me.png` (`f5c1173c73f76eb6be0b379925b1e92cae0aebdc5408b1aeba5c928897367c82`). Next safe action: audit exactly one different remaining accepted Phase 1 route, screen, or component.
 

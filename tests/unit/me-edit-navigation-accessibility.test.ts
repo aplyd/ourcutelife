@@ -15,7 +15,7 @@ void test("Me profile and relationship edit actions are explicitly named buttons
     /<Pressable\b(?:(?!<Pressable\b|<\/Pressable>).)*accessibilityLabel=\{`Edit name, \$\{name\}`\}(?:(?!<Pressable\b|<\/Pressable>).)*<\/Pressable>/s,
   );
   const anniversary = source.match(
-    /<Pressable\b(?:(?!<Pressable\b|<\/Pressable>).)*router\.push\("\/me\/anniversary"\)(?:(?!<Pressable\b|<\/Pressable>).)*<\/Pressable>/s,
+    /<Pressable\b(?:(?!<Pressable\b|<\/Pressable>).)*accessibilityLabel=\{`Edit anniversary, \$\{anniversary\}`\}(?:(?!<Pressable\b|<\/Pressable>).)*router\.push\("\/me\/anniversary"\)(?:(?!<Pressable\b|<\/Pressable>).)*<\/Pressable>/s,
   );
 
   assert.ok(profilePhoto, "expected the profile photo edit action");
@@ -25,7 +25,10 @@ void test("Me profile and relationship edit actions are explicitly named buttons
   assert.ok(editName, "expected the name edit action");
   assert.match(editName[0], /accessibilityRole="button"/);
 
-  assert.ok(anniversary, "expected the anniversary edit action");
+  assert.ok(anniversary, "expected the anniversary edit action with its displayed date");
   assert.match(anniversary[0], /accessibilityRole="button"/);
-  assert.match(anniversary[0], /accessibilityLabel="Edit anniversary"/);
+  assert.match(
+    anniversary[0],
+    /<Text className="text-lg font-bold text-ink">\{anniversary\}<\/Text>/,
+  );
 });

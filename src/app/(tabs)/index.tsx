@@ -127,6 +127,7 @@ export default function TodayTab(): JSX.Element {
             <View
               accessibilityElementsHidden
               importantForAccessibility="no-hide-descendants"
+              collapsable={false}
               className="flex-row w-16"
             >
               <View className="h-11 w-11 overflow-hidden rounded-full bg-accent border-2 border-white items-center justify-center">

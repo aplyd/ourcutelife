@@ -5,10 +5,14 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-const source = readFileSync(resolve(process.cwd(), "src/app/(tabs)/index.tsx"), "utf8");
+const todaySource = readFileSync(resolve(process.cwd(), "src/app/(tabs)/index.tsx"), "utf8");
+const meHeaderSource = readFileSync(
+  resolve(process.cwd(), "src/components/MeHeaderButton.tsx"),
+  "utf8",
+);
 
 void test("Together For renders profile images with warm initial fallbacks", () => {
-  const header = source.match(
+  const header = todaySource.match(
     /<View className="flex-row items-center gap-3">[\s\S]*?<View className="flex-row flex-wrap gap-2">/,
   );
 
@@ -26,13 +30,24 @@ void test("Together For renders profile images with warm initial fallbacks", () 
   assert.doesNotMatch(header[0], />♥</);
 });
 
-void test("Together For avatar pair is decorative while its complete sentence remains public", () => {
-  const header = source.match(
+void test("Today avatar pairs preserve their visuals behind native accessibility boundaries", () => {
+  const togetherForHeader = todaySource.match(
     /<View className="flex-row items-center gap-3">[\s\S]*?<View className="flex-row flex-wrap gap-2">/,
   );
 
-  assert.ok(header, "expected the Together For header");
-  assert.match(header[0], /accessibilityElementsHidden/);
-  assert.match(header[0], /importantForAccessibility="no-hide-descendants"/);
-  assert.match(header[0], /You and \{partnerName\} have been together for…/);
+  assert.ok(togetherForHeader, "expected the Together For header");
+  assert.match(
+    togetherForHeader[0],
+    /<View\s+accessibilityElementsHidden\s+importantForAccessibility="no-hide-descendants"\s+collapsable=\{false\}\s+className="flex-row w-16"\s*>/,
+  );
+  assert.match(togetherForHeader[0], /You and \{partnerName\} have been together for…/);
+
+  assert.match(
+    meHeaderSource,
+    /<Pressable\s+accessible\s+accessibilityRole="button"\s+accessibilityLabel="Open account"/,
+  );
+  assert.match(
+    meHeaderSource,
+    /<View\s+accessibilityElementsHidden\s+importantForAccessibility="no-hide-descendants"\s+collapsable=\{false\}\s+className="flex-row w-16"\s*>/,
+  );
 });

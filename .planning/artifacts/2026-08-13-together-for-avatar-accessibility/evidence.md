@@ -1,0 +1,22 @@
+# Together For avatar verification evidence
+
+- Date: 2026-08-13
+- Device: iPhone 17 Pro / iOS 26.5 (`F736E64F-ED8F-475C-BD05-7C156B568F74`)
+- App: installed deterministic `EXPO_PUBLIC_MOCK_AUTH=1` app (`com.ourcutelife.app`)
+- Exact route opened without control activation: `ourcutelife:///` (Expo Router `/`)
+- Argent public accessibility source: `ax-service`
+- Before: public accessibility exposed `AXGroup "A, T"`. Argent's React component tree located that node at the shared top-right `MeHeaderButton`, not the already-hidden Together For card descendants.
+- After: no public `AXGroup "A, T"` exists. The visually unchanged overlapping avatar account control is now `AXButton "Open account"`; its initial/image descendants sit behind a non-collapsable native decorative boundary.
+- The Together For avatar pair also retains a non-collapsable decorative boundary, and the complete sentence remains public immediately after its heading: `You and Test Partner have been together for…`.
+- No control, gesture, or data mutation was activated.
+- Screenshot: `today.png`
+- Screenshot SHA-256: `64683a8916c1426ef1b7e725adc6ebbf93aba70d2f773407acf4384df03b009d`
+- Accessibility tree: `accessibility-tree.txt`
+- Focused RED: 1/2 failed before the explicit account-button semantics/native boundary were implemented.
+- Focused GREEN: 2/2 passed.
+- Full unit suite: 177/177 passed.
+- TypeScript: passed (`tsc --noEmit`).
+- Targeted formatting: passed for the three changed source/test files.
+- Lint: passed with 0 errors and 4 pre-existing `no-console` warnings in `convex/prompts.ts`.
+- Argent debugger: connected on Metro 8084 to this workspace; 15 scripts loaded; source maps ready.
+- Argent debugger log registry: 0 captured entries (no warnings/errors to investigate in the captured session).

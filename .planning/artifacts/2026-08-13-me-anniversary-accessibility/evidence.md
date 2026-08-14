@@ -8,7 +8,7 @@
 - The visible anniversary date and layout remained unchanged in `me.png`.
 - No edit control, other control, gesture, or data mutation was activated.
 - Screenshot: `me.png`
-- Screenshot SHA-256: `8efff8299e3b6519487fdb8f353640b64fa24953efbb34c9c2d3bc0694e448f1`
+- Screenshot SHA-256: `05c2ef21f51065d408cd9afdb2b8ee6606943629d0a2c7f2547de5a213092ec8`
 - Accessibility tree: `accessibility-tree.json`
 - Focused RED: 0/1 passed; assertion failed with `expected the anniversary edit action with its displayed date` before the product change.
 - Focused GREEN: 1/1 passed.

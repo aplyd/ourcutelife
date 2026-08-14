@@ -1,0 +1,35 @@
+Source: Argent ax-service
+Mode: flat
+Route: ourcutelife:///
+Device: iPhone 17 Pro / iOS 26.5
+Bundle: com.ourcutelife.app
+
+AXButton "Open account"
+AXGroup "Vertical scroll bar, 2 pages" value="0%"
+AXStaticText "TODAY"
+AXStaticText "Your cute little daily reset"
+AXStaticText "Check in, answer the tiny prompt, and keep the good/hard stuff from disappearing."
+AXStaticText "TOGETHER FOR"
+AXStaticText "You and Test Partner have been together for…"
+AXGroup "4 years"
+AXGroup "6 months"
+AXGroup "3 weeks"
+AXGroup "3 days"
+AXGroup "18 hours"
+AXGroup "43 minutes"
+AXGroup "59 seconds"
+AXStaticText "DAILY PROMPT"
+AXStaticText "What small thing made you feel loved today?"
+AXButton "Add a moment"
+AXStaticText "Test Partner answered. Submit yours to see."
+AXGroup "Horizontal scroll bar, 1 page" value="0%"
+AXButton "Answer today's daily prompt"
+AXGroup "Tab Bar"
+AXButton "Today"
+AXButton "Chat"
+AXButton "Plans"
+AXButton "Me"
+AXButton "Open weekly game"
+AXButton "Open today's tiny quiz"
+
+Relevant finding: no public AXGroup "A, T" exists. The shared overlapping avatar control is now the explicit AXButton "Open account" with its visual descendants hidden, and the Together For avatar pair is decorative; the complete couple sentence remains public immediately after "TOGETHER FOR".

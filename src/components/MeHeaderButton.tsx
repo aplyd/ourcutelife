@@ -15,8 +15,19 @@ export function MeHeaderButton(): JSX.Element {
   const partner = viewer?.partner;
 
   return (
-    <Pressable className="absolute right-6 top-14 z-50" onPress={() => router.push("/account")}>
-      <View className="flex-row w-16">
+    <Pressable
+      accessible
+      accessibilityRole="button"
+      accessibilityLabel="Open account"
+      className="absolute right-6 top-14 z-50"
+      onPress={() => router.push("/account")}
+    >
+      <View
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+        collapsable={false}
+        className="flex-row w-16"
+      >
         <View className="h-11 w-11 overflow-hidden rounded-full bg-accent border-2 border-card items-center justify-center">
           {user?.avatarUrl ? (
             <Image source={{ uri: user.avatarUrl }} className="h-11 w-11" />

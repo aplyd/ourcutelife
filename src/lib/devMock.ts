@@ -166,10 +166,12 @@ const mockPrompt = {
   weeklyGame: {
     title: "Two-minute memory game",
     description: "Pick one tiny shared memory and compare what each of you remembers.",
+    principle: "love maps",
   },
   quiz: {
     title: "Tiny check-in",
     question: "What would make tonight feel 10% sweeter?",
+    principle: "turning toward",
   },
 };
 

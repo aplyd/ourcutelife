@@ -64,6 +64,15 @@ export default function MomentDetailScreen(): JSX.Element {
 
   return (
     <ScrollView className="flex-1 bg-[#fff8f1]" contentContainerClassName="px-3 pt-16 pb-10 gap-4">
+      <Pressable
+        accessibilityLabel="Back to moments"
+        accessibilityRole="button"
+        className="h-11 self-start rounded-full border border-[#e7d6ca] bg-white/85 px-4 items-center justify-center"
+        onPress={() => router.replace("/moments")}
+      >
+        <Text className="font-bold text-[#2f211c]">Back to moments</Text>
+      </Pressable>
+
       <View className="gap-2">
         <Text className="text-sm font-semibold uppercase tracking-widest text-[#8c766b]">
           Private moment

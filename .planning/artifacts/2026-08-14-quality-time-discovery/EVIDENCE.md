@@ -4,7 +4,7 @@ Date: 2026-08-14
 
 ## Scope
 
-Deterministic local verification of Phase 7 Slice 07-05 responder discovery. The app used `EXPO_PUBLIC_MOCK_AUTH=1`, bundle ID `com.ourcutelife.app`, and exact `/plans` routes through `ourcutelife://plans`. No live Convex deployment, provider, credential, notification, or production data was used.
+Deterministic local verification of Phase 7 Slice 07-05 responder discovery. The app used `EXPO_PUBLIC_MOCK_AUTH=1`, bundle ID `com.ourcutelife.app`, and exact `/plans` routes through `ourcutelife://plans` on the booted **iPhone 17 Pro**, **iOS 26.5** simulator, UDID **`F736E64F-ED8F-475C-BD05-7C156B568F74`**. No live Convex deployment, provider, credential, notification, or production data was used.
 
 ## Retained acceptance evidence
 

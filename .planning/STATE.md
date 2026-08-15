@@ -1,6 +1,6 @@
 # State
 
-Updated: 2026-08-14T22:39:00-07:00
+Updated: 2026-08-15T03:08:00-07:00
 
 ## Current position
 
@@ -16,6 +16,10 @@ Our Cute Life is on `main`, with the independently approved daily-prompt product
 - Current app spine: Expo Router iOS app with Today, Chat, Plans, Me tabs; Convex-backed couples/moments/prompts/plans/date-plan flows; mock-auth simulator path for local walkthroughs.
 
 ## Latest work / verification
+
+- Post-release watchdog review of Slice 07-05 exposed an architectural conflict at 2026-08-15 03:02 PDT: enforcing overflow after effective-expiry filtering lets bounded `.take(11)` reads hide a fresh or malformed twelfth row behind overdue rows. A focused regression first reproduced that blind-tail omission, then the safe raw persisted active-status overflow boundary was restored: more than ten indexed `sent`/`responding` rows fails closed before overdue rows are omitted. This preserves complete bounded validation; supporting larger overdue tails requires a separate reconciliation/index lifecycle slice. Focused Quality Time coverage passes 51/51; the earlier complete unit 182/182, Convex 319/319, TypeScript, lint, format, whitespace, validation, and 103/103 evidence checksum gates remain applicable because production behavior returned to the independently reviewed implementation and only the new regression/documentation remain. The retained evidence records iPhone 17 Pro, iOS 26.5, and simulator UDID `F736E64F-ED8F-475C-BD05-7C156B568F74`. Final acceptance is withheld only for an independent no-edit review. No live Convex/provider/credential/notification access or mutation occurred.
+
+- Watchdog independently revalidated the committed Slice 07-05 responder-discovery baseline at 2026-08-15 00:52 PDT without changing product code. Focused Quality Time coverage passed 50/50, the complete unit suite passed 182/182, the complete Convex suite passed 318/318, TypeScript passed, lint reported zero errors with the four preserved prompt warnings, targeted and repository-wide formatting passed, `git diff --check` passed, and all 103 retained discovery artifacts matched `SHA256SUMS`. Fresh Argent on the installed mock-auth iPhone 17 Pro / iOS 26.5 build opened exact `/plans` and confirmed the initiator state retains `Start Quality Time` plus legacy controls without a responder entry; Metro currently has no CDP target, so the retained zero-log/source-map-ready evidence remains authoritative. A strict independent no-edit privacy/boundedness review of `4d40d72..4428f2e` is in progress; Slice 07-05 final acceptance remains withheld until that review returns. No live Convex access, provider, credential, notification, deployment, migration, product mutation, commit, or push occurred.
 
 - Coordinator cumulative verification of the active Slice 07-05 implementation reached the repository-wide formatting boundary at 2026-08-14 22:39 PDT. Focused Quality Time coverage passed 40/40, the complete unit suite passed 182/182, the complete Convex suite passed 308/308, TypeScript passed, lint reported zero errors with the four preserved prompt warnings, targeted Slice 07-05 formatting passed, `git diff --check` passed, and the repository review packet found no obvious added-line security pattern. `pnpm format:check` then stopped on 23 retained 2026-08-03 JSON evidence files plus two regenerated Convex declaration files; the verification-generated declaration/evidence drift was restored exactly, and no product change was made. Final Slice 07-05 acceptance remains withheld pending the independent no-edit privacy/boundedness review and complete retained Argent sent/responding/terminal evidence. No live Convex access, provider, credential, deployment, migration, notification, commit, or push occurred.
 

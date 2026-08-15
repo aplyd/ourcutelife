@@ -2321,6 +2321,21 @@ test("pending discovery returns exactly ten valid mixed rows and fails closed on
   );
 });
 
+test("pending discovery fails closed on a raw active-status overflow before omitting effectively expired rows", async () => {
+  const t = convexTest(schema, modules);
+  const pair = await seedCouple(t);
+  for (let index = 0; index < 11; index += 1) {
+    await insertDiscoverableRequest(t, pair, 100 + index, {
+      expiresAt: Date.now() - 1,
+    });
+  }
+  await insertDiscoverableRequest(t, pair, 200);
+
+  await expect(asResponder(t).query(listPendingResponses, {})).rejects.toThrow(
+    "Quality Time requests unavailable",
+  );
+});
+
 test.each([
   ["version", { version: 0 }, 3],
   ["timing", { timingKind: "now", scheduledFor: Date.now() + 60_000 }, 3],

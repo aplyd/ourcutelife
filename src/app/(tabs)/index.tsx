@@ -125,6 +125,7 @@ export default function TodayTab(): JSX.Element {
         <View className="rounded-3xl bg-card/90 p-4 border border-soft gap-4">
           <View className="flex-row items-center gap-3">
             <View
+              accessible={false}
               accessibilityElementsHidden
               importantForAccessibility="no-hide-descendants"
               collapsable={false}

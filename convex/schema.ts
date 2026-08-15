@@ -330,7 +330,12 @@ export default defineSchema({
     expiresAt: v.optional(v.number()),
   })
     .index("by_couple_id_and_updated_at", ["coupleId", "updatedAt"])
-    .index("by_couple_id_and_status_and_updated_at", ["coupleId", "status", "updatedAt"]),
+    .index("by_couple_id_and_status_and_updated_at", ["coupleId", "status", "updatedAt"])
+    .index("by_responder_user_id_and_status_and_updated_at", [
+      "responderUserId",
+      "status",
+      "updatedAt",
+    ]),
   qualityTimeOptions: defineTable({
     requestId: v.id("qualityTimeRequests"),
     coupleId: v.id("couples"),

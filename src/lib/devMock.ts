@@ -235,6 +235,8 @@ function mockQueryResult(query: unknown, args: unknown): unknown {
       return [mockDatePlan];
     case "qualityTime:getRequest":
       return mockQualityTimeState.getRequest(args as never);
+    case "qualityTime:listPendingResponses":
+      return mockQualityTimeState.listPendingResponses();
     case "qualityTime:listDraftInventory":
       return mockQualityTimeState.listDraftInventory(args as never);
     case "chat:list":

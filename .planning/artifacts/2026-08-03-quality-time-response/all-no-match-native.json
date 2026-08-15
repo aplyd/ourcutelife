@@ -28,9 +28,7 @@
         "x": 0.5,
         "y": 0.4633867276887872
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Quality Time is still in progress"
     },
     {
@@ -54,9 +52,7 @@
         "x": 0.5,
         "y": 0.5572082379862701
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Back to Plans",
       "viewClassName": "RCTViewComponentView"
     },
@@ -81,9 +77,7 @@
         "x": 0.5,
         "y": -0.017353165522501903
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Refreshing...",
       "viewClassName": "UILabel"
     }

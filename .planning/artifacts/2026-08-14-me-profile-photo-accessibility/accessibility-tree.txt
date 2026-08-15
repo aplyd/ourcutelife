@@ -1,0 +1,46 @@
+Source: Argent `describe` / ax-service
+Mode: flat
+Device: iPhone 17 Pro, iOS 26.5, F736E64F-ED8F-475C-BD05-7C156B568F74
+Route: ourcutelife:///me/profile
+Coordinates are normalized [0,1] fractions of the screen (x, y, width, height), not pixels.
+
+ROOT  AXGroup (0.000, 0.000, 1.000, 1.000)
+
+  AXGroup "dismiss popup"  (0.000, 0.000, 1.000, 1.000)
+  AXButton "Open account"  (0.781, 0.064, 0.159, 0.050)
+  AXGroup "Vertical scroll bar, 2 pages" value="0%"  (0.918, 0.071, 0.075, 0.834)
+  AXStaticText "TODAY"  (0.030, 0.073, 0.940, 0.023)
+  AXStaticText "Your cute little daily reset"  (0.030, 0.105, 0.940, 0.092)
+  AXStaticText "Check in, answer the tiny prompt, and keep the good/hard stuff from disappearing."  (0.030, 0.206, 0.940, 0.055)
+  AXStaticText "TOGETHER FOR"  (0.261, 0.294, 0.667, 0.023)
+  AXStaticText "You and Test Partner have been together for…"  (0.261, 0.317, 0.667, 0.055)
+  AXGroup "Vertical scroll bar, 1 page" value="0%"  (0.901, 0.323, 0.072, 0.616)
+  AXStaticText "Edit profile"  (0.049, 0.325, 0.903, 0.040)
+  AXGroup "4 years"  (0.072, 0.390, 0.214, 0.087)
+  AXGroup "6 months"  (0.306, 0.390, 0.214, 0.087)
+  AXGroup "3 weeks"  (0.540, 0.390, 0.214, 0.087)
+  AXGroup "3 days"  (0.072, 0.486, 0.214, 0.087)
+  AXGroup "22 hours"  (0.306, 0.486, 0.214, 0.087)
+  AXGroup "48 minutes"  (0.540, 0.486, 0.214, 0.087)
+  AXButton "Upload profile photo"  (0.351, 0.532, 0.298, 0.036)
+  AXGroup "35 seconds"  (0.072, 0.582, 0.214, 0.087)
+  AXStaticText "Name"  (0.049, 0.600, 0.903, 0.022)
+  AXGroup "Profile name" value="Agent User"  (0.051, 0.632, 0.898, 0.051)
+  AXButton "Save profile"  (0.049, 0.697, 0.903, 0.062)
+  AXStaticText "DAILY PROMPT"  (0.070, 0.720, 0.861, 0.023)
+  AXStaticText "What small thing made you feel loved today?"  (0.070, 0.761, 0.861, 0.073)
+  AXButton "Add a moment"  (0.811, 0.799, 0.159, 0.073)
+  AXStaticText "Test Partner answered. Submit yours to see."  (0.070, 0.852, 0.861, 0.027)
+  AXGroup "Horizontal scroll bar, 1 page" value="0%"  (0.154, 0.867, 0.692, 0.034)
+  AXButton "Answer today's daily prompt"  (0.070, 0.898, 0.861, 0.050)
+  AXGroup "Tab Bar"  (0.000, 0.905, 1.000, 0.095)
+  AXButton "Today"  (0.062, 0.910, 0.236, 0.062)
+  AXButton "Chat"  (0.275, 0.910, 0.236, 0.062)
+  AXButton "Plans"  (0.488, 0.910, 0.236, 0.062)
+  AXButton "Me"  (0.701, 0.910, 0.236, 0.062)
+  AXGroup "Horizontal scroll bar, 1 page" value="0%"  (0.135, 0.917, 0.731, 0.033)
+  AXButton "Open weekly game"  (0.030, 0.981, 0.455, 0.019)
+  AXButton "Open today's tiny quiz"  (0.515, 0.981, 0.455, 0.019)
+
+Result: exactly one profile-photo picker action is exposed in the deterministic no-photo state, state-accurately named for upload. The visual avatar preview is absent from public AX. No action was activated.
+Limitation: the native form sheet continues to expose underlying Today/tab elements in the public AX tree.

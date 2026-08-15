@@ -28,9 +28,7 @@
         "x": 0.40049751243781095,
         "y": 0.08466819221967964
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "PLANS"
     },
     {
@@ -54,9 +52,7 @@
         "x": 0.40049751243781095,
         "y": 0.12814645308924486
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Our date board"
     },
     {
@@ -80,9 +76,7 @@
         "x": 0.40049751243781095,
         "y": 0.20137299771167047
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Swipe on activities and places. Dates are combinations you can like, save, schedule, complete, and rate."
     },
     {
@@ -106,9 +100,7 @@
         "x": 0.16500828871086462,
         "y": 0.2717391304347826
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Open surprise plan item picker",
       "viewClassName": "RCTViewComponentView"
     },
@@ -133,9 +125,7 @@
         "x": 0.4776119213199141,
         "y": 0.2717391304347826
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Open matched plan item history",
       "viewClassName": "RCTViewComponentView"
     },
@@ -160,9 +150,7 @@
         "x": 0.5,
         "y": 0.3501144164759725
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "QUALITY TIME"
     },
     {
@@ -186,9 +174,7 @@
         "x": 0.5,
         "y": 0.4073226544622426
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Find what sounds good together"
     },
     {
@@ -212,9 +198,7 @@
         "x": 0.5,
         "y": 0.4805491990846682
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Build a private shortlist, then share only when you’re ready to find a mutual option."
     },
     {
@@ -238,9 +222,7 @@
         "x": 0.5,
         "y": 0.5491990846681922
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Start Quality Time",
       "viewClassName": "RCTViewComponentView"
     },
@@ -265,9 +247,7 @@
         "x": 0.5,
         "y": 0.6418764302059496
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Swipe plan items"
     },
     {
@@ -291,9 +271,7 @@
         "x": 0.5,
         "y": 0.6762013729977117
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Choose a category and privately find your next match."
     },
     {
@@ -317,9 +295,7 @@
         "x": 0.25538971175008746,
         "y": 0.8051105909543943
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Browse Food plan items",
       "viewClassName": "RCTViewComponentView"
     },
@@ -344,9 +320,7 @@
         "x": 0.7446102882499126,
         "y": 0.8051105909543943
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Browse Drinks plan items",
       "viewClassName": "RCTViewComponentView"
     },
@@ -371,9 +345,7 @@
         "x": 0.25538971175008746,
         "y": 1.026506489419828
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Browse Entertainment plan items",
       "viewClassName": "RCTViewComponentView"
     },
@@ -398,9 +370,7 @@
         "x": 0.7446102882499126,
         "y": 1.026506489419828
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Browse Activity plan items",
       "viewClassName": "RCTViewComponentView"
     },
@@ -425,9 +395,7 @@
         "x": 0.25538971175008746,
         "y": 1.2479023878852618
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Browse Intimacy plan items",
       "viewClassName": "RCTViewComponentView"
     },
@@ -452,9 +420,7 @@
         "x": 0.5,
         "y": 1.3928299473952375
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Our Dates"
     },
     {
@@ -478,9 +444,7 @@
         "x": 0.5,
         "y": 1.4271548901869995
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "The decision list for date night."
     },
     {
@@ -504,9 +468,7 @@
         "x": 0.40381424937082167,
         "y": 1.4900839519718965
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Coffee walk"
     },
     {
@@ -530,9 +492,7 @@
         "x": 0.8466003190225629,
         "y": 1.4900839519718965
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "SAVED"
     },
     {
@@ -556,9 +516,7 @@
         "x": 0.5,
         "y": 1.5495805194776173
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Grab coffee and take a long walk somewhere pretty."
     },
     {
@@ -582,9 +540,7 @@
         "x": 0.15298507462686567,
         "y": 1.6045004279444366
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "60 min"
     },
     {
@@ -608,9 +564,7 @@
         "x": 0.2935323383084577,
         "y": 1.6045004279444366
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "$"
     },
     {
@@ -634,9 +588,7 @@
         "x": 0.4614427860696517,
         "y": 1.6045004279444366
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "0 matched"
     },
     {
@@ -660,9 +612,7 @@
         "x": 0.1919568854184886,
         "y": 1.6508391007133152
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Schedule",
       "viewClassName": "RCTViewComponentView"
     },
@@ -687,9 +637,7 @@
         "x": 0.4622719797922011,
         "y": 1.6508391007133152
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Mark done",
       "viewClassName": "RCTViewComponentView"
     },
@@ -714,9 +662,7 @@
         "x": 0.5,
         "y": 1.7303585515142306
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Explore Dates"
     },
     {
@@ -740,9 +686,7 @@
         "x": 0.5,
         "y": 1.7646834943059926
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Leaderboard-style date ideas built from matched items."
     },
     {
@@ -766,10 +710,7 @@
         "x": 0.16044776119402984,
         "y": 1.809878002315146
       },
-      "traits": [
-        "button",
-        "selected"
-      ],
+      "traits": ["button", "selected"],
       "label": "Sort Explore Dates by Suggested",
       "viewClassName": "RCTViewComponentView"
     },
@@ -794,9 +735,7 @@
         "x": 0.417910447761194,
         "y": 1.809878002315146
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Sort Explore Dates by Popular",
       "viewClassName": "RCTViewComponentView"
     },
@@ -821,9 +760,7 @@
         "x": 0.641376438425548,
         "y": 1.809878002315146
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Sort Explore Dates by Rating",
       "viewClassName": "RCTViewComponentView"
     },
@@ -848,9 +785,7 @@
         "x": 0.14635157229295417,
         "y": 1.8590770869833382
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Sort Explore Dates by Trending",
       "viewClassName": "RCTViewComponentView"
     },
@@ -875,9 +810,7 @@
         "x": 0.40381424937082167,
         "y": 1.9305873844661756
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Coffee walk"
     },
     {
@@ -901,9 +834,7 @@
         "x": 0.8466003190225629,
         "y": 1.9305873844661756
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "SAVED"
     },
     {
@@ -927,9 +858,7 @@
         "x": 0.5,
         "y": 1.9900839519718965
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Grab coffee and take a long walk somewhere pretty."
     },
     {
@@ -953,9 +882,7 @@
         "x": 0.15298507462686567,
         "y": 2.0450038604387157
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "60 min"
     },
     {
@@ -979,9 +906,7 @@
         "x": 0.2935323383084577,
         "y": 2.0450038604387157
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "$"
     },
     {
@@ -1005,9 +930,7 @@
         "x": 0.4614427860696517,
         "y": 2.0450038604387157
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "0 matched"
     },
     {
@@ -1031,9 +954,7 @@
         "x": 0.14718076601550353,
         "y": 2.0913425332075946
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Like",
       "viewClassName": "RCTViewComponentView"
     },
@@ -1058,9 +979,7 @@
         "x": 0.3345771239171574,
         "y": 2.0913425332075946
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Saved",
       "viewClassName": "RCTViewComponentView"
     },
@@ -1085,9 +1004,7 @@
         "x": 0.5,
         "y": 2.1708619840085097
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Matched Items"
     },
     {
@@ -1111,9 +1028,7 @@
         "x": 0.5,
         "y": 2.205186926800272
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "History of mutual yeses. These are ingredients, not dates."
     },
     {
@@ -1137,9 +1052,7 @@
         "x": 0.12728026850306573,
         "y": 2.2726926476240705
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Filter"
     },
     {
@@ -1163,9 +1076,7 @@
         "x": 0.8781094527363185,
         "y": 2.2726926476240705
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Pick random matched plan items",
       "viewClassName": "RCTViewComponentView"
     },
@@ -1190,10 +1101,7 @@
         "x": 0.152570477765591,
         "y": 2.3281845686364773
       },
-      "traits": [
-        "button",
-        "selected"
-      ],
+      "traits": ["button", "selected"],
       "label": "Filter matched plan items by Food",
       "viewClassName": "RCTViewComponentView"
     },
@@ -1218,10 +1126,7 @@
         "x": 0.34369817895082694,
         "y": 2.3281845686364773
       },
-      "traits": [
-        "button",
-        "selected"
-      ],
+      "traits": ["button", "selected"],
       "label": "Filter matched plan items by Drinks",
       "viewClassName": "RCTViewComponentView"
     },
@@ -1246,10 +1151,7 @@
         "x": 0.6073797615013312,
         "y": 2.3281845686364773
       },
-      "traits": [
-        "button",
-        "selected"
-      ],
+      "traits": ["button", "selected"],
       "label": "Filter matched plan items by Entertainment",
       "viewClassName": "RCTViewComponentView"
     },
@@ -1274,10 +1176,7 @@
         "x": 0.1720563879060508,
         "y": 2.375095393619494
       },
-      "traits": [
-        "button",
-        "selected"
-      ],
+      "traits": ["button", "selected"],
       "label": "Filter matched plan items by Activity",
       "viewClassName": "RCTViewComponentView"
     },
@@ -1302,10 +1201,7 @@
         "x": 0.3996683282045583,
         "y": 2.375095393619494
       },
-      "traits": [
-        "button",
-        "selected"
-      ],
+      "traits": ["button", "selected"],
       "label": "Filter matched plan items by Intimacy",
       "viewClassName": "RCTViewComponentView"
     },
@@ -1330,9 +1226,7 @@
         "x": 0.5,
         "y": 2.474065645335741
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "No matched activities or places in the selected categories yet."
     },
     {
@@ -1356,9 +1250,7 @@
         "x": 0.8905472636815921,
         "y": 0.8352402745995423
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Add a private plan item",
       "viewClassName": "RCTViewComponentView"
     },
@@ -1408,9 +1300,7 @@
         "x": 0.18407960199004975,
         "y": 0.9405034324942791
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Today",
       "viewClassName": "_UITabButton"
     },
@@ -1435,9 +1325,7 @@
         "x": 0.39469320066334995,
         "y": 0.9405034324942791
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Chat",
       "viewClassName": "_UITabButton"
     },
@@ -1462,10 +1350,7 @@
         "x": 0.6053067993366502,
         "y": 0.9405034324942791
       },
-      "traits": [
-        "button",
-        "selected"
-      ],
+      "traits": ["button", "selected"],
       "label": "Plans",
       "viewClassName": "_UITabButton"
     },
@@ -1490,9 +1375,7 @@
         "x": 0.8159203980099502,
         "y": 0.9405034324942791
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Me",
       "viewClassName": "_UITabButton"
     },
@@ -1517,9 +1400,7 @@
         "x": 0.18407960199004975,
         "y": 0.9405034324942791
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Today",
       "viewClassName": "_UITabButton"
     },
@@ -1544,9 +1425,7 @@
         "x": 0.39469320066334995,
         "y": 0.9405034324942791
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Chat",
       "viewClassName": "_UITabButton"
     },
@@ -1571,10 +1450,7 @@
         "x": 0.6053067993366502,
         "y": 0.9405034324942791
       },
-      "traits": [
-        "button",
-        "selected"
-      ],
+      "traits": ["button", "selected"],
       "label": "Plans",
       "viewClassName": "_UITabButton"
     },
@@ -1599,9 +1475,7 @@
         "x": 0.8159203980099502,
         "y": 0.9405034324942791
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Me",
       "viewClassName": "_UITabButton"
     },
@@ -1626,9 +1500,7 @@
         "x": 0.5,
         "y": -0.017353165522501903
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Refreshing...",
       "viewClassName": "UILabel"
     }

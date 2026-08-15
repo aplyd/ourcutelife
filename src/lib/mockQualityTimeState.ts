@@ -444,6 +444,17 @@ export function createMockQualityTimeState(clock: Clock = Date.now) {
     getRequest(args: { requestId: string }) {
       return project(requireRequest(args?.requestId));
     },
+    listPendingResponses(...args: never[]) {
+      if (args.length !== 0) throw new Error("Quality Time discovery takes no arguments.");
+      if (
+        actor !== "responder" ||
+        !request ||
+        (request.status !== "sent" && request.status !== "responding")
+      ) {
+        return [];
+      }
+      return [neutralProjection(request, request.status)];
+    },
     listDraftInventory(args: {
       requestId: string;
       category: MockQualityTimeCategory;

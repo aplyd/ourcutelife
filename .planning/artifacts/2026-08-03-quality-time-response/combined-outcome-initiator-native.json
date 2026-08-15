@@ -28,9 +28,7 @@
         "x": 0.5,
         "y": 0.11899313501144165
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Your Quality Time is ready"
     },
     {
@@ -54,9 +52,7 @@
         "x": 0.5,
         "y": 0.19221967963386727
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "No shared Entertainment option this time. You both want Breakfast picnic for Eat."
     },
     {
@@ -130,9 +126,7 @@
         "x": 0.5,
         "y": 0.6384439359267735
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Back to Plans",
       "viewClassName": "RCTViewComponentView"
     }

@@ -155,6 +155,8 @@ Initiator mobile plan: `phases/07-quality-time/07-03-PLAN.md`
 
 Responder mobile/outcome plan: `phases/07-quality-time/07-04-PLAN.md` (complete; independently approved)
 
+Responder in-app discovery plan: `phases/07-quality-time/07-05-PLAN.md` (planning approved; implementation active)
+
 Required slices:
 
 - [x] Map reusable data/routes from the current Plans model and write a migration-safe replacement plan.
@@ -165,5 +167,6 @@ Required slices:
 - Initiator accepts 3–5 private cards per selected category before the request can be sent.
 - [x] Partner receives the completed request, chooses current-interest categories, and privately decides only against server-projected relevant inventory through the Slice 07-04 responder route.
 - [x] Stop each agreed category when a mutual option is found and present the combined mutual-only Quality Time outcome to both participants.
+- [ ] Implement Slice 07-05 responder in-app discovery so a partner can reach fresh sent/responding requests from `/plans` without an out-of-band request ID; keep notification delivery, history, rescheduling, abandonment, migration, and legacy cutover separate.
 - Preserve private rejections and authorship; cover no-match, insufficient inventory, abandonment, expiration, rescheduling, and cancellation.
 - Verify the complete server-side two-partner lifecycle with focused and full tests; carry Argent evidence forward to the first Quality Time mobile slice because Slice 07-02 changes no mobile surface.

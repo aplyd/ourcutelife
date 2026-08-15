@@ -1,0 +1,30 @@
+{
+  "file": "/Users/austinftacnik/.argent/tmp/argent-logs-8084-1786769010862.log",
+  "totalEntries": 2,
+  "byLevel": {
+    "log": 1,
+    "info": 1
+  },
+  "fileSizeBytes": 1159,
+  "clusters": [
+    {
+      "message": "Running \"main\" with {\"rootTag\":11,\"initialProps\":{},\"fabric\":true}",
+      "count": 1,
+      "level": "log",
+      "firstId": 0,
+      "lastId": 0,
+      "sourceLine": 1169
+    },
+    {
+      "message": "\u001b[34mHeroUI Native Styling Principles\u001b[0m\n• className: this is your go-to styling solution. Use Tailwind CSS classes via className prop on all components.\n• StyleSheet precedence: The style prop (Styl",
+      "count": 1,
+      "level": "info",
+      "firstId": 1,
+      "lastId": 1,
+      "sourceLine": 1169
+    }
+  ],
+  "deviceName": "iPhone 17 Pro",
+  "appName": "com.ourcutelife.app (iPhone 17 Pro)",
+  "logicalDeviceId": "2842eb0d6d375366f89971fba5b5bd4406a5b503"
+}

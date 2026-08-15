@@ -28,9 +28,7 @@
         "x": 0.1148424575577921,
         "y": 0.09839816933638444
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Back to Plans",
       "viewClassName": "RCTViewComponentView"
     },
@@ -55,9 +53,7 @@
         "x": 0.5049751433567028,
         "y": 0.09839816933638444
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Matched plan items"
     },
     {
@@ -81,10 +77,7 @@
         "x": 0.0899668309225965,
         "y": 0.16189931350114417
       },
-      "traits": [
-        "button",
-        "selected"
-      ],
+      "traits": ["button", "selected"],
       "label": "Filter matched plan items by All",
       "viewClassName": "RCTViewComponentView"
     },
@@ -109,9 +102,7 @@
         "x": 0.25290214956103274,
         "y": 0.16189931350114417
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Filter matched plan items by Food",
       "viewClassName": "RCTViewComponentView"
     },
@@ -136,9 +127,7 @@
         "x": 0.4490049751243781,
         "y": 0.16189931350114417
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Filter matched plan items by Drinks",
       "viewClassName": "RCTViewComponentView"
     },
@@ -163,9 +152,7 @@
         "x": 0.7176616915422885,
         "y": 0.16189931350114417
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Filter matched plan items by Entertainment",
       "viewClassName": "RCTViewComponentView"
     },
@@ -190,9 +177,7 @@
         "x": 0.1322553928811752,
         "y": 0.21109839816933637
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Filter matched plan items by Activity",
       "viewClassName": "RCTViewComponentView"
     },
@@ -217,9 +202,7 @@
         "x": 0.3648424575577921,
         "y": 0.21109839816933637
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Filter matched plan items by Intimacy",
       "viewClassName": "RCTViewComponentView"
     },
@@ -244,9 +227,7 @@
         "x": 0.5,
         "y": 0.2803203661327231
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "ACTIVITY · DATE"
     },
     {
@@ -270,9 +251,7 @@
         "x": 0.5,
         "y": 0.31922196796338675
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Sunset picnic QA date"
     },
     {
@@ -296,9 +275,7 @@
         "x": 0.5,
         "y": 0.37414187643020597
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "A mock plan idea used for local simulator verification."
     },
     {
@@ -322,9 +299,7 @@
         "x": 0.15091210929908563,
         "y": 0.4267734553775744
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "#cozy"
     },
     {
@@ -348,9 +323,7 @@
         "x": 0.3275290247219712,
         "y": 0.4267734553775744
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "#easy"
     },
     {
@@ -374,9 +347,7 @@
         "x": 0.5,
         "y": 0.35108022056005256
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "ADD ACTIVITY OR PLACE"
     },
     {
@@ -400,9 +371,7 @@
         "x": 0.5,
         "y": 0.39282800338505797
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Suggest it safely"
     },
     {
@@ -426,9 +395,7 @@
         "x": 0.5,
         "y": 0.4499565483034864
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Your partner can swipe on it, but they won’t know you created it unless it becomes a match."
     },
     {
@@ -452,9 +419,7 @@
         "x": 0.5,
         "y": 0.504887841494283
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Title"
     },
     {
@@ -504,9 +469,7 @@
         "x": 0.5,
         "y": 0.6059614209653488
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Description"
     },
     {
@@ -555,9 +518,7 @@
         "x": 0.5,
         "y": 0.7773470557206342
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Type"
     },
     {
@@ -581,10 +542,7 @@
         "x": 0.1480862715289084,
         "y": 0.8207427773413634
       },
-      "traits": [
-        "button",
-        "selected"
-      ],
+      "traits": ["button", "selected"],
       "label": "Set plan item type to Activity",
       "viewClassName": "RCTViewComponentView"
     },
@@ -609,9 +567,7 @@
         "x": 0.35151151070420467,
         "y": 0.8207427773413634
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Set plan item type to Place",
       "viewClassName": "RCTViewComponentView"
     },
@@ -636,9 +592,7 @@
         "x": 0.5,
         "y": 0.8685330024173564
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Category"
     },
     {
@@ -662,10 +616,7 @@
         "x": 0.1269873652622601,
         "y": 0.9119287240380858
       },
-      "traits": [
-        "button",
-        "selected"
-      ],
+      "traits": ["button", "selected"],
       "label": "Set plan item category to Food",
       "viewClassName": "RCTViewComponentView"
     },
@@ -690,9 +641,7 @@
         "x": 0.3168774669924153,
         "y": 0.9119287240380858
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Set plan item category to Drinks",
       "viewClassName": "RCTViewComponentView"
     },
@@ -717,9 +666,7 @@
         "x": 0.5835994158560431,
         "y": 0.9119287240380858
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Set plan item category to Entertainment",
       "viewClassName": "RCTViewComponentView"
     },
@@ -744,9 +691,7 @@
         "x": 0.15047482626765252,
         "y": 0.9591696361821708
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Set plan item category to Activity",
       "viewClassName": "RCTViewComponentView"
     },
@@ -771,9 +716,7 @@
         "x": 0.38136844493850575,
         "y": 0.9591696361821708
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Set plan item category to Intimacy",
       "viewClassName": "RCTViewComponentView"
     },
@@ -798,9 +741,7 @@
         "x": 0.5,
         "y": 1.0069598612581638
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Hashtags / subcategories"
     },
     {
@@ -850,10 +791,7 @@
         "x": 0.5,
         "y": 1.1278087062779163
       },
-      "traits": [
-        "button",
-        "notEnabled"
-      ],
+      "traits": ["button", "notEnabled"],
       "label": "Save private suggestion",
       "viewClassName": "RCTViewComponentView"
     },
@@ -878,9 +816,7 @@
         "x": 0.5,
         "y": -0.017353165522501903
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Refreshing...",
       "viewClassName": "UILabel"
     }

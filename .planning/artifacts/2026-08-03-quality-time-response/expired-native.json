@@ -28,9 +28,7 @@
         "x": 0.5,
         "y": 0.4244851258581236
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Quality Time request expired"
     },
     {
@@ -54,9 +52,7 @@
         "x": 0.5,
         "y": 0.5205949656750573
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Nothing else was shared. Start again whenever the timing feels right."
     },
     {
@@ -80,9 +76,7 @@
         "x": 0.5,
         "y": 0.5961098398169337
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Back to Plans",
       "viewClassName": "RCTViewComponentView"
     },
@@ -107,9 +101,7 @@
         "x": 0.5,
         "y": -0.017353165522501903
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Refreshing...",
       "viewClassName": "UILabel"
     }

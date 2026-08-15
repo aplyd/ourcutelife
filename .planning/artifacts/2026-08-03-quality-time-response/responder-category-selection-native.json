@@ -28,9 +28,7 @@
         "x": 0.1148424575577921,
         "y": 0.09839816933638444
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Back to Plans",
       "viewClassName": "RCTViewComponentView"
     },
@@ -55,9 +53,7 @@
         "x": 0.5049751433567028,
         "y": 0.09839816933638444
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Matched plan items"
     },
     {
@@ -81,10 +77,7 @@
         "x": 0.0899668309225965,
         "y": 0.16189931350114417
       },
-      "traits": [
-        "button",
-        "selected"
-      ],
+      "traits": ["button", "selected"],
       "label": "Filter matched plan items by All",
       "viewClassName": "RCTViewComponentView"
     },
@@ -109,9 +102,7 @@
         "x": 0.25290214956103274,
         "y": 0.16189931350114417
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Filter matched plan items by Food",
       "viewClassName": "RCTViewComponentView"
     },
@@ -136,9 +127,7 @@
         "x": 0.4490049751243781,
         "y": 0.16189931350114417
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Filter matched plan items by Drinks",
       "viewClassName": "RCTViewComponentView"
     },
@@ -163,9 +152,7 @@
         "x": 0.7176616915422885,
         "y": 0.16189931350114417
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Filter matched plan items by Entertainment",
       "viewClassName": "RCTViewComponentView"
     },
@@ -190,9 +177,7 @@
         "x": 0.1322553928811752,
         "y": 0.21109839816933637
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Filter matched plan items by Activity",
       "viewClassName": "RCTViewComponentView"
     },
@@ -217,9 +202,7 @@
         "x": 0.3648424575577921,
         "y": 0.21109839816933637
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Filter matched plan items by Intimacy",
       "viewClassName": "RCTViewComponentView"
     },
@@ -244,9 +227,7 @@
         "x": 0.5,
         "y": 0.2803203661327231
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "ACTIVITY · DATE"
     },
     {
@@ -270,9 +251,7 @@
         "x": 0.5,
         "y": 0.31922196796338675
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Sunset picnic QA date"
     },
     {
@@ -296,9 +275,7 @@
         "x": 0.5,
         "y": 0.37414187643020597
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "A mock plan idea used for local simulator verification."
     },
     {
@@ -322,9 +299,7 @@
         "x": 0.15091210929908563,
         "y": 0.4267734553775744
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "#cozy"
     },
     {
@@ -348,9 +323,7 @@
         "x": 0.3275290247219712,
         "y": 0.4267734553775744
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "#easy"
     },
     {
@@ -374,9 +347,7 @@
         "x": 0.14550176441886337,
         "y": 0.17294534194018465
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Back to Plans",
       "viewClassName": "RCTViewComponentView"
     },
@@ -401,9 +372,7 @@
         "x": 0.5049606974368456,
         "y": 0.17294534194018465
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Quality Time"
     },
     {
@@ -427,9 +396,7 @@
         "x": 0.5000000000000001,
         "y": 0.25929847330851463
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "What sounds good together?"
     },
     {
@@ -453,9 +420,7 @@
         "x": 0.5000000000000001,
         "y": 0.33512073499778
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Pick when and what you’re open to. Your option choices stay private while you build a shortlist."
     },
     {
@@ -479,9 +444,7 @@
         "x": 0.5000000000000001,
         "y": 0.391987431264729
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "When?"
     },
     {
@@ -505,10 +468,7 @@
         "x": 0.13901470794568205,
         "y": 0.43779671436866013
       },
-      "traits": [
-        "button",
-        "selected"
-      ],
+      "traits": ["button", "selected"],
       "label": "Now",
       "viewClassName": "RCTViewComponentView"
     },
@@ -533,9 +493,7 @@
         "x": 0.36949579582536335,
         "y": 0.43779671436866013
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Plan for later",
       "viewClassName": "RCTViewComponentView"
     },
@@ -560,9 +518,7 @@
         "x": 0.5000000000000001,
         "y": 0.4920306932158431
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "What are you open to?"
     },
     {
@@ -586,9 +542,7 @@
         "x": 0.13176448068826263,
         "y": 0.5378399763197741
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Eat",
       "viewClassName": "RCTViewComponentView"
     },
@@ -613,9 +567,7 @@
         "x": 0.2962303000633523,
         "y": 0.5378399763197741
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Drink",
       "viewClassName": "RCTViewComponentView"
     },
@@ -640,9 +592,7 @@
         "x": 0.5816605141315068,
         "y": 0.5378399763197741
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Explore/Adventure",
       "viewClassName": "RCTViewComponentView"
     },
@@ -667,9 +617,7 @@
         "x": 0.2195304571669018,
         "y": 0.5915474116830038
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Entertainment",
       "viewClassName": "RCTViewComponentView"
     },
@@ -694,9 +642,7 @@
         "x": 0.5022895472884334,
         "y": 0.5915474116830038
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Romance",
       "viewClassName": "RCTViewComponentView"
     },
@@ -721,9 +667,7 @@
         "x": 0.5000000000000001,
         "y": 0.6373566947869349
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Choose at least one category to continue."
     },
     {
@@ -747,10 +691,7 @@
         "x": 0.5000000000000001,
         "y": 0.6984357389255099
       },
-      "traits": [
-        "button",
-        "notEnabled"
-      ],
+      "traits": ["button", "notEnabled"],
       "label": "Choose private options",
       "viewClassName": "RCTViewComponentView"
     },
@@ -775,9 +716,7 @@
         "x": 0.5000000000000001,
         "y": 0.38791739244282025
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Waiting for your partner"
     },
     {
@@ -801,9 +740,7 @@
         "x": 0.5000000000000001,
         "y": 0.47637669774696306
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Your private shortlist is saved. You can leave this screen and come back later."
     },
     {
@@ -827,9 +764,7 @@
         "x": 0.5000000000000001,
         "y": 0.5479866115646026
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Cancel Quality Time request",
       "viewClassName": "RCTViewComponentView"
     },
@@ -854,9 +789,7 @@
         "x": 0.5000000000000001,
         "y": 0.6174903514464293
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Back to Plans",
       "viewClassName": "RCTViewComponentView"
     },
@@ -881,9 +814,7 @@
         "x": 0.5,
         "y": 0.20137299771167047
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Choose what sounds good now"
     },
     {
@@ -907,9 +838,7 @@
         "x": 0.5,
         "y": 0.2700228832951945
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Now · Pick at least one requested category."
     },
     {
@@ -933,9 +862,7 @@
         "x": 0.5,
         "y": 0.3403890160183066
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Choose Eat for this Quality Time",
       "viewClassName": "RCTViewComponentView"
     },
@@ -960,9 +887,7 @@
         "x": 0.5,
         "y": 0.41247139588100684
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Choose Entertainment for this Quality Time",
       "viewClassName": "RCTViewComponentView"
     },
@@ -987,10 +912,7 @@
         "x": 0.5,
         "y": 0.5011441647597255
       },
-      "traits": [
-        "button",
-        "notEnabled"
-      ],
+      "traits": ["button", "notEnabled"],
       "label": "Start choosing together",
       "viewClassName": "RCTViewComponentView"
     },
@@ -1015,9 +937,7 @@
         "x": 0.5,
         "y": 0.5881006864988558
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Cancel Quality Time request",
       "viewClassName": "RCTViewComponentView"
     },
@@ -1042,9 +962,7 @@
         "x": 0.5,
         "y": 0.6681922196796338
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Back to Plans",
       "viewClassName": "RCTViewComponentView"
     },
@@ -1069,9 +987,7 @@
         "x": 0.5,
         "y": -0.017353165522501903
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Refreshing...",
       "viewClassName": "UILabel"
     }

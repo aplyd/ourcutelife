@@ -29,6 +29,7 @@ const DRAFT_LIFETIME_MS = 7 * 24 * 60 * 60 * 1_000;
 const MAX_CATEGORIES = 5;
 const MAX_DECISIONS_PER_CATEGORY = 64;
 const MAX_INVENTORY_PAGE_SIZE = 12;
+const MAX_PENDING_RESPONSES = 10;
 
 type QualityTimeCategory = "eat" | "drink" | "explore_adventure" | "entertainment" | "romance";
 
@@ -1080,6 +1081,69 @@ export const cancelRequest = mutation({
       version,
     });
     return { requestId: request._id, status: "canceled" as const, version };
+  },
+});
+
+export const listPendingResponses = query({
+  args: {},
+  handler: async (ctx) => {
+    const pair = await requireExactPair(ctx);
+    const sent = await ctx.db
+      .query("qualityTimeRequests")
+      .withIndex("by_responder_user_id_and_status_and_updated_at", (q) =>
+        q.eq("responderUserId", pair.viewerUserId).eq("status", "sent"),
+      )
+      .take(MAX_PENDING_RESPONSES + 1);
+    const responding = await ctx.db
+      .query("qualityTimeRequests")
+      .withIndex("by_responder_user_id_and_status_and_updated_at", (q) =>
+        q.eq("responderUserId", pair.viewerUserId).eq("status", "responding"),
+      )
+      .take(MAX_PENDING_RESPONSES + 1);
+    if (
+      sent.length > MAX_PENDING_RESPONSES ||
+      responding.length > MAX_PENDING_RESPONSES ||
+      sent.length + responding.length > MAX_PENDING_RESPONSES
+    ) {
+      throw new Error("Quality Time requests unavailable.");
+    }
+
+    const now = Date.now();
+    const candidates = [...sent, ...responding];
+    for (const request of candidates) {
+      if (requestRoleForExactPair(request, pair) !== "responder") {
+        throw new Error("Quality Time requests unavailable.");
+      }
+      validatePersistedRequestVersion(request);
+      validateActiveRequestEvidence(request);
+      if (request.expiresAt !== undefined && !Number.isFinite(request.expiresAt)) {
+        throw new Error("Quality Time requests unavailable.");
+      }
+      if (request.status === "sent") {
+        await collectSendAcceptedOptions(ctx, request);
+        const outcomes = await ctx.db
+          .query("qualityTimeOutcomes")
+          .withIndex("by_request_id_and_created_at", (q) => q.eq("requestId", request._id))
+          .take(1);
+        if (outcomes.length !== 0) throw new Error("Quality Time requests unavailable.");
+      } else {
+        await loadAllOutcomeEvidence(ctx, request);
+      }
+    }
+
+    return candidates
+      .filter((request) => request.expiresAt === undefined || now < request.expiresAt)
+      .sort((left, right) => {
+        if (left.updatedAt !== right.updatedAt) return right.updatedAt - left.updatedAt;
+        return left._id < right._id ? -1 : left._id > right._id ? 1 : 0;
+      })
+      .map((request) => ({
+        requestId: request._id,
+        status: request.status as "sent" | "responding",
+        version: request.version,
+        timing: projectTiming(request),
+        selectedCategories: [...request.selectedCategories],
+      }));
   },
 });
 

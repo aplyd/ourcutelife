@@ -28,9 +28,7 @@
         "x": 0.1148424575577921,
         "y": 0.08924485125858124
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Back",
       "viewClassName": "RCTViewComponentView"
     },
@@ -55,9 +53,7 @@
         "x": 0.4792703087650128,
         "y": 0.08924485125858124
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Food plan items"
     },
     {
@@ -81,9 +77,7 @@
         "x": 0.8644278606965174,
         "y": 0.08924485125858124
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "History",
       "viewClassName": "RCTViewComponentView"
     },
@@ -108,9 +102,7 @@
         "x": 0.29892205005854516,
         "y": 0.16819221967963388
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "FOOD PLAN ITEMS"
     },
     {
@@ -134,9 +126,7 @@
         "x": 0.682006627172973,
         "y": 0.16819221967963388
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "ACTIVITY"
     },
     {
@@ -160,9 +150,7 @@
         "x": 0.5,
         "y": 0.2597254004576659
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Sunset picnic QA date"
     },
     {
@@ -186,9 +174,7 @@
         "x": 0.5,
         "y": 0.36270022883295194
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "A mock plan idea used for local simulator verification."
     },
     {
@@ -212,9 +198,7 @@
         "x": 0.15298507462686567,
         "y": 0.43363844393592677
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "#cozy"
     },
     {
@@ -238,9 +222,7 @@
         "x": 0.3341625270558827,
         "y": 0.43363844393592677
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "#easy"
     },
     {
@@ -264,9 +246,7 @@
         "x": 0.27860696517412936,
         "y": 0.8981693363844394
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Pass",
       "viewClassName": "RCTViewComponentView"
     },
@@ -291,9 +271,7 @@
         "x": 0.7213930348258707,
         "y": 0.8981693363844394
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Like",
       "viewClassName": "RCTViewComponentView"
     },
@@ -318,9 +296,7 @@
         "x": 0.5,
         "y": -0.017353165522501903
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Refreshing...",
       "viewClassName": "UILabel"
     }

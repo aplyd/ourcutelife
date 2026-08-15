@@ -28,9 +28,7 @@
         "x": 0.5,
         "y": 0.39931350114416475
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Quality Time is ready"
     },
     {
@@ -54,9 +52,7 @@
         "x": 0.5,
         "y": 0.4588100686498856
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Your shared result is ready."
     },
     {
@@ -80,9 +76,7 @@
         "x": 0.5,
         "y": 0.522883295194508
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "View Quality Time outcome",
       "viewClassName": "RCTViewComponentView"
     },
@@ -107,9 +101,7 @@
         "x": 0.5,
         "y": 0.5983981693363845
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Back to Plans",
       "viewClassName": "RCTViewComponentView"
     },
@@ -134,9 +126,7 @@
         "x": 0.5,
         "y": -0.017353165522501903
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Refreshing...",
       "viewClassName": "UILabel"
     }

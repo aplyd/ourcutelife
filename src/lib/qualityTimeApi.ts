@@ -9,6 +9,14 @@ export type QualityTimeCategory =
 
 export type QualityTimeTiming = { kind: "now" } | { kind: "future"; scheduledFor: number };
 
+export type QualityTimePendingResponse = {
+  requestId: QualityTimeRequestId;
+  status: "sent" | "responding";
+  version: number;
+  timing: QualityTimeTiming;
+  selectedCategories: QualityTimeCategory[];
+};
+
 export type QualityTimeRequestId = string & {
   readonly __qualityTimeRequestId: unique symbol;
 };
@@ -131,6 +139,13 @@ export const getQualityTimeRequest: FunctionReference<
   { requestId: QualityTimeRequestId },
   QualityTimeRequestProjection
 > = makeFunctionReference("qualityTime:getRequest");
+
+export const listQualityTimePendingResponses: FunctionReference<
+  "query",
+  "public",
+  Record<string, never>,
+  QualityTimePendingResponse[]
+> = makeFunctionReference("qualityTime:listPendingResponses");
 
 export const listQualityTimeDraftInventory: FunctionReference<
   "query",

@@ -642,3 +642,58 @@ void test("test bridge exposes only fixed development operations and devMock ins
   );
   assert.match(devMockSource, /case "qualityTime:beginResponse"/);
 });
+
+void test("responder discovery follows sent, responding, completed, and terminal fixture states", () => {
+  const state = createMockQualityTimeState(() => NOW);
+  const seeded = state.seed("mixed");
+  assert.deepEqual(state.listPendingResponses(), []);
+  assert.throws(() => state.listPendingResponses({ actor: "responder" } as never));
+
+  state.setActor("responder");
+  const sent = state.listPendingResponses();
+  assert.deepEqual(sent, [
+    {
+      requestId: seeded.requestId,
+      status: "sent",
+      version: seeded.version,
+      timing: { kind: "now" },
+      selectedCategories: ["eat", "entertainment"],
+    },
+  ]);
+  assert.notStrictEqual(state.listPendingResponses(), sent);
+  assert.notStrictEqual(state.listPendingResponses()[0], sent[0]);
+
+  let refreshes = 0;
+  state.subscribe(() => (refreshes += 1));
+  const begun = state.beginResponse({
+    requestId: seeded.requestId,
+    expectedVersion: seeded.version,
+    categories: ["eat", "entertainment"],
+  });
+  assert.equal(state.listPendingResponses()[0]?.status, "responding");
+  let version = begun.version;
+  version = state.recordDecision({
+    requestId: seeded.requestId,
+    expectedVersion: version,
+    optionId: "mock_quality_time_option_eat_1",
+    decision: "accept",
+  }).version;
+  for (let index = 1; index <= 3; index += 1) {
+    version = state.recordDecision({
+      requestId: seeded.requestId,
+      expectedVersion: version,
+      optionId: `mock_quality_time_option_entertainment_${index}`,
+      decision: "pass",
+    }).version;
+  }
+  assert.deepEqual(state.listPendingResponses(), []);
+  assert.ok(refreshes >= 5);
+
+  for (const scenario of ["expired", "canceled", "all_match", "all_no_match"] as const) {
+    state.seed(scenario);
+    for (const actor of ["initiator", "responder"] as const) {
+      state.setActor(actor);
+      assert.deepEqual(state.listPendingResponses(), []);
+    }
+  }
+});

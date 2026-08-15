@@ -4,7 +4,10 @@ import { makeFunctionReference } from "convex/server";
 import { expect, test, vi } from "vitest";
 
 import type { Id } from "./_generated/dataModel";
-import { recordDecision as recordDecisionDefinition } from "./qualityTime";
+import {
+  listPendingResponses as listPendingResponsesDefinition,
+  recordDecision as recordDecisionDefinition,
+} from "./qualityTime";
 import schema from "./schema";
 
 const modules = import.meta.glob("./**/*.ts");
@@ -12,6 +15,11 @@ const modules = import.meta.glob("./**/*.ts");
 test("recordDecision exports the top-level object validator required by Convex mutations", () => {
   const registered = recordDecisionDefinition as unknown as { exportArgs: () => string };
   expect(JSON.parse(registered.exportArgs())).toMatchObject({ type: "object" });
+});
+
+test("listPendingResponses exports an exact empty object validator", () => {
+  const registered = listPendingResponsesDefinition as unknown as { exportArgs: () => string };
+  expect(JSON.parse(registered.exportArgs())).toEqual({ type: "object", value: {} });
 });
 
 type Category = "eat" | "drink" | "explore_adventure" | "entertainment" | "romance";
@@ -94,6 +102,18 @@ const recordDecision = makeFunctionReference<
     version: number;
   }
 >("qualityTime:recordDecision");
+
+const listPendingResponses = makeFunctionReference<
+  "query",
+  Record<string, never>,
+  Array<{
+    requestId: Id<"qualityTimeRequests">;
+    status: "sent" | "responding";
+    version: number;
+    timing: Timing;
+    selectedCategories: Category[];
+  }>
+>("qualityTime:listPendingResponses");
 
 type TestClient = ReturnType<typeof convexTest>;
 
@@ -2132,4 +2152,285 @@ test("draft counts reject orphan options and extra option-attached decision evid
       asInitiator(t, prefix).query(getRequest, { requestId: draft.requestId }),
     ).rejects.toThrow("Invalid draft decision evidence");
   }
+});
+
+async function insertDiscoverableRequest(
+  t: TestClient,
+  pair: SeededCouple,
+  updatedAt: number,
+  overrides: Record<string, unknown> = {},
+  optionCount = 3,
+) {
+  return await t.run(async (ctx) => {
+    const status = overrides.status === "responding" ? "responding" : "sent";
+    const requestId = await ctx.db.insert("qualityTimeRequests", {
+      coupleId: pair.coupleId,
+      initiatorUserId: pair.initiatorUserId,
+      responderUserId: pair.responderUserId,
+      timingKind: "now",
+      selectedCategories: ["eat"],
+      status,
+      version: status === "responding" ? 3 : 2,
+      createdAt: updatedAt - 2,
+      updatedAt,
+      sentAt: status === "responding" ? updatedAt - 1 : updatedAt,
+      responderCategories: status === "responding" ? ["eat"] : undefined,
+      expiresAt: Date.now() + 60_000,
+      ...overrides,
+    } as never);
+    for (let index = 0; index < optionCount; index += 1) {
+      const planIdeaId = await ctx.db.insert("planIdeas", {
+        coupleId: pair.coupleId,
+        title: `Discovery ${updatedAt} ${index}`,
+        description: "Neutral inventory",
+        category: "food",
+        costLevel: 1,
+        durationMinutes: 30,
+        vibeTags: [],
+        createdAt: updatedAt + index,
+      });
+      const optionId = await ctx.db.insert("qualityTimeOptions", {
+        requestId,
+        coupleId: pair.coupleId,
+        category: "eat",
+        planIdeaId,
+        title: `Discovery ${updatedAt} ${index}`,
+        description: "Neutral snapshot",
+        kind: "place",
+        costLevel: 1,
+        durationMinutes: 30,
+        vibeTags: [],
+        createdAt: updatedAt + index,
+      });
+      await ctx.db.insert("qualityTimeDecisions", {
+        requestId,
+        coupleId: pair.coupleId,
+        optionId,
+        category: "eat",
+        userId: pair.initiatorUserId,
+        decision: "accept",
+        createdAt: updatedAt + index,
+      });
+    }
+    return requestId;
+  });
+}
+
+async function snapshotDiscoveryWriteTables(t: TestClient) {
+  return await t.run(async (ctx) => ({
+    qualityTimeRequests: await ctx.db.query("qualityTimeRequests").take(100),
+    qualityTimeOptions: await ctx.db.query("qualityTimeOptions").take(100),
+    qualityTimeDecisions: await ctx.db.query("qualityTimeDecisions").take(100),
+    qualityTimeOutcomes: await ctx.db.query("qualityTimeOutcomes").take(100),
+    notificationDevices: await ctx.db.query("notificationDevices").take(100),
+    pairingAcceptedNotifications: await ctx.db.query("pairingAcceptedNotifications").take(100),
+    pushTokens: await ctx.db.query("pushTokens").take(100),
+    promptResponses: await ctx.db.query("promptResponses").take(100),
+    dailyPrompts: await ctx.db.query("dailyPrompts").take(100),
+    dailyPromptLifecycles: await ctx.db.query("dailyPromptLifecycles").take(100),
+    dailyPromptCompletions: await ctx.db.query("dailyPromptCompletions").take(100),
+    dailyPromptDeliveryAttempts: await ctx.db.query("dailyPromptDeliveryAttempts").take(100),
+    dailyPromptAnswerStarts: await ctx.db.query("dailyPromptAnswerStarts").take(100),
+    planIdeas: await ctx.db.query("planIdeas").take(100),
+    planSwipes: await ctx.db.query("planSwipes").take(100),
+    planMatches: await ctx.db.query("planMatches").take(100),
+    planArchiveVotes: await ctx.db.query("planArchiveVotes").take(100),
+    datePlans: await ctx.db.query("datePlans").take(100),
+    datePlanLikes: await ctx.db.query("datePlanLikes").take(100),
+    savedDatePlans: await ctx.db.query("savedDatePlans").take(100),
+    datePlanRatings: await ctx.db.query("datePlanRatings").take(100),
+  }));
+}
+
+test("pending discovery accepts no arguments and projects sent/responding only to the exact responder", async () => {
+  const t = convexTest(schema, modules);
+  const pair = await seedCouple(t);
+  const sent = await insertDiscoverableRequest(t, pair, 10);
+  const responding = await insertDiscoverableRequest(t, pair, 20, { status: "responding" });
+
+  expect(await asInitiator(t).query(listPendingResponses, {})).toEqual([]);
+  expect(await asResponder(t).query(listPendingResponses, {})).toEqual([
+    {
+      requestId: responding,
+      status: "responding",
+      version: 3,
+      timing: { kind: "now" },
+      selectedCategories: ["eat"],
+    },
+    {
+      requestId: sent,
+      status: "sent",
+      version: 2,
+      timing: { kind: "now" },
+      selectedCategories: ["eat"],
+    },
+  ]);
+  await expect(
+    asResponder(t).query(listPendingResponses, { status: "sent" } as never),
+  ).rejects.toThrow();
+});
+
+test("pending discovery excludes draft, completed, canceled, persisted-expired, overdue, and initiator-owned rows", async () => {
+  const t = convexTest(schema, modules);
+  const pair = await seedCouple(t);
+  const statuses = ["draft", "completed", "canceled", "expired"] as const;
+  for (let index = 0; index < statuses.length; index += 1) {
+    const requestId = await insertDiscoverableRequest(t, pair, 10 + index);
+    await t.run(async (ctx) => ctx.db.patch(requestId, { status: statuses[index] }));
+  }
+  await insertDiscoverableRequest(t, pair, 30, { expiresAt: Date.now() - 1 });
+
+  expect(await asResponder(t).query(listPendingResponses, {})).toEqual([]);
+  expect(await asInitiator(t).query(listPendingResponses, {})).toEqual([]);
+});
+
+test("pending discovery is newest-first with request ID as the equal-updatedAt tie-break", async () => {
+  const t = convexTest(schema, modules);
+  const pair = await seedCouple(t);
+  const tiedA = await insertDiscoverableRequest(t, pair, 10);
+  const tiedB = await insertDiscoverableRequest(t, pair, 10);
+  const newest = await insertDiscoverableRequest(t, pair, 20);
+  const tied = [tiedA, tiedB].sort();
+
+  expect(
+    (await asResponder(t).query(listPendingResponses, {})).map((entry) => entry.requestId),
+  ).toEqual([newest, ...tied]);
+});
+
+test("pending discovery returns exactly ten valid mixed rows and fails closed on per-status or combined overflow", async () => {
+  const exact = convexTest(schema, modules);
+  const exactPair = await seedCouple(exact);
+  for (let index = 0; index < 5; index += 1) {
+    await insertDiscoverableRequest(exact, exactPair, 100 + index);
+    await insertDiscoverableRequest(exact, exactPair, 200 + index, { status: "responding" });
+  }
+  expect(await asResponder(exact).query(listPendingResponses, {})).toHaveLength(10);
+
+  await insertDiscoverableRequest(exact, exactPair, 300, { status: "responding" });
+  await expect(asResponder(exact).query(listPendingResponses, {})).rejects.toThrow(
+    "Quality Time requests unavailable",
+  );
+
+  const perStatus = convexTest(schema, modules);
+  const perStatusPair = await seedCouple(perStatus);
+  for (let index = 0; index < 11; index += 1) {
+    await insertDiscoverableRequest(perStatus, perStatusPair, 400 + index);
+  }
+  await expect(asResponder(perStatus).query(listPendingResponses, {})).rejects.toThrow(
+    "Quality Time requests unavailable",
+  );
+});
+
+test.each([
+  ["version", { version: 0 }, 3],
+  ["timing", { timingKind: "now", scheduledFor: Date.now() + 60_000 }, 3],
+  ["category", { selectedCategories: ["eat", "eat"] }, 3],
+  ["sent active state", { responderCategories: ["eat"] }, 3],
+  ["shortlist", {}, 2],
+])(
+  "pending discovery fails closed on malformed %s evidence",
+  async (_label, overrides, optionCount) => {
+    const t = convexTest(schema, modules);
+    const pair = await seedCouple(t);
+    await insertDiscoverableRequest(t, pair, 10, overrides, optionCount);
+    await expect(asResponder(t).query(listPendingResponses, {})).rejects.toThrow();
+  },
+);
+
+test("pending discovery fails closed on malformed outcome evidence", async () => {
+  const t = convexTest(schema, modules);
+  const pair = await seedCouple(t);
+  const requestId = await insertDiscoverableRequest(t, pair, 10);
+  await t.run(async (ctx) => {
+    const option = (
+      await ctx.db
+        .query("qualityTimeOptions")
+        .withIndex("by_request_id_and_category_and_created_at", (q) =>
+          q.eq("requestId", requestId).eq("category", "eat"),
+        )
+        .take(1)
+    )[0];
+    await ctx.db.insert("qualityTimeOutcomes", {
+      requestId,
+      coupleId: pair.coupleId,
+      category: "eat",
+      optionId: option._id,
+      matchedAt: 10,
+      createdAt: 10,
+    });
+  });
+  await expect(asResponder(t).query(listPendingResponses, {})).rejects.toThrow(
+    "Quality Time requests unavailable",
+  );
+});
+
+test("pending discovery fails closed on foreign and changed exact-pair membership", async () => {
+  const foreign = convexTest(schema, modules);
+  const pair = await seedCouple(foreign);
+  const foreignPair = await seedCouple(foreign, "foreign");
+  await insertDiscoverableRequest(
+    foreign,
+    {
+      coupleId: foreignPair.coupleId,
+      initiatorUserId: foreignPair.initiatorUserId,
+      responderUserId: pair.responderUserId,
+    },
+    10,
+  );
+  await expect(asResponder(foreign).query(listPendingResponses, {})).rejects.toThrow(
+    "Quality Time requests unavailable",
+  );
+
+  const changed = convexTest(schema, modules);
+  const changedPair = await seedCouple(changed);
+  await insertDiscoverableRequest(changed, changedPair, 10);
+  const replacementUserId = await insertUser(changed, "replacement-auth");
+  await changed.run(async (ctx) => {
+    const memberships = await ctx.db
+      .query("coupleMembers")
+      .withIndex("by_couple", (q) => q.eq("coupleId", changedPair.coupleId))
+      .take(3);
+    const oldInitiatorMembership = memberships.find(
+      (membership) => membership.userId === changedPair.initiatorUserId,
+    )!;
+    await ctx.db.delete(oldInitiatorMembership._id);
+    await ctx.db.insert("coupleMembers", {
+      coupleId: changedPair.coupleId,
+      userId: replacementUserId,
+      role: "partner",
+      joinedAt: 3,
+    });
+  });
+  await expect(asResponder(changed).query(listPendingResponses, {})).rejects.toThrow(
+    "Quality Time requests unavailable",
+  );
+});
+
+test("pending discovery returns only allowlisted fields and writes no Quality Time, prompt, notification, or legacy row", async () => {
+  const t = convexTest(schema, modules);
+  const pair = await seedCouple(t);
+  await insertDiscoverableRequest(t, pair, 10, {
+    timingKind: "future",
+    scheduledFor: Date.now() + 30_000,
+  });
+  await insertDiscoverableRequest(t, pair, 20, { expiresAt: Date.now() - 1 });
+  const before = await snapshotDiscoveryWriteTables(t);
+
+  const result = await asResponder(t).query(listPendingResponses, {});
+  expect(result).toHaveLength(1);
+  expect(Object.keys(result[0]).sort()).toEqual([
+    "requestId",
+    "selectedCategories",
+    "status",
+    "timing",
+    "version",
+  ]);
+  expect(result[0].timing).toEqual({
+    kind: "future",
+    scheduledFor: expect.any(Number),
+  });
+  expect(JSON.stringify(result)).not.toMatch(
+    /initiator|responder|userId|coupleId|decision|outcome|option|card|author|provenance|reject|createdAt|updatedAt|expiresAt|sentAt|completedAt|canceledAt|notif|deliver|seen|opened|acknowledged/i,
+  );
+  expect(await snapshotDiscoveryWriteTables(t)).toEqual(before);
 });

@@ -7,10 +7,6 @@
   "isNewDebugger": true,
   "connected": true,
   "loadedScripts": 12,
-  "enabledDomains": [
-    "ReactNativeApplication",
-    "Runtime",
-    "Debugger"
-  ],
+  "enabledDomains": ["ReactNativeApplication", "Runtime", "Debugger"],
   "sourceMapReady": true
 }

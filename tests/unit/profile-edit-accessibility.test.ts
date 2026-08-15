@@ -8,8 +8,11 @@ import { resolve } from "node:path";
 const source = readFileSync(resolve(process.cwd(), "src/app/(sheet)/me/profile.tsx"), "utf8");
 
 void test("Edit Profile controls expose stable native accessibility semantics", () => {
-  const avatar = source.match(
-    /<Pressable\b(?:(?!<Pressable\b|<\/Pressable>).)*className="h-28 w-28(?:(?!<Pressable\b|<\/Pressable>).)*<\/Pressable>/s,
+  const avatarPreview = source.match(
+    /<View\b(?:(?!<View\b|<\/View>).)*className="h-28 w-28(?:(?!<View\b|<\/View>).)*<\/View>/s,
+  );
+  const photoActions = source.match(
+    /<Pressable\b(?:(?!<Pressable\b|<\/Pressable>).)*onPress=\{handlePickPhoto\}(?:(?!<Pressable\b|<\/Pressable>).)*<\/Pressable>/gs,
   );
   const nameInput = source.match(
     /<TextInput\b(?:(?!\/>).)*placeholder="Your name"(?:(?!\/>).)*\/>/s,
@@ -18,11 +21,19 @@ void test("Edit Profile controls expose stable native accessibility semantics", 
     /<Pressable\b(?:(?!<Pressable\b|<\/Pressable>).)*onPress=\{handleSave\}(?:(?!<Pressable\b|<\/Pressable>).)*<\/Pressable>/s,
   );
 
-  assert.ok(avatar, "expected the profile photo picker");
-  assert.match(avatar[0], /accessibilityRole="button"/);
-  assert.match(avatar[0], /accessibilityLabel="Change profile photo"/);
+  assert.ok(avatarPreview, "expected the visual profile photo preview");
+  assert.match(avatarPreview[0], /accessible=\{false\}/);
+  assert.match(avatarPreview[0], /accessibilityElementsHidden/);
+  assert.match(avatarPreview[0], /importantForAccessibility="no-hide-descendants"/);
+
+  assert.equal(photoActions?.length, 1, "expected exactly one profile photo picker action");
+  assert.match(photoActions[0], /accessibilityRole="button"/);
   assert.match(
-    avatar[0],
+    photoActions[0],
+    /accessibilityLabel=\{avatarUrl \? "Change profile photo" : "Upload profile photo"\}/,
+  );
+  assert.match(
+    photoActions[0],
     /accessibilityState=\{\{ disabled: isUploadingPhoto, busy: isUploadingPhoto \}\}/,
   );
 

@@ -129,13 +129,11 @@ export default function EditProfileSheet(): JSX.Element {
       <Text className="text-3xl font-bold text-ink">Edit profile</Text>
 
       <View className="items-center gap-3 rounded-3xl border border-soft bg-card/90 p-4">
-        <Pressable
-          accessibilityLabel="Change profile photo"
-          accessibilityRole="button"
-          accessibilityState={{ disabled: isUploadingPhoto, busy: isUploadingPhoto }}
+        <View
+          accessible={false}
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
           className="h-28 w-28 overflow-hidden rounded-full bg-accent items-center justify-center"
-          disabled={isUploadingPhoto}
-          onPress={handlePickPhoto}
         >
           {avatarUrl ? (
             <Image source={{ uri: avatarUrl }} className="h-28 w-28" />
@@ -144,7 +142,7 @@ export default function EditProfileSheet(): JSX.Element {
               {(fullName || viewer.user.email || "?").slice(0, 1).toUpperCase()}
             </Text>
           )}
-        </Pressable>
+        </View>
         <Pressable
           accessibilityLabel={avatarUrl ? "Change profile photo" : "Upload profile photo"}
           accessibilityRole="button"

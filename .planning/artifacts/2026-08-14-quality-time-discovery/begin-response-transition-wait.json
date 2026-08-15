@@ -1,0 +1,5 @@
+{
+  "success": true,
+  "elapsed": 50,
+  "note": "condition met immediately — the selector never matched any element, so it may have already been hidden before the wait, or the selector is wrong"
+}

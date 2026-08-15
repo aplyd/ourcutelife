@@ -28,9 +28,7 @@
         "x": 0.5,
         "y": 0.09610983981693363
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Choose together"
     },
     {
@@ -54,9 +52,7 @@
         "x": 0.5,
         "y": 0.15560640732265446
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Choose privately from the options available for this request."
     },
     {
@@ -80,10 +76,7 @@
         "x": 0.2027363184079602,
         "y": 0.2305491990846682
       },
-      "traits": [
-        "button",
-        "selected"
-      ],
+      "traits": ["button", "selected"],
       "label": "Choose Entertainment choices",
       "viewClassName": "RCTViewComponentView"
     },
@@ -108,10 +101,7 @@
         "x": 0.6446932133157455,
         "y": 0.2305491990846682
       },
-      "traits": [
-        "button",
-        "notEnabled"
-      ],
+      "traits": ["button", "notEnabled"],
       "label": "Choose Eat choices",
       "viewClassName": "RCTViewComponentView"
     },
@@ -136,9 +126,7 @@
         "x": 0.5,
         "y": 0.32036613272311215
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Comedy show"
     },
     {
@@ -162,9 +150,7 @@
         "x": 0.5,
         "y": 0.37528604118993136
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Entertainment together with a simple, low-pressure plan."
     },
     {
@@ -188,9 +174,7 @@
         "x": 0.5,
         "y": 0.4233409610983982
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "activity · Free · 45 min"
     },
     {
@@ -214,9 +198,7 @@
         "x": 0.5,
         "y": 0.45537757437070936
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "easy · cozy"
     },
     {
@@ -240,9 +222,7 @@
         "x": 0.2898009950248756,
         "y": 0.5148741418764302
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Pass Comedy show",
       "viewClassName": "RCTViewComponentView"
     },
@@ -267,9 +247,7 @@
         "x": 0.7126865671641791,
         "y": 0.5148741418764302
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Accept Comedy show",
       "viewClassName": "RCTViewComponentView"
     },
@@ -294,9 +272,7 @@
         "x": 0.5,
         "y": 0.6189931350114416
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Cancel Quality Time request",
       "viewClassName": "RCTViewComponentView"
     },
@@ -321,9 +297,7 @@
         "x": 0.5,
         "y": 0.6945080091533181
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Back to Plans",
       "viewClassName": "RCTViewComponentView"
     },
@@ -348,9 +322,7 @@
         "x": 0.5,
         "y": -0.017353165522501903
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Refreshing...",
       "viewClassName": "UILabel"
     }

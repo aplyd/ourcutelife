@@ -28,9 +28,7 @@
         "x": 0.5,
         "y": 0.11899313501144165
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Choose what sounds good now"
     },
     {
@@ -54,9 +52,7 @@
         "x": 0.5,
         "y": 0.18764302059496568
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Now · Pick at least one requested category."
     },
     {
@@ -80,10 +76,7 @@
         "x": 0.5,
         "y": 0.2568649885583524
       },
-      "traits": [
-        "button",
-        "selected"
-      ],
+      "traits": ["button", "selected"],
       "label": "Choose Eat for this Quality Time",
       "viewClassName": "RCTViewComponentView"
     },
@@ -108,9 +101,7 @@
         "x": 0.5,
         "y": 0.32780320366132726
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Choose Entertainment for this Quality Time",
       "viewClassName": "RCTViewComponentView"
     },
@@ -135,9 +126,7 @@
         "x": 0.5,
         "y": 0.41647597254004576
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Start choosing together",
       "viewClassName": "RCTViewComponentView"
     },
@@ -162,9 +151,7 @@
         "x": 0.5,
         "y": 0.5034324942791762
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Cancel Quality Time request",
       "viewClassName": "RCTViewComponentView"
     },
@@ -189,9 +176,7 @@
         "x": 0.5,
         "y": 0.5835240274599542
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Back to Plans",
       "viewClassName": "RCTViewComponentView"
     }

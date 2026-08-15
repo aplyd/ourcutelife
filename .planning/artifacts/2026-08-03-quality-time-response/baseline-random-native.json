@@ -28,9 +28,7 @@
         "x": 0.1148424575577921,
         "y": 0.09839816933638444
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Back to Plans",
       "viewClassName": "RCTViewComponentView"
     },
@@ -55,9 +53,7 @@
         "x": 0.5049751433567028,
         "y": 0.09839816933638444
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Matched plan items"
     },
     {
@@ -81,10 +77,7 @@
         "x": 0.0899668309225965,
         "y": 0.16189931350114417
       },
-      "traits": [
-        "button",
-        "selected"
-      ],
+      "traits": ["button", "selected"],
       "label": "Filter matched plan items by All",
       "viewClassName": "RCTViewComponentView"
     },
@@ -109,9 +102,7 @@
         "x": 0.25290214956103274,
         "y": 0.16189931350114417
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Filter matched plan items by Food",
       "viewClassName": "RCTViewComponentView"
     },
@@ -136,9 +127,7 @@
         "x": 0.4490049751243781,
         "y": 0.16189931350114417
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Filter matched plan items by Drinks",
       "viewClassName": "RCTViewComponentView"
     },
@@ -163,9 +152,7 @@
         "x": 0.7176616915422885,
         "y": 0.16189931350114417
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Filter matched plan items by Entertainment",
       "viewClassName": "RCTViewComponentView"
     },
@@ -190,9 +177,7 @@
         "x": 0.1322553928811752,
         "y": 0.21109839816933637
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Filter matched plan items by Activity",
       "viewClassName": "RCTViewComponentView"
     },
@@ -217,9 +202,7 @@
         "x": 0.3648424575577921,
         "y": 0.21109839816933637
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Filter matched plan items by Intimacy",
       "viewClassName": "RCTViewComponentView"
     },
@@ -244,9 +227,7 @@
         "x": 0.5,
         "y": 0.2803203661327231
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "ACTIVITY · DATE"
     },
     {
@@ -270,9 +251,7 @@
         "x": 0.5,
         "y": 0.31922196796338675
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Sunset picnic QA date"
     },
     {
@@ -296,9 +275,7 @@
         "x": 0.5,
         "y": 0.37414187643020597
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "A mock plan idea used for local simulator verification."
     },
     {
@@ -322,9 +299,7 @@
         "x": 0.15091210929908563,
         "y": 0.4267734553775744
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "#cozy"
     },
     {
@@ -348,9 +323,7 @@
         "x": 0.3275290247219712,
         "y": 0.4267734553775744
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "#easy"
     },
     {
@@ -374,9 +347,7 @@
         "x": 0.1301721109883277,
         "y": 0.36426373092584374
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Back to Plans",
       "viewClassName": "RCTViewComponentView"
     },
@@ -401,9 +372,7 @@
         "x": 0.5047771094774882,
         "y": 0.36426373092584374
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Surprise us"
     },
     {
@@ -427,9 +396,7 @@
         "x": 0.5,
         "y": 0.4279840310271678
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Roll the dice"
     },
     {
@@ -453,10 +420,7 @@
         "x": 0.12579308789288807,
         "y": 0.4867605147413201
       },
-      "traits": [
-        "button",
-        "selected"
-      ],
+      "traits": ["button", "selected"],
       "label": "Include Food in surprise picks",
       "viewClassName": "RCTViewComponentView"
     },
@@ -481,9 +445,7 @@
         "x": 0.3117022711328786,
         "y": 0.4867605147413201
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Include Drinks in surprise picks",
       "viewClassName": "RCTViewComponentView"
     },
@@ -508,9 +470,7 @@
         "x": 0.5696661738056271,
         "y": 0.4867605147413201
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Include Entertainment in surprise picks",
       "viewClassName": "RCTViewComponentView"
     },
@@ -535,10 +495,7 @@
         "x": 0.8339995588188975,
         "y": 0.4867605147413201
       },
-      "traits": [
-        "button",
-        "selected"
-      ],
+      "traits": ["button", "selected"],
       "label": "Include Activity in surprise picks",
       "viewClassName": "RCTViewComponentView"
     },
@@ -563,9 +520,7 @@
         "x": 0.15445574475781715,
         "y": 0.5340014268854052
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Include Intimacy in surprise picks",
       "viewClassName": "RCTViewComponentView"
     },
@@ -590,9 +545,7 @@
         "x": 0.5,
         "y": 0.6004682916462691
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "DATE"
     },
     {
@@ -616,9 +569,7 @@
         "x": 0.5,
         "y": 0.6378215710160107
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Sunset picnic QA date"
     },
     {
@@ -642,9 +593,7 @@
         "x": 0.5,
         "y": 0.6905556124791755
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "A mock plan idea used for local simulator verification."
     },
     {
@@ -668,9 +617,7 @@
         "x": 0.5,
         "y": -0.017353165522501903
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Refreshing...",
       "viewClassName": "UILabel"
     }

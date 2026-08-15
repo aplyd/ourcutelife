@@ -38,7 +38,7 @@ void test("Today avatar pairs preserve their visuals behind native accessibility
   assert.ok(togetherForHeader, "expected the Together For header");
   assert.match(
     togetherForHeader[0],
-    /<View\s+accessibilityElementsHidden\s+importantForAccessibility="no-hide-descendants"\s+collapsable=\{false\}\s+className="flex-row w-16"\s*>/,
+    /<View\s+accessible=\{false\}\s+accessibilityElementsHidden\s+importantForAccessibility="no-hide-descendants"\s+collapsable=\{false\}\s+className="flex-row w-16"\s*>/,
   );
   assert.match(togetherForHeader[0], /You and \{partnerName\} have been together for…/);
 

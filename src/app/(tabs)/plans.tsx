@@ -1,13 +1,18 @@
 import { useAppMutation, useAppQuery } from "@/lib/devMock";
 import { Redirect, router } from "expo-router";
-import type { JSX } from "react";
-import { useState } from "react";
+import { Component, type ErrorInfo, type JSX, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from "react-native";
 
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { MeHeaderButton } from "@/components/MeHeaderButton";
 import { useSession } from "@/lib/betterAuth";
+import {
+  listQualityTimePendingResponses,
+  type QualityTimeCategory,
+  type QualityTimePendingResponse,
+  type QualityTimeTiming,
+} from "@/lib/qualityTimeApi";
 
 type Category = "food" | "drinks" | "entertainment" | "activity" | "intimacy";
 type DateSort = "suggested" | "popular" | "rating" | "trending";
@@ -26,6 +31,14 @@ const dateSorts: Array<{ value: DateSort; label: string }> = [
   { value: "rating", label: "Rating" },
   { value: "trending", label: "Trending" },
 ];
+
+const qualityTimeCategoryLabels: Record<QualityTimeCategory, string> = {
+  eat: "Eat",
+  drink: "Drink",
+  explore_adventure: "Explore/Adventure",
+  entertainment: "Entertainment",
+  romance: "Romance",
+};
 
 export default function PlansTab(): JSX.Element {
   const betterAuthSession = useSession();
@@ -143,6 +156,7 @@ export default function PlansTab(): JSX.Element {
               Build a private shortlist, then share only when you’re ready to find a mutual option.
             </Text>
           </View>
+          <QualityTimeDiscoveryBoundary />
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Start Quality Time"
@@ -336,6 +350,79 @@ export default function PlansTab(): JSX.Element {
       </Pressable>
     </View>
   );
+}
+
+class QualityTimeDiscoveryBoundary extends Component<
+  Record<string, never>,
+  { unavailable: boolean }
+> {
+  state = { unavailable: false };
+
+  static getDerivedStateFromError() {
+    return { unavailable: true };
+  }
+
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    void error;
+    void info;
+  }
+
+  render() {
+    if (this.state.unavailable) {
+      return <Text className="text-sm text-muted">Quality Time requests unavailable</Text>;
+    }
+    return <QualityTimeDiscovery />;
+  }
+}
+
+function QualityTimeDiscovery() {
+  const pendingResponses = useAppQuery(listQualityTimePendingResponses, {});
+  if (pendingResponses === undefined || pendingResponses.length === 0) return null;
+  return (
+    <View className="gap-3">
+      {pendingResponses.map((entry) => (
+        <QualityTimePendingResponseCard key={entry.requestId} entry={entry} />
+      ))}
+    </View>
+  );
+}
+
+function QualityTimePendingResponseCard({ entry }: { entry: QualityTimePendingResponse }) {
+  const timingLabel = formatQualityTimeDiscoveryTiming(entry.timing);
+  const categoryLabel = entry.selectedCategories
+    .map((category) => qualityTimeCategoryLabels[category])
+    .join(", ");
+  const statusLabel = entry.status === "sent" ? "Ready to respond" : "Response started";
+  const actionLabel = entry.status === "sent" ? "Respond to Quality Time" : "Continue Quality Time";
+  const summaryLabel = `${statusLabel}. ${timingLabel}. Requested categories: ${categoryLabel}.`;
+  return (
+    <View className="gap-3 rounded-2xl border border-soft bg-app-bg p-4">
+      <View accessible accessibilityLabel={summaryLabel} className="gap-1">
+        <Text className="text-sm font-bold text-ink">{statusLabel}</Text>
+        <Text className="text-sm text-muted">{timingLabel}</Text>
+        <Text className="text-sm text-muted">{categoryLabel}</Text>
+      </View>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={actionLabel}
+        className="h-11 items-center justify-center rounded-full border border-accent"
+        onPress={() => router.push(`/plans/quality-time/${entry.requestId}/respond` as never)}
+      >
+        <Text className="font-bold text-accent">{actionLabel}</Text>
+      </Pressable>
+    </View>
+  );
+}
+
+function formatQualityTimeDiscoveryTiming(timing: QualityTimeTiming) {
+  if (timing.kind === "now") return "Now";
+  return new Date(timing.scheduledFor).toLocaleString(undefined, {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
 }
 
 function Section({

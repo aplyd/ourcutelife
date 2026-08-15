@@ -28,9 +28,7 @@
         "x": 0.5,
         "y": 0.38558352402745993
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Waiting for your partner"
     },
     {
@@ -54,9 +52,7 @@
         "x": 0.5,
         "y": 0.4816933638443936
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Your private shortlist is saved. You can leave this screen and come back later."
     },
     {
@@ -80,9 +76,7 @@
         "x": 0.5,
         "y": 0.5594965675057209
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Cancel Quality Time request",
       "viewClassName": "RCTViewComponentView"
     },
@@ -107,9 +101,7 @@
         "x": 0.5,
         "y": 0.6350114416475973
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Back to Plans",
       "viewClassName": "RCTViewComponentView"
     },
@@ -134,9 +126,7 @@
         "x": 0.5,
         "y": 0.4223874904652936
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Cancel Quality Time request?",
       "viewClassName": "UILabel"
     },
@@ -161,9 +151,7 @@
         "x": 0.5,
         "y": 0.4641495041952708
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "This ends the request without sharing choices.",
       "viewClassName": "UILabel"
     },
@@ -188,9 +176,7 @@
         "x": 0.5,
         "y": 0.5366132723112128
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Cancel request",
       "viewClassName": "_UIInterfaceActionCustomViewRepresentationView"
     },
@@ -215,9 +201,7 @@
         "x": 0.5,
         "y": 0.6006864988558352
       },
-      "traits": [
-        "button"
-      ],
+      "traits": ["button"],
       "label": "Keep request",
       "viewClassName": "_UIInterfaceActionCustomViewRepresentationView"
     },
@@ -242,9 +226,7 @@
         "x": 0.5,
         "y": -0.017353165522501903
       },
-      "traits": [
-        "staticText"
-      ],
+      "traits": ["staticText"],
       "label": "Refreshing...",
       "viewClassName": "UILabel"
     }

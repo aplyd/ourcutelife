@@ -84,10 +84,28 @@ void test("Today recent-moments navigation exposes descriptive named button sema
     "expected the moment label to be a template",
   );
   assert.equal(momentLabelExpression.head.text, "Open moment: ");
-  assert.equal(momentLabelExpression.templateSpans.length, 1);
+  assert.equal(momentLabelExpression.templateSpans.length, 3);
   assert.match(
     momentLabelExpression.templateSpans[0].expression.getText(sourceFile),
+    /^formatTone\(moment\s*\.\s*tone\)$/,
+  );
+  assert.equal(momentLabelExpression.templateSpans[0].literal.text, ", ");
+  assert.match(
+    momentLabelExpression.templateSpans[1].expression.getText(sourceFile),
+    /^formatDate\(moment\s*\.\s*happenedAt\)$/,
+  );
+  assert.equal(momentLabelExpression.templateSpans[1].literal.text, ", ");
+  assert.match(
+    momentLabelExpression.templateSpans[2].expression.getText(sourceFile),
     /^moment\s*\.\s*summary$/,
   );
-  assert.equal(momentLabelExpression.templateSpans[0].literal.text, "");
+  assert.equal(momentLabelExpression.templateSpans[2].literal.text, "");
+});
+
+void test("Today recent-moment tone names stay warm and match the visible badge", () => {
+  assert.match(
+    source,
+    /function formatTone\(tone: keyof typeof toneStyles\): string \{\s*return tone === "bad" \? "Hard" : tone === "mixed" \? "Mixed" : "Good";\s*\}/,
+  );
+  assert.match(source, /\{formatTone\(moment\.tone\)\.toUpperCase\(\)\}/);
 });

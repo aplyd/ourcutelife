@@ -45,6 +45,10 @@ function formatDate(timestamp: number): string {
   );
 }
 
+function formatTone(tone: keyof typeof toneStyles): string {
+  return tone === "bad" ? "Hard" : tone === "mixed" ? "Mixed" : "Good";
+}
+
 function formatDurationSegmentLabel(label: string, value: number): string {
   return `${value} ${value === 1 ? label.slice(0, -1) : label}`;
 }
@@ -265,7 +269,7 @@ export default function TodayTab(): JSX.Element {
               {recentMoments.map((moment) => (
                 <Pressable
                   key={moment._id}
-                  accessibilityLabel={`Open moment: ${moment.summary}`}
+                  accessibilityLabel={`Open moment: ${formatTone(moment.tone)}, ${formatDate(moment.happenedAt)}, ${moment.summary}`}
                   accessibilityRole="button"
                   className="flex-row items-center gap-3 py-2"
                   onPress={() => router.push(`/moments/${moment._id}`)}
@@ -273,7 +277,7 @@ export default function TodayTab(): JSX.Element {
                   <Text
                     className={`overflow-hidden rounded-full px-2 py-1 text-xs font-bold ${toneStyles[moment.tone]}`}
                   >
-                    {moment.tone === "bad" ? "HARD" : moment.tone.toUpperCase()}
+                    {formatTone(moment.tone).toUpperCase()}
                   </Text>
                   <Text className="w-14 text-xs text-muted">{formatDate(moment.happenedAt)}</Text>
                   <Text className="flex-1 text-base font-semibold text-ink" numberOfLines={1}>

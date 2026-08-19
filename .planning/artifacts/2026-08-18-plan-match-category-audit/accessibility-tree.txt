@@ -1,0 +1,15 @@
+Source: Argent ax-service
+Device: iPhone 17 Pro / iOS 26.5
+Simulator UDID: F736E64F-ED8F-475C-BD05-7C156B568F74
+Route: ourcutelife:///plans/match/food
+Bundle: com.ourcutelife.app
+
+ROOT AXGroup
+  AXButton "Back"
+  AXButton "History"
+  AXStaticText "Food plan items"
+  AXStaticText "No more food plan item cards"
+  AXStaticText "Add your own private suggestion or check another category."
+  AXButton "Add a private plan item"
+
+No control was activated after opening the exact deep link. In particular, Pass, Like, History, Back, Add a private plan item, and every mutation control were not activated. The non-matching Activity fixture is absent and the existing honest Food empty state is present.

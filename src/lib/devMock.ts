@@ -3,6 +3,7 @@ import { useMutation, useQuery } from "convex/react";
 import { useSyncExternalStore } from "react";
 
 import { applyMockDatePlanMutation, type MockDatePlanMutationName } from "@/lib/mockDatePlanState";
+import { filterMockPlanIdeas, filterMockPlanMatches } from "@/lib/mockPlanMatches";
 import {
   installMockQualityTimeTestBridge,
   mockQualityTimeState,
@@ -91,7 +92,7 @@ const mockPlanIdea = {
   title: "Sunset picnic QA date",
   description: "A mock plan idea used for local simulator verification.",
   kind: "activity" as const,
-  category: "date" as const,
+  category: "activity" as const,
   costLevel: 2,
   durationMinutes: 90,
   vibeTags: ["cozy", "easy"],
@@ -224,9 +225,15 @@ function mockQueryResult(query: unknown, args: unknown): unknown {
     case "moments:getMine":
       return mockMoments[0];
     case "plans:list":
-      return [mockPlanIdea];
+      return filterMockPlanIdeas(
+        [mockPlanIdea],
+        (args as { category?: string } | undefined)?.category,
+      );
     case "plans:matches":
-      return [mockMatch];
+      return filterMockPlanMatches(
+        [mockMatch],
+        (args as { category?: string } | undefined)?.category,
+      );
     case "plans:randomMatchesByCategories":
       return [mockPlanIdea];
     case "plans:randomByCategories":
